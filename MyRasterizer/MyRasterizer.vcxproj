@@ -36,6 +36,11 @@
     <ClCompile Include="Src\Vertex.cpp" />
     <ClCompile Include="Src\Texture.cpp" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\LibMath\LibMath.vcxproj">
+      <Project>{1cd6ed26-7578-4d41-bbbd-857eede3b4f0}</Project>
+    </ProjectReference>
+  </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>
     <Keyword>Win32Proj</Keyword>
@@ -106,7 +111,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir)Dependencies\raylib-4.2.0_msvc16\include;$(SolutionDir)Dependencies\stb_image</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)include;$(SolutionDir)LibMath\Header;$(SolutionDir)Dependencies\raylib-4.2.0_msvc16\include;$(SolutionDir)Dependencies\stb_image</AdditionalIncludeDirectories>
       <TreatWarningAsError>true</TreatWarningAsError>
     </ClCompile>
     <Link>
@@ -124,7 +129,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir)Dependencies\raylib-4.2.0_msvc16\include;$(SolutionDir)Dependencies\stb_image</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)include;$(SolutionDir)LibMath\Header;$(SolutionDir)Dependencies\raylib-4.2.0_msvc16\include;$(SolutionDir)Dependencies\stb_image</AdditionalIncludeDirectories>
       <TreatWarningAsError>true</TreatWarningAsError>
     </ClCompile>
     <Link>
@@ -142,7 +147,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir)Dependencies\raylib-4.2.0_msvc16\include;$(SolutionDir)Dependencies\stb_image;$(ProjectDir)include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)include;$(SolutionDir)LibMath\Header;$(SolutionDir)Dependencies\raylib-4.2.0_msvc16\include;$(SolutionDir)Dependencies\stb_image</AdditionalIncludeDirectories>
       <TreatWarningAsError>true</TreatWarningAsError>
     </ClCompile>
     <Link>
@@ -160,7 +165,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir)Dependencies\raylib-4.2.0_msvc16\include;$(SolutionDir)Dependencies\stb_image;$(ProjectDir)include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)include;$(SolutionDir)LibMath\Header;$(SolutionDir)Dependencies\raylib-4.2.0_msvc16\include;$(SolutionDir)Dependencies\stb_image</AdditionalIncludeDirectories>
       <TreatWarningAsError>true</TreatWarningAsError>
     </ClCompile>
     <Link>
