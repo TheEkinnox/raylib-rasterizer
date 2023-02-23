@@ -10,6 +10,7 @@ namespace My
 	std::vector<Vertex> vertices : le vertex buffer du mesh.
 	Les vertices du mesh ne doivent jamais changer pendant la simulation
 	Pour déplacer un objet, on modifie sa matrice de transformation, pas les vertices du mesh
+
 	std::vector<int> indices : l’index buffer du mesh.
 	C’est une suite de triplets d’index du vertex buffer qui déterminent les triangles du mesh.
 	ex : 0, 1, 2 désigne le triangle(vertices[0], vertices[1], vertices[2])
