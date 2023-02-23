@@ -31,7 +31,7 @@
     <ClCompile Include="Src\Mesh.cpp" />
     <ClCompile Include="Src\Color.cpp" />
     <ClCompile Include="Src\Entity.cpp" />
-    <ClCompile Include="Src\MyRasterizer.cpp" />
+    <ClCompile Include="Src\main.cpp" />
     <ClCompile Include="Src\Scene.cpp" />
     <ClCompile Include="Src\Vertex.cpp" />
     <ClCompile Include="Src\Texture.cpp" />
