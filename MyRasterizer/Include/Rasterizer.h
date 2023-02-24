@@ -3,6 +3,14 @@
 
 namespace My
 {
+	/*
+	Cette fonction dessine la scène en 3D dans la texture target.
+	Elle doit d’abord remplir la texture target de noir.
+	Elle doit ensuite rendre chaque entité dans la texture en dessinant
+	avec des lignes chaque triangle transformé un par un :
+	chaque vertex est transformé par la matrice de transformation de l'entité.
+	*/
+
 	struct Vertex;
 	class Texture;
 	class Scene;
