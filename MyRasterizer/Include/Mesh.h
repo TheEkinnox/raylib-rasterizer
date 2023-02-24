@@ -72,6 +72,18 @@ namespace My
 		Mesh&	operator=(Mesh&& p_other) = default;
 
 		/**
+		 * \brief Gives read access to the vertex buffer of the mesh
+		 * \return The vertex buffer of the mesh
+		 */
+		std::vector<Vertex>	getVertices() const;
+
+		/**ss
+		 * \brief Gives read access to the index buffer of the mesh
+		 * \return The index buffer of the mesh
+		 */
+		std::vector<size_t>	getIndices() const;
+
+		/**
 		 * \brief Creates a cube of side 1
 		 * \return A pointer to the created cube mesh
 		 */

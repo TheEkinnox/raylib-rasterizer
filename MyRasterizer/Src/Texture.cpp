@@ -16,7 +16,7 @@ My::Texture::Texture(const uint32_t p_width, const uint32_t p_height)
 	m_pixels = numPixels == 0 ? nullptr : new Color[numPixels];
 
 	for (size_t i = 0; i < numPixels; i++)
-		m_pixels[i] = Color::BLACK;
+		m_pixels[i] = Color::black;
 }
 
 uint32_t My::Texture::getWidth() const
@@ -36,7 +36,7 @@ My::Color My::Texture::getPixelColor(const uint32_t p_x, const uint32_t p_y) con
 
 void My::Texture::setPixelColor(const uint32_t p_x, const uint32_t p_y, const Color& p_c)
 {
-	if (p_x < 0 || p_x > m_width || p_y < 0 || p_y > m_height)
+	if (p_x < 0 || p_x >= m_width || p_y < 0 || p_y >= m_height)
 		throw std::out_of_range("Pixel at coordinates " + std::to_string(p_x) +
 			", " + std::to_string(p_y) + " is not in the texture");
 

@@ -10,11 +10,11 @@ namespace My
 		uint8_t m_b;
 		uint8_t m_a;
 
-		static const Color BLACK;
-		static const Color WHITE;
-		static const Color RED;
-		static const Color GREEN;
-		static const Color BLUE;
+		static const Color black;
+		static const Color white;
+		static const Color red;
+		static const Color green;
+		static const Color blue;
 	};
 }
 

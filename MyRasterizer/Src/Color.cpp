@@ -2,9 +2,9 @@
 
 namespace My
 {
-	const Color Color::BLACK	= { 0, 0, 0, 255 };
-	const Color Color::WHITE	= { 255, 255, 255, 255 };
-	const Color Color::RED		= { 255, 0, 0, 255 };
-	const Color Color::GREEN	= { 0, 255, 0, 255 };
-	const Color Color::BLUE		= { 0, 0, 255, 255 };
+	const Color Color::black	= { 0, 0, 0, 255 };
+	const Color Color::white	= { 255, 255, 255, 255 };
+	const Color Color::red		= { 255, 0, 0, 255 };
+	const Color Color::green	= { 0, 255, 0, 255 };
+	const Color Color::blue		= { 0, 0, 255, 255 };
 }

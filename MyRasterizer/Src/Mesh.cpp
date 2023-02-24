@@ -17,6 +17,16 @@ My::Mesh::Mesh(const std::vector<Vertex>& p_vertices, const std::vector<size_t>&
 	this->m_indices = p_indices;
 }
 
+std::vector<My::Vertex> My::Mesh::getVertices() const
+{
+	return m_vertices;
+}
+
+std::vector<size_t> My::Mesh::getIndices() const
+{
+	return m_indices;
+}
+
 My::Mesh* My::Mesh::createCube()
 {
 	const std::vector<Vertex> vertices
