@@ -4,18 +4,18 @@
 #include <iostream>
 #include <string>
 
-#include "Angle/Radian.h"
-
 namespace LibMath
 {
+	class Radian;
+
 	class Vector3
 	{
 	public:
-						Vector3();
+						Vector3() = default;
 		explicit		Vector3(float);									// set all the component to the same value
 						Vector3(float, float, float);					// set all component individually
-						Vector3(Vector3 const& other);
-						Vector3(Vector3&& other);
+						Vector3(Vector3 const& other) = default;
+						Vector3(Vector3&& other) = default;
 						~Vector3() = default;
 
 		static Vector3	zero();											// return a vector with all its component set to 0
@@ -27,8 +27,8 @@ namespace LibMath
 		static Vector3	front();										// return a unit vector pointing forward
 		static Vector3	back();											// return a unit vector pointing backward
 
-		Vector3&		operator=(Vector3 const& other);
-		Vector3&		operator=(Vector3&& other);
+		Vector3&		operator=(Vector3 const& other) = default;
+		Vector3&		operator=(Vector3&& other) = default;
 
 		float&			operator[](int);								// return this vector component value
 		float			operator[](int) const;							// return this vector component value
@@ -65,13 +65,15 @@ namespace LibMath
 		float			magnitudeSquared() const;						// return square value of the vector magnitude
 
 		void			normalize();									// scale this vector to have a magnitude of 1
+		Vector3			normalized() const;								// returns this vector scaled to have a magnitude of 1
 
 		void			projectOnto(Vector3 const&);					// project this vector onto an other
 
 		void			reflectOnto(Vector3 const&);					// reflect this vector by an other
 
-		void			rotate(Radian, Radian, Radian);					// rotate this vector using euler angle apply in the z, x, y order
-		void			rotate(Radian, Vector3 const&);					// rotate this vector around an arbitrary axis
+		void			rotate(const Radian&, const Radian&,
+							const Radian&);								// rotate this vector using euler angle apply in the z, x, y order
+		void			rotate(const Radian&, Vector3 const&);			// rotate this vector around an arbitrary axis
 		//void			rotate(Quaternion const&); todo quaternion		// rotate this vector using a quaternion rotor
 
 		void			scale(Vector3 const&);							// scale this vector by a given factor
@@ -81,9 +83,9 @@ namespace LibMath
 
 		void			translate(Vector3 const&);						// offset this vector by a given distance
 
-		float m_x;
-		float m_y;
-		float m_z;
+		float m_x = 0;
+		float m_y = 0;
+		float m_z = 0;
 	};
 
 	bool			operator==(Vector3 const&, Vector3 const&);			// Vector3{ 1 } == Vector3::one()				// true					// return whether 2 vectors have the same components

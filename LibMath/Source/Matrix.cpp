@@ -2,6 +2,11 @@
 
 #include <stdexcept>
 
+#include "Arithmetic.h"
+#include "Trigonometry.h"
+#include "Angle/Radian.h"
+#include "Vector/Vector3.h"
+
 using namespace LibMath::Exceptions;
 
 namespace LibMath
@@ -14,12 +19,36 @@ namespace LibMath
 	{
 	}
 
+	Matrix2x2::Matrix2x2(const Matrix& other) : Matrix(other)
+	{
+		if (other.getRowCount() != 2 || other.getColumnCount() != 2)
+			throw IncompatibleMatrix();
+	}
+
+	Matrix2x2::Matrix2x2(Matrix&& other) : Matrix(other)
+	{
+		if (other.getRowCount() != 2 || other.getColumnCount() != 2)
+			throw IncompatibleMatrix();
+	}
+
 	Matrix2x3::Matrix2x3() : Matrix(2, 3)
 	{
 	}
 
 	Matrix2x3::Matrix2x3(const float scalar) : Matrix(2, 3, scalar)
 	{
+	}
+
+	Matrix2x3::Matrix2x3(const Matrix& other) : Matrix(other)
+	{
+		if (other.getRowCount() != 2 || other.getColumnCount() != 3)
+			throw IncompatibleMatrix();
+	}
+
+	Matrix2x3::Matrix2x3(Matrix&& other) : Matrix(other)
+	{
+		if (other.getRowCount() != 2 || other.getColumnCount() != 3)
+			throw IncompatibleMatrix();
 	}
 
 	Matrix2x4::Matrix2x4() : Matrix(2, 4)
@@ -30,12 +59,36 @@ namespace LibMath
 	{
 	}
 
+	Matrix2x4::Matrix2x4(const Matrix& other) : Matrix(other)
+	{
+		if (other.getRowCount() != 2 || other.getColumnCount() != 4)
+			throw IncompatibleMatrix();
+	}
+
+	Matrix2x4::Matrix2x4(Matrix&& other) : Matrix(other)
+	{
+		if (other.getRowCount() != 2 || other.getColumnCount() != 4)
+			throw IncompatibleMatrix();
+	}
+
 	Matrix3x2::Matrix3x2() : Matrix(3, 2)
 	{
 	}
 
 	Matrix3x2::Matrix3x2(const float scalar) : Matrix(3, 2, scalar)
 	{
+	}
+
+	Matrix3x2::Matrix3x2(const Matrix& other) : Matrix(other)
+	{
+		if (other.getRowCount() != 3 || other.getColumnCount() != 2)
+			throw IncompatibleMatrix();
+	}
+
+	Matrix3x2::Matrix3x2(Matrix&& other) : Matrix(other)
+	{
+		if (other.getRowCount() != 3 || other.getColumnCount() != 2)
+			throw IncompatibleMatrix();
 	}
 
 	Matrix3x3::Matrix3x3() : Matrix(3, 3)
@@ -46,12 +99,36 @@ namespace LibMath
 	{
 	}
 
+	Matrix3x3::Matrix3x3(const Matrix& other) : Matrix(other)
+	{
+		if (other.getRowCount() != 3 || other.getColumnCount() != 3)
+			throw IncompatibleMatrix();
+	}
+
+	Matrix3x3::Matrix3x3(Matrix&& other) : Matrix(other)
+	{
+		if (other.getRowCount() != 3 || other.getColumnCount() != 3)
+			throw IncompatibleMatrix();
+	}
+
 	Matrix3x4::Matrix3x4() : Matrix(3, 4)
 	{
 	}
 
 	Matrix3x4::Matrix3x4(const float scalar) : Matrix(3, 4, scalar)
 	{
+	}
+
+	Matrix3x4::Matrix3x4(const Matrix& other) : Matrix(other)
+	{
+		if (other.getRowCount() != 3 || other.getColumnCount() != 4)
+			throw IncompatibleMatrix();
+	}
+
+	Matrix3x4::Matrix3x4(Matrix&& other) : Matrix(other)
+	{
+		if (other.getRowCount() != 3 || other.getColumnCount() != 4)
+			throw IncompatibleMatrix();
 	}
 
 	Matrix4x2::Matrix4x2() : Matrix(4, 2)
@@ -62,12 +139,36 @@ namespace LibMath
 	{
 	}
 
+	Matrix4x2::Matrix4x2(const Matrix& other) : Matrix(other)
+	{
+		if (other.getRowCount() != 4 || other.getColumnCount() != 2)
+			throw IncompatibleMatrix();
+	}
+
+	Matrix4x2::Matrix4x2(Matrix&& other) : Matrix(other)
+	{
+		if (other.getRowCount() != 4 || other.getColumnCount() != 2)
+			throw IncompatibleMatrix();
+	}
+
 	Matrix4x3::Matrix4x3() : Matrix(4, 3)
 	{
 	}
 
 	Matrix4x3::Matrix4x3(const float scalar) : Matrix(4, 3, scalar)
 	{
+	}
+
+	Matrix4x3::Matrix4x3(const Matrix& other) : Matrix(other)
+	{
+		if (other.getRowCount() != 4 || other.getColumnCount() != 3)
+			throw IncompatibleMatrix();
+	}
+
+	Matrix4x3::Matrix4x3(Matrix&& other) : Matrix(other)
+	{
+		if (other.getRowCount() != 4 || other.getColumnCount() != 3)
+			throw IncompatibleMatrix();
 	}
 
 	Matrix4x4::Matrix4x4() : Matrix(4, 4)
@@ -78,6 +179,113 @@ namespace LibMath
 	{
 	}
 
+	Matrix4x4::Matrix4x4(const Matrix& other) : Matrix(other)
+	{
+		if (other.getRowCount() != 4 || other.getColumnCount() != 4)
+			throw IncompatibleMatrix();
+	}
+
+	Matrix4x4::Matrix4x4(Matrix&& other) : Matrix(other)
+	{
+		if (other.getRowCount() != 4 || other.getColumnCount() != 4)
+			throw IncompatibleMatrix();
+	}
+
+	Matrix4x4 Matrix4x4::translation(const float x, const float y, const float z)
+	{
+		Matrix4x4 translationMatrix(1.f);
+
+		translationMatrix[translationMatrix.getIndex(0, 3)] = x;
+		translationMatrix[translationMatrix.getIndex(1, 3)] = y;
+		translationMatrix[translationMatrix.getIndex(2, 3)] = z;
+
+		return translationMatrix;
+	}
+
+	Matrix4x4 Matrix4x4::scaling(const float x, const float y, const float z)
+	{
+		Matrix4x4 scalingMatrix;
+
+		scalingMatrix[scalingMatrix.getIndex(0, 0)] = x;
+		scalingMatrix[scalingMatrix.getIndex(1, 1)] = y;
+		scalingMatrix[scalingMatrix.getIndex(2, 2)] = z;
+		scalingMatrix[scalingMatrix.getIndex(3, 3)] = 1.f;
+
+		return scalingMatrix;
+	}
+
+	Matrix4x4 Matrix4x4::rotation(const Radian& angle, const Vector3& axis)
+	{
+		const Vector3 dir = axis.normalized();
+		const float cos = LibMath::cos(angle);
+		const float sin = LibMath::sin(angle);
+
+		Matrix4x4 mat;
+
+		mat[mat.getIndex(0, 0)] = cos + dir.m_x * dir.m_x * (1.f - cos);
+		mat[mat.getIndex(0, 1)] = dir.m_x * dir.m_y * (1 - cos) - dir.m_z * sin;
+		mat[mat.getIndex(0, 2)] = dir.m_x * dir.m_z * (1 - cos) + dir.m_y * sin;
+		mat[mat.getIndex(0, 3)] = 0.f;
+
+		mat[mat.getIndex(1, 0)] = dir.m_y * dir.m_x * (1 - cos) + dir.m_z * sin;
+		mat[mat.getIndex(1, 1)] = cos + dir.m_y * dir.m_y * (1.f - cos);
+		mat[mat.getIndex(1, 2)] = dir.m_y * dir.m_z * (1 - cos) - dir.m_x * sin;
+		mat[mat.getIndex(1, 3)] = 0.f;
+
+		mat[mat.getIndex(2, 0)] = dir.m_z * dir.m_x * (1 - cos) - dir.m_y * sin;
+		mat[mat.getIndex(2, 1)] = dir.m_z * dir.m_y * (1 - cos) + dir.m_x * sin;
+		mat[mat.getIndex(2, 2)] = cos + dir.m_z * dir.m_z * (1.f - cos);
+		mat[mat.getIndex(2, 3)] = 0.f;
+
+		mat[mat.getIndex(3, 0)] = 0.f;
+		mat[mat.getIndex(3, 1)] = 0.f;
+		mat[mat.getIndex(3, 2)] = 0.f;
+		mat[mat.getIndex(3, 3)] = 1.f;
+
+		return mat;
+	}
+
+	Matrix4x4 Matrix4x4::rotationEuler(const Radian& xAngle, const Radian& yAngle, const Radian& zAngle)
+	{
+		return rotation(zAngle, xAngle, yAngle);
+	}
+
+	Matrix4x4 Matrix4x4::rotation(const Radian& yaw, const Radian& pitch, const Radian& roll)
+	{
+		const float cosYaw = cos(yaw);
+		const float sinYaw = sin(yaw);
+
+		const float cosPitch = cos(pitch);
+		const float sinPitch = sin(pitch);
+
+		const float cosRoll = cos(roll);
+		const float sinRoll = sin(roll);
+
+		Matrix4x4 rotationMat;
+
+		rotationMat[rotationMat.getIndex(0, 0)] = cosYaw * cosRoll + sinYaw * sinPitch * sinRoll;
+		rotationMat[rotationMat.getIndex(0, 1)] = -cosYaw * sinRoll + sinYaw * sinPitch * cosRoll;
+		rotationMat[rotationMat.getIndex(0, 2)] = sinYaw * cosPitch;
+		rotationMat[rotationMat.getIndex(0, 3)] = 0.f;
+
+		rotationMat[rotationMat.getIndex(1, 0)] = sinRoll * cosPitch;
+		rotationMat[rotationMat.getIndex(1, 1)] = cosRoll * cosPitch;
+		rotationMat[rotationMat.getIndex(1, 2)] = -sinPitch;
+		rotationMat[rotationMat.getIndex(1, 3)] = 0.f;
+
+		rotationMat[rotationMat.getIndex(2, 0)] = -sinYaw * cosRoll + cosYaw * sinPitch * sinRoll;
+		rotationMat[rotationMat.getIndex(2, 1)] = sinRoll * sinYaw + cosYaw * sinPitch * cosRoll;
+		rotationMat[rotationMat.getIndex(2, 2)] = cosYaw * cosPitch;
+		rotationMat[rotationMat.getIndex(2, 3)] = 0.f;
+
+		rotationMat[rotationMat.getIndex(3, 0)] = 0.f;
+		rotationMat[rotationMat.getIndex(3, 1)] = 0.f;
+		rotationMat[rotationMat.getIndex(3, 2)] = 0.f;
+		rotationMat[rotationMat.getIndex(3, 3)] = 1.f;
+
+		return rotationMat;
+	}
+
 	Matrix::Matrix(const length_t rows, const length_t columns)
 	{
 		if (rows == 0 || columns == 0)
@@ -86,12 +294,12 @@ namespace LibMath
 		m_rows = rows;
 		m_columns = columns;
 
-		const length_t size = m_rows * m_columns;
+		const size_t size = static_cast<size_t>(m_rows) * m_columns;
 
 		m_values = new float[size]();
 
 		// Builds a matrix filled with zeros
-		for (length_t i = 0; i < size; i++)
+		for (size_t i = 0; i < size; i++)
 			m_values[i] = 0;
 	}
 
@@ -103,22 +311,21 @@ namespace LibMath
 		m_rows = rows;
 		m_columns = columns;
 
-		const length_t size = m_rows * m_columns;
+		const size_t size = static_cast<size_t>(m_rows) * m_columns;
 
 		m_values = new float[size]();
 
 		// Builds a diagonal matrix with the given scalar
-		for (length_t i = 0; i < size; i++)
-		{
-			const length_t row = i / m_columns;
-			const length_t col = i % m_columns;
-
-			m_values[i] = row == col ? scalar : 0;
-		}
+		for (length_t row = 0; row < m_rows; row++)
+			for (length_t col = 0; col < m_columns; col++)
+				m_values[getIndex(row, col)] = row == col ? scalar : 0;
 	}
 
 	Matrix::length_t Matrix::getIndex(const length_t row, const length_t column) const
 	{
+		if (row < 0 || row >= m_rows || column < 0 || column >= m_columns)
+			throw std::out_of_range("Index out of range");
+
 		return row * m_columns + column;
 	}
 
@@ -127,12 +334,13 @@ namespace LibMath
 		delete[] m_values;
 	}
 
-	Matrix::Matrix(Matrix const& other)
+	Matrix::Matrix(const Matrix& other)
 	{
-		const length_t size = other.m_columns * other.m_rows;
+		const size_t size = static_cast<size_t>(other.m_rows) * other.m_columns;
+
 		m_values = new float[size]();
 
-		for (length_t i = 0; i < size; i++)
+		for (size_t i = 0; i < size; i++)
 			m_values[i] = other[i];
 
 		m_columns = other.m_columns;
@@ -149,7 +357,7 @@ namespace LibMath
 		other.m_values = nullptr;
 	}
 
-	Matrix& Matrix::operator=(Matrix const& other)
+	Matrix& Matrix::operator=(const Matrix& other)
 	{
 		if (this == &other)
 			return *this;
@@ -157,6 +365,7 @@ namespace LibMath
 		delete[] m_values;
 
 		const length_t size = other.m_columns * other.m_rows;
+
 		m_values = new float[size]();
 
 		for (length_t i = 0; i < size; i++)
@@ -185,47 +394,67 @@ namespace LibMath
 		return *this;
 	}
 
-	float Matrix::operator[](const length_t index) const
+	float Matrix::operator[](const size_t index) const
 	{
-		if (index < 0 || index >= m_rows * m_columns)
+		const size_t size = static_cast<size_t>(m_rows) * m_columns;
+
+		if (index < 0 || index >= size)
 			throw std::out_of_range("Index out of range");
 
 		return m_values[index];
 	}
 
-	float& Matrix::operator[](const length_t index)
+	float& Matrix::operator[](const size_t index)
 	{
-		if (index < 0 || index >= m_rows * m_columns)
+		const size_t size = static_cast<size_t>(m_rows) * m_columns;
+
+		if (index < 0 || index >= size)
 			throw std::out_of_range("Index out of range");
 
 		return m_values[index];
 	}
 
-	Matrix& Matrix::operator+=(Matrix const& other)
+	Matrix& Matrix::operator+=(const Matrix& other)
 	{
 		if (other.m_columns != m_columns || other.m_rows != m_rows)
 			throw IncompatibleMatrix();
 
-		for (length_t i = 0; i < other.m_columns * other.m_rows; i++)
+		const size_t size = static_cast<size_t>(m_rows) * m_columns;
+
+		for (size_t i = 0; i < size; i++)
 			m_values[i] += other[i];
 
 		return *this;
 	}
 
-	Matrix& Matrix::operator-=(Matrix const& other)
+	Matrix& Matrix::operator-=(const Matrix& other)
 	{
 		if (other.m_columns != m_columns || other.m_rows != m_rows)
 			throw IncompatibleMatrix();
 
-		for (length_t i = 0; i < other.m_columns * other.m_rows; i++)
+		const size_t size = static_cast<size_t>(m_rows) * m_columns;
+
+		for (size_t i = 0; i < size; i++)
 			m_values[i] -= other[i];
 
 		return *this;
 	}
 
+	Matrix& Matrix::operator*=(const Matrix& other)
+	{
+		return (*this = *this * other);
+	}
+
+	Matrix& Matrix::operator/=(const Matrix& other)
+	{
+		return (*this = *this / other);
+	}
+
 	Matrix& Matrix::operator+=(const float scalar)
 	{
-		for (length_t i = 0; i < m_columns * m_rows; i++)
+		const size_t size = static_cast<size_t>(m_rows) * m_columns;
+
+		for (size_t i = 0; i < size; i++)
 			m_values[i] += scalar;
 
 		return *this;
@@ -233,7 +462,9 @@ namespace LibMath
 
 	Matrix& Matrix::operator-=(const float scalar)
 	{
-		for (length_t i = 0; i < m_columns * m_rows; i++)
+		const size_t size = static_cast<size_t>(m_rows) * m_columns;
+
+		for (size_t i = 0; i < size; i++)
 			m_values[i] -= scalar;
 
 		return *this;
@@ -241,7 +472,9 @@ namespace LibMath
 
 	Matrix& Matrix::operator*=(const float scalar)
 	{
-		for (length_t i = 0; i < m_columns * m_rows; i++)
+		const size_t size = static_cast<size_t>(m_rows) * m_columns;
+
+		for (size_t i = 0; i < size; i++)
 			m_values[i] *= scalar;
 
 		return *this;
@@ -249,46 +482,48 @@ namespace LibMath
 
 	Matrix& Matrix::operator/=(const float scalar)
 	{
-		for (length_t i = 0; i < m_columns * m_rows; i++)
+		const size_t size = static_cast<size_t>(m_rows) * m_columns;
+
+		for (size_t i = 0; i < size; i++)
 			m_values[i] /= scalar;
 
 		return *this;
 	}
 
-	Matrix Matrix::operator+(Matrix const& other) const
+	Matrix Matrix::operator+(const Matrix& other) const
 	{
 		Matrix mat = *this;
 		return mat += other;
 	}
 
-	Matrix Matrix::operator-(Matrix const& other) const
+	Matrix Matrix::operator-(const Matrix& other) const
 	{
 		Matrix mat = *this;
 		return mat -= other;
 	}
 
-	Matrix Matrix::operator*(Matrix const& other) const
+	Matrix Matrix::operator*(const Matrix& other) const
 	{
 		if (other.m_rows != m_columns)
 			throw IncompatibleMatrix();
 
 		Matrix result(m_rows, other.m_columns);
 
-		for (length_t i = 0; i < other.m_columns; i++)
+		for (length_t otherCol = 0; otherCol < other.m_columns; otherCol++)
 		{
-			for (length_t j = 0; j < m_rows; j++)
+			for (length_t row = 0; row < m_rows; row++)
 			{
 				float scalar = 0;
 
-				for (length_t k = 0; k < m_columns; k++)
+				for (length_t col = 0; col < m_columns; col++)
 				{
-					const length_t curIndex = getIndex(j, k);
-					const length_t otherIndex = other.getIndex(k, i);
+					const length_t curIndex = getIndex(row, col);
+					const length_t otherIndex = other.getIndex(col, otherCol);
 
 					scalar += m_values[curIndex] * other[otherIndex];
 				}
 
-				const length_t resultIndex = j * result.m_columns * i;
+				const length_t resultIndex = result.getIndex(row, otherCol);
 				result[resultIndex] = scalar;
 			}
 		}
@@ -296,7 +531,7 @@ namespace LibMath
 		return result;
 	}
 
-	Matrix Matrix::operator/(Matrix const& other) const
+	Matrix Matrix::operator/(const Matrix& other) const
 	{
 		return *this * other.inverse();
 	}
@@ -325,6 +560,38 @@ namespace LibMath
 		return mat /= scalar;
 	}
 
+	Matrix Matrix::operator-() const
+	{
+		return *this * -1;
+	}
+
+	bool Matrix::operator==(const Matrix& other) const
+	{
+		if (other.m_rows != m_rows || other.m_columns != m_columns)
+			return false;
+
+		const size_t size = static_cast<size_t>(m_rows) * m_columns;
+
+		for (size_t i = 0; i < size; i++)
+			if (!floatEquals(m_values[i], other[i]))
+				return false;
+
+		return true;
+	}
+
+	bool Matrix::operator!=(const Matrix& other) const
+	{
+		return !(*this == other);
+	}
+
+	bool Matrix::isIdentity() const
+	{
+		if (m_rows != m_columns)
+			return false;
+
+		return *this == Matrix(m_rows, m_columns, 1.f);
+	}
+
 	Matrix::length_t Matrix::getRowCount() const
 	{
 		return m_rows;
@@ -340,6 +607,9 @@ namespace LibMath
 		if (m_rows != m_columns)
 			throw NonSquareMatrix();
 
+		if (m_rows == 1)
+			return m_values[0];
+
 		// The multiplier is (-1)^(i+j) so 1 when i + j is pair and -1 otherwise
 		const float multiplier = (row + column) % 2 == 0 ? 1.f : -1.f;
 
@@ -349,19 +619,21 @@ namespace LibMath
 	Matrix Matrix::minor(const length_t row, const length_t column) const
 	{
 		Matrix minor(m_rows - 1, m_columns - 1);
-		length_t minorLine = 0, minorCol = 0;
+		length_t minorLine = 0;
 
 		for (length_t i = 0; i < m_rows; i++)
 		{
 			if (i == row)
 				continue;
 
+			length_t minorCol = 0;
+
 			for (length_t j = 0; j < m_columns; j++)
 			{
 				if (j == column)
 					continue;
 
-				minor[getIndex(minorLine, minorCol++)];
+				minor[minor.getIndex(minorLine, minorCol++)] = m_values[getIndex(i, j)];
 			}
 
 			minorLine++;
@@ -415,7 +687,7 @@ namespace LibMath
 		return determinant;
 	}
 
-	Matrix Matrix::transpose() const
+	Matrix Matrix::transposed() const
 	{
 		if (m_rows != m_columns)
 			throw NonSquareMatrix();
@@ -445,7 +717,7 @@ namespace LibMath
 
 	Matrix Matrix::adjugate() const
 	{
-		return coMatrix().transpose();
+		return coMatrix().transposed();
 	}
 
 	Matrix Matrix::inverse() const

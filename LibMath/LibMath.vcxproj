@@ -153,14 +153,12 @@
     <ClInclude Include="Header\Angle\Degree.h" />
     <ClInclude Include="Header\Angle\Radian.h" />
     <ClInclude Include="Header\Arithmetic.h" />
-    <ClInclude Include="Header\Intersection.h" />
     <ClInclude Include="Header\Matrix.h" />
     <ClInclude Include="Header\Matrix4Vector4Operation.h" />
     <ClInclude Include="Header\Matrix\Matrix2.h" />
     <ClInclude Include="Header\Matrix\Matrix3.h" />
     <ClInclude Include="Header\Matrix\Matrix4.h" />
     <ClInclude Include="Header\Matrix\MatrixInternal.h" />
-    <ClInclude Include="Header\Quaternion.h" />
     <ClInclude Include="Header\Trigonometry.h" />
     <ClInclude Include="Header\Vector.h" />
     <ClInclude Include="Header\Vector\Vector2.h" />
@@ -170,10 +168,7 @@
   <ItemGroup>
     <ClCompile Include="Source\Angle.cpp" />
     <ClCompile Include="Source\Arithmetic.cpp" />
-    <ClCompile Include="Source\Interpolation.cpp" />
-    <ClCompile Include="Source\Intersection.cpp" />
     <ClCompile Include="Source\Matrix.cpp" />
-    <ClCompile Include="Source\Quaternion.cpp" />
     <ClCompile Include="Source\Trigonometry.cpp" />
     <ClCompile Include="Source\Vector.cpp" />
   </ItemGroup>

@@ -1,7 +1,11 @@
 #include "Arithmetic.h"
 #include "Trigonometry.h"
+#include "Matrix/Matrix4.h"
+#include "Angle/Radian.h"
 
-#include"vector.h"
+#include "Vector.h"
+
+#include <sstream>
 
 namespace LibMath
 {
@@ -45,29 +49,7 @@ namespace LibMath
 
 	Vector2::operator Vector3() const
 	{
-		return Vector3(m_x, m_y, 0);
-	}
-
-	Vector2& Vector2::operator=(Vector2 const& other)
-	{
-		if (this == &other)
-			return *this;
-
-		this->m_x = other.m_x;
-		this->m_y = other.m_y;
-
-		return *this;
-	}
-
-	Vector2& Vector2::operator=(Vector2&& other) noexcept
-	{
-		if (this == &other)
-			return *this;
-
-		this->m_x = other.m_x;
-		this->m_y = other.m_y;
-
-		return *this;
+		return { m_x, m_y, 0 };
 	}
 
 	float& Vector2::operator[](const int index)
@@ -225,6 +207,13 @@ namespace LibMath
 		*this /= this->magnitude();
 	}
 
+	Vector2 Vector2::normalized() const
+	{
+		Vector2 vec = *this;
+		vec.normalize();
+		return vec;
+	}
+
 	void Vector2::projectOnto(Vector2 const& normal)
 	{
 		*this = this->dot(normal) / normal.magnitudeSquared() * normal;
@@ -249,14 +238,20 @@ namespace LibMath
 
 	std::string Vector2::string() const
 	{
-		return "{" + std::to_string(this->m_x)
-			+ "," + std::to_string(this->m_y) + "}";
+		std::ostringstream oss;
+
+		oss << "{" << this->m_x << "," << this->m_y << "}";
+
+		return oss.str();
 	}
 
 	std::string Vector2::stringLong() const
 	{
-		return "{ x:" + std::to_string(this->m_x)
-			+ ", y:" + std::to_string(this->m_y) + " }";
+		std::ostringstream oss;
+
+		oss << "Vector2{ x:" << this->m_x << ", y:" << this->m_y << " }";
+
+		return oss.str();
 	}
 
 	void Vector2::translate(Vector2 const& vect)
@@ -367,19 +362,11 @@ namespace LibMath
 		return stream;
 	}
 
-	Vector3::Vector3() : Vector3(0)
+	Vector3::Vector3(const float value) : Vector3(value, value, value)
 	{
 	}
 
-	Vector3::Vector3(float value) : Vector3(value, value, value)
-	{
-	}
-
-	Vector3::Vector3(float x, float y, float z) : m_x(x), m_y(y), m_z(z)
-	{
-	}
-
-	Vector3::Vector3(Vector3 const& other) : Vector3(other.m_x, other.m_y, other.m_z)
+	Vector3::Vector3(const float x, const float y, const float z) : m_x(x), m_y(y), m_z(z)
 	{
 	}
 
@@ -421,30 +408,6 @@ namespace LibMath
 	Vector3 Vector3::back()
 	{
 		return {0.f, 0.f, -1.f};
-	}
-
-	Vector3& Vector3::operator=(Vector3 const& other)
-	{
-		if (this == &other)
-			return *this;
-
-		this->m_x = other.m_x;
-		this->m_y = other.m_y;
-		this->m_z = other.m_z;
-
-		return *this;
-	}
-
-	Vector3& Vector3::operator=(Vector3&& other)
-	{
-		if (this == &other)
-			return *this;
-
-		this->m_x = other.m_x;
-		this->m_y = other.m_y;
-		this->m_z = other.m_z;
-
-		return *this;
 	}
 
 	float& Vector3::operator[](const int index)
@@ -633,6 +596,13 @@ namespace LibMath
 		*this /= this->magnitude();
 	}
 
+	Vector3 Vector3::normalized() const
+	{
+		Vector3 vec = *this;
+		vec.normalize();
+		return vec;
+	}
+
 	void Vector3::projectOnto(Vector3 const& normal)
 	{
 		*this = this->dot(normal) / normal.magnitudeSquared() * normal;
@@ -644,14 +614,24 @@ namespace LibMath
 		*this -= 2 * this->dot(other) / other.magnitudeSquared() * other;
 	}
 
-	void Vector3::rotate(Radian xAngle, Radian yAngle, Radian zAngle)
+	void Vector3::rotate(const Radian& xAngle, const Radian& yAngle, const Radian& zAngle)
 	{
-		//Todo: Vector3.rotate(Radian, Radian, Radian)
+		const Matrix4 rotationMat = Matrix4::rotationEuler(xAngle, yAngle, zAngle);
+		const Vector4 vec4 = rotationMat * Vector4( m_x, m_y, m_z, 1 );
+
+		m_x = vec4.m_x;
+		m_y = vec4.m_y;
+		m_z = vec4.m_z;
 	}
 
-	void Vector3::rotate(Radian, Vector3 const&)
+	void Vector3::rotate(const Radian& angle, Vector3 const& axis)
 	{
-		//Todo: Vector3.rotate(Radian, Vector3 const&)
+		const Matrix4 rotationMat = Matrix4::rotation(angle, axis);
+		const Vector4 vec4 = rotationMat * Vector4(m_x, m_y, m_z, 1);
+
+		m_x = vec4.m_x;
+		m_y = vec4.m_y;
+		m_z = vec4.m_z;
 	}
 
 	void Vector3::scale(Vector3 const& other)
@@ -661,16 +641,21 @@ namespace LibMath
 
 	std::string Vector3::string() const
 	{
-		return "{" + std::to_string(this->m_x)
-			+ "," + std::to_string(this->m_y)
-			+ "," + std::to_string(this->m_z) + "}";
+		std::ostringstream oss;
+
+		oss << "{" << this->m_x << "," << this->m_y << "," << this->m_z << "}";
+
+		return oss.str();
 	}
 
 	std::string Vector3::stringLong() const
 	{
-		return "{ x:" + std::to_string(this->m_x)
-			+ ", y:" + std::to_string(this->m_y)
-			+ ", z:" + std::to_string(this->m_z) + " }";
+		std::ostringstream oss;
+
+		oss << "Vector3{ x:" << this->m_x << ", y:" << this->m_y << ", z:"
+			<< this->m_z << " }";
+
+		return oss.str();
 	}
 
 	void Vector3::translate(Vector3 const& vect)
@@ -781,4 +766,16 @@ namespace LibMath
 
 		return stream;
 	}
+
+	Vector4::Vector4(const float value) :
+		Vector4(value, value, value, value)
+	{
+	}
+
+	Vector4::Vector4(const float x, const float y, const float z, const float w) :
+		m_x(x), m_y(y), m_z(z), m_w(w)
+	{
+	}
+
+
 }

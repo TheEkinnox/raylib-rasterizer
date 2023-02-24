@@ -1,8 +1,30 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <ClInclude Include="framework.h" />
-    <ClInclude Include="pch.h" />
+    <ClInclude Include="Header\Angle.h">
+      <Filter>Header</Filter>
+    </ClInclude>
+    <ClInclude Include="Header\Arithmetic.h">
+      <Filter>Header</Filter>
+    </ClInclude>
+    <ClInclude Include="Header\Intersection.h">
+      <Filter>Header</Filter>
+    </ClInclude>
+    <ClInclude Include="Header\Matrix.h">
+      <Filter>Header</Filter>
+    </ClInclude>
+    <ClInclude Include="Header\Matrix4Vector4Operation.h">
+      <Filter>Header</Filter>
+    </ClInclude>
+    <ClInclude Include="Header\Quaternion.h">
+      <Filter>Header</Filter>
+    </ClInclude>
+    <ClInclude Include="Header\Trigonometry.h">
+      <Filter>Header</Filter>
+    </ClInclude>
+    <ClInclude Include="Header\Vector.h">
+      <Filter>Header</Filter>
+    </ClInclude>
     <ClInclude Include="Header\Angle\Degree.h">
       <Filter>Header\Angle</Filter>
     </ClInclude>
@@ -30,34 +52,8 @@
     <ClInclude Include="Header\Vector\Vector4.h">
       <Filter>Header\Vector</Filter>
     </ClInclude>
-    <ClInclude Include="Header\Angle.h">
-      <Filter>Header</Filter>
-    </ClInclude>
-    <ClInclude Include="Header\Arithmetic.h">
-      <Filter>Header</Filter>
-    </ClInclude>
-    <ClInclude Include="Header\Intersection.h">
-      <Filter>Header</Filter>
-    </ClInclude>
-    <ClInclude Include="Header\Matrix.h">
-      <Filter>Header</Filter>
-    </ClInclude>
-    <ClInclude Include="Header\Matrix4Vector4Operation.h">
-      <Filter>Header</Filter>
-    </ClInclude>
-    <ClInclude Include="Header\Quaternion.h">
-      <Filter>Header</Filter>
-    </ClInclude>
-    <ClInclude Include="Header\Trigonometry.h">
-      <Filter>Header</Filter>
-    </ClInclude>
-    <ClInclude Include="Header\Vector.h">
-      <Filter>Header</Filter>
-    </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="LibMath.cpp" />
-    <ClCompile Include="pch.cpp" />
     <ClCompile Include="Source\Angle.cpp">
       <Filter>Source</Filter>
     </ClCompile>
@@ -85,19 +81,19 @@
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Header">
-      <UniqueIdentifier>{d35742ee-7fe9-4a3a-8d38-bf6945e3afce}</UniqueIdentifier>
+      <UniqueIdentifier>{859ec8c8-0535-42e7-9cad-6bf653177aad}</UniqueIdentifier>
     </Filter>
     <Filter Include="Header\Angle">
-      <UniqueIdentifier>{b923e0a3-7720-4246-a379-ee35486feff5}</UniqueIdentifier>
+      <UniqueIdentifier>{caf1c433-58f3-488f-a000-120dd99e0009}</UniqueIdentifier>
     </Filter>
     <Filter Include="Header\Matrix">
-      <UniqueIdentifier>{4afa0d29-eb8f-40b2-ba6e-fdb20c7b47e1}</UniqueIdentifier>
+      <UniqueIdentifier>{eb2f195f-c32e-4e99-9914-34ca898dcad5}</UniqueIdentifier>
     </Filter>
     <Filter Include="Header\Vector">
-      <UniqueIdentifier>{d7aa23bf-1e5c-4e94-b354-d2d28520a887}</UniqueIdentifier>
+      <UniqueIdentifier>{702b1e6a-ef1e-4e17-b201-42faabad763a}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source">
-      <UniqueIdentifier>{ffaf5f71-0605-4add-9e1a-41da5f4c9d39}</UniqueIdentifier>
+      <UniqueIdentifier>{7fe3b1c9-00bf-4e9e-80b8-1aa90fd546d0}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

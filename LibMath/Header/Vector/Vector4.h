@@ -3,14 +3,16 @@
 
 namespace LibMath
 {
+	class Radian;
+
 	class Vector4
 	{
 	public:
-						Vector4();
+						Vector4() = default;
 		explicit		Vector4(float);									// set all the component to the same value
-						Vector4(float, float, float);					// set all component individually
-						Vector4(Vector4 const& other);
-						Vector4(Vector4&& other);
+						Vector4(float, float, float, float);			// set all component individually
+						Vector4(Vector4 const& other) = default;
+						Vector4(Vector4&& other) = default;
 						~Vector4() = default;
 
 		static Vector4	zero();											// return a vector with all its component set to 0
@@ -22,8 +24,8 @@ namespace LibMath
 		static Vector4	front();										// return a unit vector pointing forward
 		static Vector4	back();											// return a unit vector pointing backward
 
-		Vector4&		operator=(Vector4 const& other);
-		Vector4&		operator=(Vector4&& other);
+		Vector4&		operator=(Vector4 const& other) = default;
+		Vector4&		operator=(Vector4&& other) = default;
 
 		float&			operator[](int);								// return this vector component value
 		float			operator[](int) const;							// return this vector component value
@@ -60,6 +62,7 @@ namespace LibMath
 		float			magnitudeSquared() const;						// return square value of the vector magnitude
 
 		void			normalize();									// scale this vector to have a magnitude of 1
+		Vector4			normalized() const;								// returns this vector scaled to have a magnitude of 1
 
 		void			projectOnto(Vector4 const&);					// project this vector onto an other
 
@@ -76,9 +79,10 @@ namespace LibMath
 
 		void			translate(Vector4 const&);						// offset this vector by a given distance
 
-		float m_x;
-		float m_y;
-		float m_z;
+		float m_x = 0;
+		float m_y = 0;
+		float m_z = 0;
+		float m_w = 0;
 	};
 }
 
