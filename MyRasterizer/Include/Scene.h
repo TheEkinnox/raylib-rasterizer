@@ -4,25 +4,20 @@
 
 namespace My
 {
-	/*
-	Scene: représente la scène dessinée à l'écran 
-	Elle contient les membres suivants :
-
-	std::vector<Entity> entities
-
-	La scène doit détruire tous les éléments qu’elle représente(meshes en l'occurrence) 
-	lorsqu’elle est elle-même détruite. 
-	*/
-
-
+	class Mesh;
 	class Scene
 	{
 	public:
 		Scene() = default;
+		Scene(const Scene& p_other) = default;
+		Scene(Scene&& p_other) = default;
 		~Scene();
 
-	private:
-		std::vector<Entity> m_entities;
+		Scene& operator=(const Scene& p_other) = default;
+		Scene& operator=(Scene&& p_other) = default;
 
+	private:
+		std::vector<Mesh*> m_meshes;
+		std::vector<Entity> m_entities;
 	};
 }

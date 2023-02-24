@@ -1,34 +1,31 @@
 #pragma once
+#include <cstdint>
 
 namespace My
 {
-	/*
-	Texture: représente une image et m_a donc les membres suivants privés
-	unsigned int m_width
-	unsigned int m_height
-	Color* m_pixels
-
-	La Texture ne doit pas avoir de constructeur par défaut(= delete)
-	Elle doit avoir un constructeur qui prend en paramètre la largeur et la hauteur, et remplit l’image de noir
-	
-	Elle doit avoir une fonction SetPixelColor(unsigned int x, unsigned int y, const Color& c)
-	*/
-
-	class Color;
+	struct Color;
 
 	class Texture
 	{
 	public:
-		Texture(unsigned int p_x, unsigned int p_y);
+		Texture() = delete;
+		Texture(uint32_t p_width, uint32_t p_height);
+		Texture(const Texture&) = default;
+		Texture(Texture&&) = default;
 		~Texture() = default;
 
-		void SetPixelColor(unsigned int p_x, unsigned int p_y, const Color& p_c);
+		Texture&	operator=(const Texture&) = default;
+		Texture&	operator=(Texture&&) = default;
+
+		uint32_t	getWidth() const;
+		uint32_t	getHeight() const;
+		Color		getPixelColor(uint32_t p_x, uint32_t p_y) const;
+		void		setPixelColor(uint32_t p_x, uint32_t p_y, const Color& p_c);
 
 	private:
-		unsigned int m_width;
-		unsigned int m_height;
-		Color* m_pixels;
-
+		uint32_t	m_width;
+		uint32_t	m_height;
+		Color*		m_pixels;
 	};
 
 }

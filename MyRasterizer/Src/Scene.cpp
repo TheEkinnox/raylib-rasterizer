@@ -1,9 +1,10 @@
 #include "Scene.h"
+#include "Mesh.h"
 
 My::Scene::~Scene()
 {
-	for (auto& entity : this->m_entities)
-	{
-		entity
-	}
+	m_entities.clear();
+
+	for (const auto* mesh : m_meshes)
+		delete mesh;
 }

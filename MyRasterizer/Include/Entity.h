@@ -1,28 +1,24 @@
 #pragma once
+#include "Matrix/Matrix4.h"
 
 namespace My
 {
-	/*
-	Entity: représente une instance de mesh dessinée à l'écran 
-	On peut donc avoir le même mesh dessiné plusieurs fois à l'écran 
-	sans dupliquer les vertex et index buffer du mesh
-	L'entité contient donc les membres suivants : 
-	
-	Mesh * mesh : pointeur sur le mesh
-	Mat4 transform : transformation world(rotation, position, scale) de l'entité 
-	*/
-
 	class Mesh;
-	class Mat4;
 
 	class Entity
 	{
-		Entity(const Mesh& p_mesh);
-		~Entity() = default;
+	public:
+		explicit			Entity(const Mesh& p_mesh);
+							Entity(const Entity& p_other) = default;
+							Entity(Entity&& p_other) = default;
+							~Entity() = default;
+
+		Entity&				operator=(const Entity& p_other) = default;
+		Entity&				operator=(Entity&& p_other) = default;
 
 	private:
-		const Mesh* m_mesh;
-		//Mat4 m_transform; //TODO: mat4
+		const Mesh*			m_mesh;
+		LibMath::Matrix4	m_transform;
 	};
 }
 
