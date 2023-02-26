@@ -646,7 +646,7 @@ namespace LibMath
 	{
 		// 0 1
 		// 2 3
-		return (*this)[0] * (*this)[2] - (*this)[1] * (*this)[3];
+		return (*this)[0] * (*this)[3] - (*this)[1] * (*this)[2];
 	}
 
 	float Matrix::determinant3x3() const

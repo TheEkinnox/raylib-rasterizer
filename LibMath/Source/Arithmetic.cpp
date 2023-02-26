@@ -56,7 +56,7 @@ namespace LibMath
 			value < 1.f ? 1.f / value : value;
 
 		// Keep repeating until the approximation is close enough to the real value
-		for (size_t i = 0; (maxSteps == 0 || i < maxSteps) && sqrt * sqrt - value > precision; i++)
+		for (size_t i = 0; (maxSteps == 0 || i < maxSteps) && abs(sqrt * sqrt - value) > precision; i++)
 			sqrt = .5f * (sqrt + value / sqrt); // Babylonian step - cf. https://en.wikipedia.org/wiki/Methods_of_computing_square_roots#Heron's_method
 
 		return sqrt;
