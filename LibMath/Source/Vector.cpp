@@ -727,9 +727,7 @@ namespace LibMath
 
 	std::ostream& operator<<(std::ostream& stream, Vector3 const& vect)
 	{
-		stream << vect.string();
-
-		return stream;
+		return stream << vect.string();
 	}
 
 	std::istream& operator>>(std::istream& stream, Vector3& vect)
@@ -773,9 +771,305 @@ namespace LibMath
 	}
 
 	Vector4::Vector4(const float x, const float y, const float z, const float w) :
-		m_x(x), m_y(y), m_z(z), m_w(w)
+		Vector3(x, y, z), m_w(w)
 	{
 	}
 
+	Vector4 Vector4::zero()
+	{
+		return { 0.f, 0.f, 0.f, 0.f };
+	}
 
+	Vector4 Vector4::one()
+	{
+		return { 1.f, 1.f, 1.f, 1.f };
+	}
+
+	Vector4 Vector4::up()
+	{
+		return { 0.f, 1.f, 0.f, 0.f };
+	}
+
+	Vector4 Vector4::down()
+	{
+		return { 0.f, -1.f, 0.f, 0.f };
+	}
+
+	Vector4 Vector4::left()
+	{
+		return { -1.f, 0.f, 0.f, 0.f };
+	}
+
+	Vector4 Vector4::right()
+	{
+		return { 1.f, 0.f, 0.f, 0.f };
+	}
+
+	Vector4 Vector4::front()
+	{
+		return { 0.f, 0.f, 1.f, 0.f };
+	}
+
+	Vector4 Vector4::back()
+	{
+		return { 0.f, 0.f, -1.f, 0.f };
+	}
+
+	float& Vector4::operator[](const int index)
+	{
+		switch (index)
+		{
+		case 0:
+			return this->m_x;
+		case 1:
+			return this->m_y;
+		case 2:
+			return this->m_z;
+		case 3:
+			return this->m_w;
+		default:
+			throw std::out_of_range("Invalid index \"" + std::to_string(index) + "\" received");
+		}
+	}
+
+	float Vector4::operator[](const int index) const
+	{
+		switch (index)
+		{
+		case 0:
+			return this->m_x;
+		case 1:
+			return this->m_y;
+		case 2:
+			return this->m_z;
+		case 3:
+			return this->m_w;
+		default:
+			throw std::out_of_range("Invalid index \"" + std::to_string(index) + "\" received");
+		}
+	}
+
+	Vector4& Vector4::operator+=(Vector4 const& other)
+	{
+		m_x += other.m_x;
+		m_y += other.m_y;
+		m_z += other.m_z;
+		m_w += other.m_w;
+
+		return *this;
+	}
+
+	Vector4& Vector4::operator-=(Vector4 const& other)
+	{
+		m_x -= other.m_x;
+		m_y -= other.m_y;
+		m_z -= other.m_z;
+		m_w -= other.m_w;
+
+		return *this;
+	}
+
+	Vector4& Vector4::operator*=(Vector4 const& other)
+	{
+		m_x *= other.m_x;
+		m_y *= other.m_y;
+		m_z *= other.m_z;
+		m_w *= other.m_w;
+
+		return *this;
+	}
+
+	Vector4& Vector4::operator/=(Vector4 const& other)
+	{
+		m_x /= other.m_x;
+		m_y /= other.m_y;
+		m_z /= other.m_z;
+		m_w /= other.m_w;
+
+		return *this;
+	}
+
+	Vector4& Vector4::operator+=(float const& value)
+	{
+		m_x += value;
+		m_y += value;
+		m_z += value;
+		m_w += value;
+
+		return *this;
+	}
+
+	Vector4& Vector4::operator-=(float const& value)
+	{
+		m_x -= value;
+		m_y -= value;
+		m_z -= value;
+		m_w -= value;
+
+		return *this;
+	}
+
+	Vector4& Vector4::operator*=(float const& value)
+	{
+		m_x *= value;
+		m_y *= value;
+		m_z *= value;
+		m_w *= value;
+
+		return *this;
+	}
+
+	Vector4& Vector4::operator/=(float const& value)
+	{
+		m_x /= value;
+		m_y /= value;
+		m_z /= value;
+		m_w /= value;
+
+		return *this;
+	}
+
+	float Vector4::dot(Vector4 const& other) const
+	{
+		return this->m_x * other.m_x +
+			this->m_y * other.m_y +
+			this->m_z * other.m_z +
+			this->m_w * other.m_w;
+	}
+
+	float Vector4::magnitudeSquared() const
+	{
+		return this->m_x * this->m_x +
+			this->m_y * this->m_y +
+			this->m_z * this->m_z +
+			this->m_w * this->m_w;
+	}
+
+	Vector4 Vector4::normalized() const
+	{
+		return *this / magnitude();
+	}
+
+	std::string Vector4::string() const
+	{
+		std::ostringstream oss;
+
+		oss << "{" << this->m_x << "," << this->m_y
+			<< "," << this->m_z << "," << this->m_w << "}";
+
+		return oss.str();
+	}
+
+	std::string Vector4::stringLong() const
+	{
+		std::ostringstream oss;
+
+		oss << "Vector4{ x:" << this->m_x << ", y:" << this->m_y
+			<< ", z:" << this->m_z << ", w:" << this->m_w << " }";
+
+		return oss.str();
+	}
+
+	bool operator==(Vector4 const& left, Vector4 const& right)
+	{
+		return floatEquals(left.m_x, right.m_x) &&
+			floatEquals(left.m_y, right.m_y) &&
+			floatEquals(left.m_z, right.m_z) &&
+			floatEquals(left.m_w, right.m_w);
+	}
+
+	bool operator!=(Vector4 const& left, Vector4 const& right)
+	{
+		return !(left == right);
+	}
+
+	Vector4 operator-(const Vector4& vector)
+	{
+		return { -vector.m_x, -vector.m_y, -vector.m_z, -vector.m_w };
+	}
+
+	Vector4 operator+(Vector4 left, Vector4 const& right)
+	{
+		return left += right;
+	}
+
+	Vector4 operator-(Vector4 left, Vector4 const& right)
+	{
+		return left -= right;
+	}
+
+	Vector4 operator*(Vector4 left, Vector4 const& right)
+	{
+		return left *= right;
+	}
+
+	Vector4 operator/(Vector4 vector, Vector4 const& value)
+	{
+		return vector /= value;
+	}
+
+	Vector4 operator+(Vector4 vector, float const& value)
+	{
+		return vector += value;
+	}
+
+	Vector4 operator-(Vector4 vector, float const& value)
+	{
+		return vector -= value;
+	}
+
+	Vector4 operator*(Vector4 vector, float const& scalar)
+	{
+		return vector *= scalar;
+	}
+
+	Vector4 operator*(float const& scalar, Vector4 vector)
+	{
+		return vector *= scalar;
+	}
+
+	Vector4 operator/(Vector4 vector, float const& scalar)
+	{
+		return vector /= scalar;
+	}
+
+	std::ostream& operator<<(std::ostream& stream, Vector4 const& vector)
+	{
+		return stream << vector.string();
+	}
+
+	std::istream& operator>>(std::istream& stream, Vector4& vector)
+	{
+		std::string line;
+
+		std::getline(stream, line, '}');
+
+		int component = 0;
+		size_t valStart = 0;
+
+		do
+		{
+			if (valStart == std::string::npos)
+				break;
+
+			if (line[valStart] == '{' || std::isspace(line[valStart]))
+			{
+				valStart++;
+				continue;
+			}
+
+			if (line[valStart] != '-' && !std::isdigit(line[valStart]))
+				break;
+
+			vector[component] = std::stof(line.substr(valStart));
+
+			valStart = line.find(',', valStart) + 1;
+			component++;
+		} while (component < 4 && valStart != 0);
+
+		if (component != 4)
+			vector = Vector4::zero();
+
+		return stream;
+	}
 }
