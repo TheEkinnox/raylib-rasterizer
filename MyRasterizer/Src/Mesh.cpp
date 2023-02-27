@@ -27,18 +27,18 @@ std::vector<size_t> My::Mesh::getIndices() const
 	return m_indices;
 }
 
-My::Mesh* My::Mesh::createCube()
+My::Mesh* My::Mesh::createCube(const Color& p_color)
 {
 	const std::vector<Vertex> vertices
 	{
-		{ { -.5f, .5f, .5f } },		// Front-top-left
-		{ { .5f, .5f, .5f } },		// Front-top-right
-		{ { -.5f, -.5f, .5f } },	// Front-bottom-left
-		{ { .5f, -.5f, .5f } },		// Front-bottom-right
-		{ { -.5f, .5f, -.5f } },	// Back-top-left
-		{ { .5f, .5f, -.5f } },		// Back-top-right
-		{ { -.5f, -.5f, -.5f } },	// Back-bottom-left
-		{ { .5f, -.5f, -.5f } }		// Back-bottom-right
+		{ { -.5f, .5f, .5f }, p_color },		// Front-top-left
+		{ { .5f, .5f, .5f }, p_color },		// Front-top-right
+		{ { -.5f, -.5f, .5f }, p_color },	// Front-bottom-left
+		{ { .5f, -.5f, .5f }, p_color },		// Front-bottom-right
+		{ { -.5f, .5f, -.5f }, p_color },	// Back-top-left
+		{ { .5f, .5f, -.5f }, p_color },		// Back-top-right
+		{ { -.5f, -.5f, -.5f }, p_color },	// Back-bottom-left
+		{ { .5f, -.5f, -.5f }, p_color }		// Back-bottom-right
 	};
 
 	const std::vector<size_t> indices
@@ -71,7 +71,8 @@ My::Mesh* My::Mesh::createCube()
 	return new Mesh(vertices, indices);
 }
 
-My::Mesh* My::Mesh::createSphere(const uint32_t p_latitudeCount, const uint32_t p_longitudeCount)
+My::Mesh* My::Mesh::createSphere(const uint32_t p_latitudeCount, const uint32_t p_longitudeCount,
+	const Color& p_color)
 {
 	const float deltaPhi = LibMath::g_pi / static_cast<float>(p_latitudeCount);
 	const float deltaTheta = LibMath::g_pi * 2.f / static_cast<float>(p_longitudeCount);
@@ -99,7 +100,7 @@ My::Mesh* My::Mesh::createSphere(const uint32_t p_latitudeCount, const uint32_t 
 				sinPhi * cosTheta * radius
 			};
 
-			vertices.push_back({ position });
+			vertices.push_back({ position, p_color });
 		}
 	}
 
