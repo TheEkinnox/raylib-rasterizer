@@ -16,6 +16,7 @@ namespace LibMath
 	 * \return An approximation of the square root of the given value
 	 */
 	float	squareRoot(float value, float precision = std::numeric_limits<float>::epsilon(), size_t maxSteps = 16);
+	float	pow(float base, size_t exposant);
 	float	wrap(float, float, float);	// Return parameter as value inside the given range
 	float	min(float, float);			// Return smallest parameter
 	float	max(float, float);			// Return largest parameter

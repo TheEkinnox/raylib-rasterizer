@@ -62,6 +62,19 @@ namespace LibMath
 		return sqrt;
 	}
 
+	float pow(float base, size_t exposant)
+	{
+		if (exposant == 0 || base == 1.0f)
+			return 1.0f;
+
+		float val = base;
+
+		for (size_t i = 1; i < exposant; i++)
+			val *= base;
+
+		return val;
+	}
+
 	float wrap(const float val, const float min, const float max)
 	{
 		return val - (max - min) * floor((val - min) / (max - min));
