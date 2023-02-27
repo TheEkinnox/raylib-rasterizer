@@ -7,6 +7,9 @@
 #include "Rasterizer.h"
 #include "Texture.h"
 #include "Matrix/Matrix4.h"
+#include "Angle/Radian.h"
+#include "Angle/Degree.h"
+#include "Arithmetic.h"
 
 constexpr auto SCREEN_WIDTH = 800;
 constexpr auto SCREEN_HEIGHT = 600;
@@ -25,6 +28,44 @@ int main()
 
 	transform = LibMath::Matrix4::translation(2.5, 0, 2);
 	scene.addEntity(My::Entity(*scene.getMesh("sphere"), transform));
+
+	//transformation tests
+	/**
+	scene.getEntity(0).Translate(0, 1, 0);
+	scene.getEntity(1).Translate(0, -1, 0);
+
+	scene.getEntity(0).Scale(2, 1, 2);
+	scene.getEntity(1).Scale(2.0f, 2.0f, 1.0f);
+
+	LibMath::Vector3 s1 = scene.getEntity(0).GetScale();
+	LibMath::Vector3 s2 = scene.getEntity(1).GetScale();
+	
+	LibMath::Vector3 vR = scene.getEntity(0).GetRightward();
+	LibMath::Vector3 vU = scene.getEntity(0).GetUpward();
+	LibMath::Vector3 vF = scene.getEntity(0).GetForward();
+
+	scene.getEntity(0).RotateEulerAngles((LibMath::Radian)0, (LibMath::Radian)0, (LibMath::Radian)(3.1416f / 2));
+	vR = scene.getEntity(0).GetRightward();
+	vU = scene.getEntity(0).GetUpward();
+	vF = scene.getEntity(0).GetForward();
+
+	scene.getEntity(0).Translate(0, 3, 0);
+	scene.getEntity(0).SetPosition(0, 0, 0);
+
+	scene.getEntity(0).Scale(3, 3, 3);
+	scene.getEntity(0).SetScale(1.0f, 1.0f, 1.0f);
+	
+	scene.getEntity(0).RotateEulerAngles((LibMath::Radian)(3.1416f/ 4), (LibMath::Radian)0, (LibMath::Radian)(3.1416f / 4));
+	LibMath::Vector3 v = scene.getEntity(0).GetRotationEulerAngles();
+	scene.getEntity(0).RotateEulerAngles((LibMath::Radian)(-v.m_x), (LibMath::Radian)(-v.m_y), (LibMath::Radian)(-v.m_z));
+	LibMath::Vector3 v2 = scene.getEntity(0).GetRotationEulerAngles();
+
+	float pres = 0.001f;
+	bool isZero = true;
+	isZero = LibMath::abs(v2.m_x) > pres ? false : isZero;
+	isZero = LibMath::abs(v2.m_y) > pres ? false : isZero;
+	isZero = LibMath::abs(v2.m_z) > pres ? false : isZero;
+	*/
 
 	My::Texture texture(SCREEN_WIDTH, SCREEN_HEIGHT);
 

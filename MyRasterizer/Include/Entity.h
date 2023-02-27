@@ -35,6 +35,10 @@ namespace My
 		Vec3 GetScale()const;
 		Vec3 GetRotationEulerAngles()const;
 
+		float GetScaleX()const;
+		float GetScaleY()const;
+		float GetScaleZ()const;
+
 		Vec3 GetRightward()const;
 		Vec3 GetLeftward()const;
 		Vec3 GetUpward()const;
