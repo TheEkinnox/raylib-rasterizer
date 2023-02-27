@@ -1,5 +1,4 @@
 #pragma once
-#include <vector>
 #include "Matrix/Matrix4.h"
 #include "Vector/Vector3.h"
 #include "Angle/Radian.h"
@@ -22,25 +21,28 @@ namespace My
 					Entity(Entity&& p_other) = default;
 					~Entity() = default;
 
-		Entity& Translate(float p_x, float p_y, float p_z);
-		//Entity& TranslateLocaly(float p_x, float p_y, float p_z); // ???
-		Entity& Scale(float p_x, float p_y, float p_z);
-		Entity& RotateEulerAngles(Rad p_x, Rad p_y, Rad p_z);
+		Entity& translate(float p_x, float p_y, float p_z);
+		//Entity& translateLocally(float p_x, float p_y, float p_z); // ???
+		Entity& scale(float p_x, float p_y, float p_z);
+		Entity& rotateEulerAngles(const Rad& p_x, const Rad& p_y, const Rad& p_z);
 
-		Entity& SetPosition(float p_x, float p_y, float p_z);
-		Entity& SetScale(float p_x, float p_y, float p_z);
-		Entity& SetRotationEulerAngles(Rad p_x, Rad p_y, Rad p_z);
+		Entity& setPosition(float p_x, float p_y, float p_z);
+		Entity& setScale(float p_x, float p_y, float p_z);
+		Entity& setRotationEulerAngles(const Rad& p_x, const Rad& p_y, const Rad& p_z);
 
-		Vec3 GetPosition()const;
-		Vec3 GetScale()const;
-		Vec3 GetRotationEulerAngles()const;
+		Vec3 getPosition()const;
+		Vec3 getScale()const;
+		float getScaleX() const;
+		float getScaleY() const;
+		float getScaleZ() const;
+		Vec3 getRotationEulerAngles()const;
 
-		Vec3 GetRightward()const;
-		Vec3 GetLeftward()const;
-		Vec3 GetUpward()const;
-		Vec3 GetDownward()const;
-		Vec3 GetForward()const;
-		Vec3 GetBackward()const;
+		Vec3 getRightward()const;
+		Vec3 getLeftward()const;
+		Vec3 getUpward()const;
+		Vec3 getDownward()const;
+		Vec3 getForward()const;
+		Vec3 getBackward()const;
 
 
 		const Mesh*	getMesh() const;

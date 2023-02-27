@@ -37,3 +37,11 @@ std::vector<My::Entity> My::Scene::getEntities() const
 {
 	return m_entities;
 }
+
+My::Entity& My::Scene::getEntity(size_t index)
+{
+	if (index >= this->m_entities.size())
+		throw "index out of range Scene.h l.44";
+
+	return m_entities[index];
+}

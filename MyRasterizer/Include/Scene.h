@@ -34,6 +34,7 @@ namespace My
 
 		void				addEntity(const Entity& p_entity);
 		std::vector<Entity>	getEntities() const;
+		Entity&				getEntity(size_t index);
 
 	private:
 		std::map<std::string, Mesh*> m_meshes;
