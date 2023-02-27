@@ -6,5 +6,6 @@ namespace My
 	struct Vertex
 	{
 		LibMath::Vector3	m_position;
+		LibMath::Vector3	m_normal;
 	};
 }

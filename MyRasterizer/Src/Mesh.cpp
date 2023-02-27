@@ -31,14 +31,14 @@ My::Mesh* My::Mesh::createCube()
 {
 	const std::vector<Vertex> vertices
 	{
-		{ { -.5f, .5f, .5f } },		// Front-top-left
-		{ { .5f, .5f, .5f } },		// Front-top-right
-		{ { -.5f, -.5f, .5f } },	// Front-bottom-left
-		{ { .5f, -.5f, .5f } },		// Front-bottom-right
-		{ { -.5f, .5f, -.5f } },	// Back-top-left
-		{ { .5f, .5f, -.5f } },		// Back-top-right
-		{ { -.5f, -.5f, -.5f } },	// Back-bottom-left
-		{ { .5f, -.5f, -.5f } }		// Back-bottom-right
+		{ { -.5f, .5f, .5f }, { -.5f, .5f, .5f } },		// Front-top-left
+		{ { .5f, .5f, .5f }, { .5f, .5f, .5f } },		// Front-top-right
+		{ { -.5f, -.5f, .5f }, { -.5f, -.5f, .5f } },	// Front-bottom-left
+		{ { .5f, -.5f, .5f }, { .5f, -.5f, .5f } },		// Front-bottom-right
+		{ { -.5f, .5f, -.5f }, { -.5f, .5f, -.5f } },	// Back-top-left
+		{ { .5f, .5f, -.5f }, { .5f, .5f, -.5f } },		// Back-top-right
+		{ { -.5f, -.5f, -.5f }, { -.5f, -.5f, -.5f } },	// Back-bottom-left
+		{ { .5f, -.5f, -.5f }, { .5f, -.5f, -.5f } }	// Back-bottom-right
 	};
 
 	const std::vector<size_t> indices
@@ -92,14 +92,14 @@ My::Mesh* My::Mesh::createSphere(const uint32_t p_latitudeCount, const uint32_t 
 			const float cosTheta = cosf(theta);
 			const float sinTheta = -sinf(theta);
 
-			const LibMath::Vector3 position
+			const LibMath::Vector3 normal
 			{
-				sinPhi * sinTheta * radius,
-				cosPhi * radius,
-				sinPhi * cosTheta * radius
+				sinPhi * sinTheta,
+				cosPhi,
+				sinPhi * cosTheta
 			};
 
-			vertices.push_back({ position });
+			vertices.push_back({ normal * radius, normal });
 		}
 	}
 
