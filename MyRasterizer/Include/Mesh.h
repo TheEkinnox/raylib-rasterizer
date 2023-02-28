@@ -84,6 +84,11 @@ namespace My
 		std::vector<size_t>	getIndices() const;
 
 		/**
+		* \brief Calculates the normal of each Vertex
+		*/
+		void CalculateNormals();
+
+		/**
 		 * \brief Creates a cube of side 1
 		 * \return A pointer to the created cube mesh
 		 */

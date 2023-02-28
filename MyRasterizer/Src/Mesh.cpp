@@ -1,5 +1,9 @@
 #include "Trigonometry.h"
 #include "Mesh.h"
+#include "Vector/Vector3.h"
+#include <map>
+
+using Vec3 = LibMath::Vector3;
 
 My::Mesh::Mesh(const std::vector<Vertex>& p_vertices, const std::vector<size_t>& p_indices)
 {
@@ -29,16 +33,17 @@ std::vector<size_t> My::Mesh::getIndices() const
 
 My::Mesh* My::Mesh::createCube()
 {
+	float nLen = 0.57735027f;	// 1 = sqrt(3 * x2) => sqrt(1/3) = x => 0.57735027f = x
 	const std::vector<Vertex> vertices
 	{
-		{ { -.5f, .5f, .5f }, { -.5f, .5f, .5f } },		// Front-top-left
-		{ { .5f, .5f, .5f }, { .5f, .5f, .5f } },		// Front-top-right
-		{ { -.5f, -.5f, .5f }, { -.5f, -.5f, .5f } },	// Front-bottom-left
-		{ { .5f, -.5f, .5f }, { .5f, -.5f, .5f } },		// Front-bottom-right
-		{ { -.5f, .5f, -.5f }, { -.5f, .5f, -.5f } },	// Back-top-left
-		{ { .5f, .5f, -.5f }, { .5f, .5f, -.5f } },		// Back-top-right
-		{ { -.5f, -.5f, -.5f }, { -.5f, -.5f, -.5f } },	// Back-bottom-left
-		{ { .5f, -.5f, -.5f }, { .5f, -.5f, -.5f } }	// Back-bottom-right
+		{ { -.5f, .5f, .5f }, { -nLen, nLen, nLen } },		// Front-top-left
+		{ { .5f, .5f, .5f }, { nLen, nLen, nLen } },		// Front-top-right
+		{ { -.5f, -.5f, .5f }, { -nLen, -nLen, nLen } },	// Front-bottom-left
+		{ { .5f, -.5f, .5f }, { nLen, -nLen, nLen } },		// Front-bottom-right
+		{ { -.5f, .5f, -.5f }, { -nLen, nLen, -nLen } },	// Back-top-left
+		{ { .5f, .5f, -.5f }, { nLen, nLen, -nLen } },		// Back-top-right
+		{ { -.5f, -.5f, -.5f }, { -nLen, -nLen, -nLen } },	// Back-bottom-left
+		{ { .5f, -.5f, -.5f }, { nLen, -nLen, -nLen } }	// Back-bottom-right
 	};
 
 	const std::vector<size_t> indices
@@ -67,6 +72,12 @@ My::Mesh* My::Mesh::createCube()
 		1, 5, 4,
 		4, 0, 1
 	};
+	//normal test
+	//bool test = vertices[0].m_normal.isUnitVector();
+	//Mesh* m = new Mesh(vertices, indices);
+	//m->CalculateNormals();
+
+	//return new Mesh(vertices, indices);
 
 	return new Mesh(vertices, indices);
 }
@@ -99,6 +110,9 @@ My::Mesh* My::Mesh::createSphere(const uint32_t p_latitudeCount, const uint32_t 
 				sinPhi * cosTheta
 			};
 
+			bool test = normal.isUnitVector();
+			float mag = normal.magnitudeSquared();
+				
 			vertices.push_back({ normal * radius, normal });
 		}
 	}
@@ -144,4 +158,46 @@ My::Mesh* My::Mesh::createSphere(const uint32_t p_latitudeCount, const uint32_t 
 	}
 
 	return new Mesh(vertices, indices);
+}
+
+void My::Mesh::CalculateNormals()
+{
+	Vec3* A, *B, *C;
+	Vec3 BC, BA, normal;
+
+	for (size_t i = 0; i < this->m_indices.size() / 3; i += 3)
+	{
+		//triangle ABC
+		A = &this->m_vertices[m_indices[i]].m_position;
+		B = &this->m_vertices[m_indices[i + 1]].m_position;
+		C = &this->m_vertices[m_indices[i + 2]].m_position;
+
+		//create plane
+		BC = *C - *B;
+		BA = *A - *B;	
+
+		/**
+		* 
+		*	|	 i		 j		 k	  |
+		*	|	BC.x	BC.y	BC.z  |
+		*	|	BA.x	BA.y	BA.z  |
+		* 
+		*/
+		//get normal
+		normal = {	BC.m_y * BA.m_z - BC.m_z * BA.m_y,
+				  -(BC.m_x * BA.m_z - BC.m_z * BA.m_x),
+					BC.m_x * BA.m_y - BC.m_y * BA.m_x };
+		normal.normalize();
+
+		//add normals to vertex
+		m_vertices[m_indices[i]].m_normal += normal;
+		m_vertices[m_indices[i + 1]].m_normal += normal;
+		m_vertices[m_indices[i + 2]].m_normal += normal;
+	}
+
+	for (auto& vertex : m_vertices) //normalize all normals
+	{
+		if (vertex.m_normal != Vec3::zero())
+			vertex.m_normal.normalize();
+	}
 }
