@@ -1,6 +1,7 @@
 #include "Scene.h"
 #include "Mesh.h"
 #include "Entity.h"
+#include "Light.h"
 
 My::Scene::~Scene()
 {
