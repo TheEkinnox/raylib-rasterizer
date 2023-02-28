@@ -39,7 +39,8 @@ int main()
 
 	LibMath::Vector3 s1 = scene.getEntity(0).GetScale();
 	LibMath::Vector3 s2 = scene.getEntity(1).GetScale();
-	
+	*/
+	/**
 	LibMath::Vector3 vR = scene.getEntity(0).GetRightward();
 	LibMath::Vector3 vU = scene.getEntity(0).GetUpward();
 	LibMath::Vector3 vF = scene.getEntity(0).GetForward();
@@ -48,14 +49,21 @@ int main()
 	vR = scene.getEntity(0).GetRightward();
 	vU = scene.getEntity(0).GetUpward();
 	vF = scene.getEntity(0).GetForward();
-
+	*/
+	/*
 	scene.getEntity(0).Translate(0, 3, 0);
 	scene.getEntity(0).SetPosition(0, 0, 0);
 
 	scene.getEntity(0).Scale(3, 3, 3);
 	scene.getEntity(0).SetScale(1.0f, 1.0f, 1.0f);
 	
-	scene.getEntity(0).RotateEulerAngles((LibMath::Radian)(3.1416f/ 4), (LibMath::Radian)0, (LibMath::Radian)(3.1416f / 4));
+	scene.getEntity(0).RotateEulerAngles((LibMath::Radian)(3.1416f/8), (LibMath::Radian)(-3.1416f/4), (LibMath::Radian)(3.1416f));
+	scene.getEntity(0).SetRotationEulerAngles((LibMath::Radian)(0), (LibMath::Radian)(0), (LibMath::Radian)(3.1416f/20.0f));
+	LibMath::Vector3 rot = scene.getEntity(0).GetRotationEulerAngles();
+	*/
+	/**
+	
+	scene.getEntity(0).RotateEulerAngles((LibMath::Radian)(0), (LibMath::Radian)0, (LibMath::Radian)(3.1416f));
 	LibMath::Vector3 v = scene.getEntity(0).GetRotationEulerAngles();
 	scene.getEntity(0).RotateEulerAngles((LibMath::Radian)(-v.m_x), (LibMath::Radian)(-v.m_y), (LibMath::Radian)(-v.m_z));
 	LibMath::Vector3 v2 = scene.getEntity(0).GetRotationEulerAngles();

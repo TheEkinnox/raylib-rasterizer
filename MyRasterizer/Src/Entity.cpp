@@ -27,33 +27,44 @@ My::Entity& My::Entity::RotateEulerAngles(Rad p_x, Rad p_y, Rad p_z)
 {
 	this->m_transform *= Mat4::rotation(p_x, Vec3::right());	//rotate x axis
 	this->m_transform *= Mat4::rotation(p_y, Vec3::up());		//rotate y axis
-	this->m_transform *= Mat4::rotation(p_z, Vec3::front());	//rotate z axis
+	this->m_transform *= Mat4::rotation(p_z, Vec3::back());		//rotate z axis
 	return *this;
 }
 
 My::Entity& My::Entity::SetPosition(float p_x, float p_y, float p_z)
 {
 	LibMath::Vector3 pos = this->GetPosition();
-	this->Translate(-pos.m_x, -pos.m_y, -pos.m_z); // back to (0, 0, 0)
-
-	this->Translate(p_x, p_y, p_z); // to SetPos
-
+	//this->Translate(-pos.m_x, -pos.m_y, -pos.m_z); // back to (0, 0, 0)
+	//this->Translate(p_x, p_y, p_z); // to SetPos
+	this->Translate(	p_x - pos.m_x,
+						p_y - pos.m_y, 
+						p_z - pos.m_z);
 	return *this;
 }
 
 My::Entity& My::Entity::SetScale(float p_x, float p_y, float p_z)
 {
 	LibMath::Vector3 scale = this->GetScale();
-	this->Scale(1 / scale.m_x, 1 / scale.m_y, 1 / scale.m_z); // back to (1, 1, 1)
-
-	this->Scale(p_x, p_y, p_z); // to Setscale
+	//this->Scale(1 / scale.m_x, 1 / scale.m_y, 1 / scale.m_z); // back to (1, 1, 1)
+	//this->Scale(p_x, p_y, p_z); // to Setscale
+	this->Scale(	p_x / scale.m_x, 
+					p_y / scale.m_y, 
+					p_z / scale.m_z);
 
 	return *this;
 }
 
 My::Entity& My::Entity::SetRotationEulerAngles(Rad p_x, Rad p_y, Rad p_z)
 {
-	// TODO: set rotation
+	LibMath::Vector3 rotateAngles = this->GetRotationEulerAngles();
+	//this->RotateEulerAngles(	static_cast<Rad>(-rotateAngles.m_x), 
+	//							static_cast<Rad>(-rotateAngles.m_y), 
+	//							static_cast<Rad>(-rotateAngles.m_z)); // back to (0, 0, 0)
+	//this->RotateEulerAngles(p_x, p_y, p_z); // to Setscale
+	this->RotateEulerAngles(	p_x - static_cast<Rad>(rotateAngles.m_x),
+								p_y - static_cast<Rad>(rotateAngles.m_y),
+								p_z - static_cast<Rad>(rotateAngles.m_z)); // back to (0, 0, 0)
+
 	return *this;
 }
 
@@ -68,7 +79,6 @@ My::Entity::Vec3 My::Entity::GetPosition() const
 	* translationVector = [ m13 ]
     *	                  [ m23 ]
 	*/
-
 	return Vec3(	m_transform[3], 
 					m_transform[7], 
 					m_transform[11]);
@@ -127,7 +137,6 @@ My::Entity::Vec3 My::Entity::GetRotationEulerAngles() const
 	*		|		   0		   0		   0		   1 	 |
 	* http://eecs.qmul.ac.uk/~gslabaugh/publications/euler.pdf
 	*/
-
 	Vec3 scale(this->GetScale());
 	Mat4 rotation(this->m_transform);
 
@@ -136,7 +145,6 @@ My::Entity::Vec3 My::Entity::GetRotationEulerAngles() const
 
 	LibMath::Radian psi1, teta1, phi1, psi2, teta2, phi2;
 	float cosTeta1, cosTeta2;
-	LibMath::Radian pi(3.1416f);
 
 	if (LibMath::abs(rotation[8]) != 1) 
 	{
@@ -148,7 +156,7 @@ My::Entity::Vec3 My::Entity::GetRotationEulerAngles() const
 		*/
 
 		teta1 = -LibMath::asin(rotation[8]);
-		teta2 = pi - teta1;
+		teta2 = static_cast<Rad>(LibMath::g_pi) - teta1;
 
 		cosTeta1 = LibMath::cos(teta1);
 		cosTeta2 = LibMath::cos(teta2);
@@ -164,12 +172,14 @@ My::Entity::Vec3 My::Entity::GetRotationEulerAngles() const
 		// TODO : Gimble lock exception Euler ANGLES, counld only give one?
 	}
 
-	// TODO : Get Rotation return? only 1 or 2 solutions? one is NAN sometimes
+	//reverse phi bcs of global orientation
+	phi1 *= -1;
+	phi2 *= -1;
 
+	// TODO : Get Rotation return? only 1 or 2 solutions? one is NAN sometimes
 	//if (cosTeta1 != 0) //not NAN
 	return Vec3(psi1.raw(), teta1.raw(), phi1.raw());
 	//return Vec3(psi2.raw(), teta2.raw(), phi2.raw());
-
 }
 
 My::Entity::Vec3 My::Entity::GetRightward() const
