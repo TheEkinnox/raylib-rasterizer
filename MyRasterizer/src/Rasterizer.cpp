@@ -11,7 +11,8 @@
 
 namespace My
 {
-	void Rasterizer::renderScene(const Scene& p_scene, Texture& p_target)
+	void Rasterizer::renderScene(const Scene& p_scene, Texture& p_target,
+		const Mat4& p_projectionMatrix)
 	{
 		// Set every pixel to black
 		for (uint32_t x = 0; x < p_target.getWidth(); x++)
@@ -19,10 +20,11 @@ namespace My
 				p_target.setPixelColor(x, y, Color::black);
 
 		for (const auto& entity : p_scene.getEntities())
-			drawEntity(entity, p_target);
+			drawEntity(entity, p_target, p_projectionMatrix);
 	}
 
-	void Rasterizer::drawEntity(const Entity& p_entity, Texture& p_target)
+	void Rasterizer::drawEntity(const Entity& p_entity, Texture& p_target,
+		const Mat4& p_projectionMatrix)
 	{
 		if (p_entity.getMesh() != nullptr)
 		{
@@ -47,12 +49,13 @@ namespace My
 					pos = {vec4.m_x, vec4.m_y, vec4.m_z};
 				}
 
-				drawTriangle(triangle, p_target);
+				drawTriangle(triangle, p_target, p_projectionMatrix);
 			}
 		}
 	}
 
-	void Rasterizer::drawTriangle(const Vertex p_vertices[3], Texture& p_target)
+	void Rasterizer::drawTriangle(const Vertex p_vertices[3], Texture& p_target,
+		const Mat4& p_projectionMatrix)
 	{
 		// Create an array of vector4 for the positions
 		LibMath::Vector4 points[3]
@@ -62,37 +65,25 @@ namespace My
 			{p_vertices[2].m_position.m_x, p_vertices[2].m_position.m_y, p_vertices[2].m_position.m_z, 1.f}
 		};
 
-		LibMath::Matrix4 projMat;
-		projMat[projMat.getIndex(0, 0)] = .2f;
-		projMat[projMat.getIndex(0, 3)] = 1.f;
-		projMat[projMat.getIndex(1, 1)] = .2f;
-		projMat[projMat.getIndex(1, 3)] = 1.f;
-		projMat[projMat.getIndex(3, 3)] = 1.f;
-
 		const float floatWidth = static_cast<float>(p_target.getWidth());
 		const float floatHeight = static_cast<float>(p_target.getHeight());
 
 		// Project each point on the screen
 		for (LibMath::Vector4& pos : points)
-		{
-			pos = projMat * pos;
-
-			pos.m_x *= 0.5f * floatWidth;
-			pos.m_y = floatHeight - pos.m_y * 0.5f * floatHeight;
-		}
+			pos = worldToPixel(pos, p_target, p_projectionMatrix);
 
 		/* get the bounding box of the triangle */
-		const int minX = static_cast<int>(LibMath::min(points[0].m_x,
-			LibMath::min(points[1].m_x, points[2].m_x)));
+		const int minX = static_cast<int>(LibMath::max(0.f, LibMath::min(points[0].m_x,
+			LibMath::min(points[1].m_x, points[2].m_x))));
 
-		const int minY = static_cast<int>(LibMath::min(points[0].m_y,
-			LibMath::min(points[1].m_y, points[2].m_y)));
+		const int minY = static_cast<int>(LibMath::max(0.f, LibMath::min(points[0].m_y,
+			LibMath::min(points[1].m_y, points[2].m_y))));
 
-		const int maxX = static_cast<int>(LibMath::max(points[0].m_x,
-			LibMath::max(points[1].m_x, points[2].m_x)));
+		const int maxX = static_cast<int>(LibMath::min(floatWidth - 1, LibMath::max(points[0].m_x,
+			LibMath::max(points[1].m_x, points[2].m_x))));
 
-		const int maxY = static_cast<int>(LibMath::max(points[0].m_y,
-			LibMath::max(points[1].m_y, points[2].m_y)));
+		const int maxY = static_cast<int>(LibMath::min(floatHeight - 1, LibMath::max(points[0].m_y,
+			LibMath::max(points[1].m_y, points[2].m_y))));
 
 		/* spanning vectors of edge (v1,v2) and (v1,v3) */
 		const LibMath::Vector2 vs1(points[1].m_x - points[0].m_x,
@@ -118,5 +109,19 @@ namespace My
 					p_target.setPixelColor(x, y, pixelColor);
 			}
 		}
+	}
+
+	LibMath::Vector4 Rasterizer::worldToPixel(const Vec4& p_pos,
+		const Texture& p_target, const Mat4& p_projectionMatrix)
+	{
+		const float floatWidth = static_cast<float>(p_target.getWidth());
+		const float floatHeight = static_cast<float>(p_target.getHeight());
+
+		Vec4 projectedVec = p_projectionMatrix * p_pos;
+
+		projectedVec.m_x = (projectedVec.m_x + 1.f) / (2.f / floatWidth);
+		projectedVec.m_y = (1.f - projectedVec.m_y) / (2.f / floatHeight);
+
+		return projectedVec;
 	}
 }

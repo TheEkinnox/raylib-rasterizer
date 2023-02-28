@@ -7,12 +7,16 @@
 #include "Rasterizer.h"
 #include "Texture.h"
 #include "Matrix/Matrix4.h"
-#include "Angle/Radian.h"
-#include "Angle/Degree.h"
-#include "Arithmetic.h"
+#include "Angle.h"
 
 constexpr auto SCREEN_WIDTH = 800;
 constexpr auto SCREEN_HEIGHT = 600;
+constexpr auto ASPECT = static_cast<float>(SCREEN_WIDTH) /
+	static_cast<float>(SCREEN_HEIGHT);
+
+using namespace LibMath::Literal;
+
+using Mat4 = LibMath::Matrix4;
 
 int main()
 {
@@ -20,24 +24,14 @@ int main()
 	InitWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "Rasterize me baby");
 
 	My::Scene scene;
+	scene.addMesh("cube", *My::Mesh::createCube());
+	scene.addMesh("sphere", *My::Mesh::createSphere(32, 32));
 
-	std::vector<My::Vertex> vertices
-	{
-		{ { -0.5, -0.5, 0 } , My::Color::green},
-		{ { 0.5 ,-0.5 , 0 } , My::Color::red },
-		{ { 0 , 0.5 ,  0 }  , My::Color::blue}
-	};
+	Mat4 transform = Mat4::translation(-2.5, 0, 2);
+	scene.addEntity(My::Entity(*scene.getMesh("cube"), transform));
 
-	std::vector<size_t> indices
-	{
-		0,
-		1,
-		2
-	};
-
-	My::Mesh triangle = My::Mesh(vertices, indices);
-	LibMath::Matrix4 transform = LibMath::Matrix4::translation(0, 0, 2);
-	scene.addEntity(My::Entity(triangle, transform));
+	transform = Mat4::translation(2.5, 0, 2);
+	scene.addEntity(My::Entity(*scene.getMesh("sphere"), transform));
 
 	//transformation tests
 	/**
@@ -78,11 +72,14 @@ int main()
 	*/
 
 	My::Texture texture(SCREEN_WIDTH, SCREEN_HEIGHT);
+	
+	const Mat4 projMat = Mat4::perspectiveProjection(145_deg, ASPECT, 0.f, 2.f);
 
-	My::Rasterizer::renderScene(scene, texture);
+	My::Rasterizer::renderScene(scene, texture, projMat);
 
 	// Create the texture
-	const RenderTexture2D target = LoadRenderTexture(static_cast<int>(texture.getWidth()), static_cast<int>(texture.getHeight()));
+	const RenderTexture2D target = LoadRenderTexture(static_cast<int>(texture.getWidth()),
+	                                                 static_cast<int>(texture.getHeight()));
 
 	// Main game loop
 	while (!WindowShouldClose())
