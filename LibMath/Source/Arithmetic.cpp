@@ -4,30 +4,6 @@
 
 namespace LibMath
 {
-	float ceil(const float num)
-	{
-		const auto intPart = static_cast<float>(static_cast<int>(num));
-
-		if (intPart < num)
-			return intPart + 1;
-
-		return intPart;
-	}
-
-	float clamp(const float val, const float a, const float b)
-	{
-		const float min = a < b ? a : b;
-		const float max = a > b ? a : b;
-
-		if (val < min)
-			return min;
-
-		if (val > max)
-			return max;
-
-		return val;
-	}
-
 	float floor(const float value)
 	{
 		const float intPart = static_cast<float>(static_cast<int>(value));
@@ -36,6 +12,38 @@ namespace LibMath
 			return intPart - 1;
 
 		return intPart;
+	}
+
+	float ceil(const float value)
+	{
+		const auto intPart = static_cast<float>(static_cast<int>(value));
+
+		if (intPart < value)
+			return intPart + 1;
+
+		return intPart;
+	}
+
+	float clamp(const float value, const float a, const float b)
+	{
+		const float min = a < b ? a : b;
+		const float max = a > b ? a : b;
+
+		if (value < min)
+			return min;
+
+		if (value > max)
+			return max;
+
+		return value;
+	}
+
+	float wrap(const float value, const float a, const float b)
+	{
+		const float min = a < b ? a : b;
+		const float max = a > b ? a : b;
+
+		return value - (max - min) * floor((value - min) / (max - min));
 	}
 
 	float squareRoot(const float value, float precision, const size_t maxSteps)
@@ -62,19 +70,42 @@ namespace LibMath
 		return sqrt;
 	}
 
-	float wrap(const float val, const float min, const float max)
+	float pow(const float value, const int exponent)
 	{
-		return val - (max - min) * floor((val - min) / (max - min));
+		if (floatEquals(value, 1.f) || exponent == 0)
+			return 1.f;
+
+		if (floatEquals(value, 0))
+			return 0.f;
+
+		float result;
+
+		if (exponent > 0)
+		{
+			result = value;
+
+			for (int i = 1; i < exponent; i++)
+				result *= value;
+		}
+		else
+		{
+			result = 1.f;
+
+			for (int i = 0; i > exponent; i--)
+				result /= value;
+		}
+
+		return result;
 	}
 
-	float min(const float x, const float y)
+	float min(const float a, const float b)
 	{
-		return x < y ? x : y;
+		return a < b ? a : b;
 	}
 
-	float max(const float x, const float y)
+	float max(const float a, const float b)
 	{
-		return x > y ? x : y;
+		return a > b ? a : b;
 	}
 
 	float abs(const float value)
