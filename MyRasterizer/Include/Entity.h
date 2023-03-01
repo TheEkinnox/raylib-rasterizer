@@ -19,6 +19,7 @@ namespace My
 		explicit	Entity(const Mesh& p_mesh, Mat4 p_transform = Mat4());
 					Entity(const Entity& p_other) = default;
 					Entity(Entity&& p_other) = default;
+					Entity() = default;
 					~Entity() = default;
 
 		Entity& translate(float p_x, float p_y, float p_z);

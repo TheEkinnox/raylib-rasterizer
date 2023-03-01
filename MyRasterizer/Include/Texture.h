@@ -1,5 +1,6 @@
 #pragma once
 #include <cstdint>
+#include <stb_image.h>
 
 namespace My
 {
@@ -12,6 +13,7 @@ namespace My
 		Texture(uint32_t p_width, uint32_t p_height);
 		Texture(const Texture&) = default;
 		Texture(Texture&&) = default;
+		Texture(std::string imagePath);
 		~Texture() = default;
 
 		Texture&	operator=(const Texture&) = default;
