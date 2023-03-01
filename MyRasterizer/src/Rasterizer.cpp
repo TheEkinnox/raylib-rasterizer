@@ -18,7 +18,10 @@ namespace My
 				p_target.setPixelColor(x, y, Color::black);
 
 		for (const auto& entity : p_scene.getEntities())
-			drawEntity(entity, p_target);
+		{
+			//drawEntity(entity, p_target);
+			drawNormals(entity, p_target);
+		}
 	}
 
 	void Rasterizer::drawEntity(const Entity& p_entity, Texture& p_target)
@@ -47,6 +50,36 @@ namespace My
 				}
 
 				drawTriangle(triangle, p_target);
+			}
+		}
+	}
+
+	void Rasterizer::drawNormals(const Entity& p_entity, Texture& p_target)
+	{
+		if (p_entity.getMesh() != nullptr)
+		{
+			const auto vertices = p_entity.getMesh()->getVertices();
+			const auto indices = p_entity.getMesh()->getIndices();
+
+			for (auto& v : vertices)
+			{
+				Vertex triangle1[3]
+				{
+					Vertex{v.m_position + LibMath::Vector3(0.02f)},
+					Vertex{v.m_position + v.m_normal},
+					Vertex{v.m_position}
+				};
+
+				drawTriangle(triangle1, p_target);
+
+				Vertex triangle2[3]
+				{
+					Vertex{v.m_position + LibMath::Vector3(0.02f)},
+					Vertex{v.m_position + v.m_normal},
+					Vertex{v.m_position + v.m_normal + LibMath::Vector3(0.02f) }
+				};
+
+				drawTriangle(triangle2, p_target);
 			}
 		}
 	}

@@ -33,6 +33,13 @@ namespace My
 		static void drawEntity(const Entity& p_entity, Texture& p_target);
 
 		/**
+		 * \brief Draws the entity's normals on the target texture
+		 * \param p_entity The entity to draw
+		 * \param p_target The texture on which the entity should be drawn
+		 */
+		static void drawNormals(const Entity& p_entity, Texture& p_target);
+
+		/**
 		 * \brief Draws the received triangle on the target texture
 		 * \param p_vertices The triangle to draw
 		 * \param p_target The texture on which the triangle should be drawn
