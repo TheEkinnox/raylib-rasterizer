@@ -23,11 +23,23 @@ int main()
 	//scene.addMesh("cube", *My::Mesh::createCube());
 	scene.addMesh("sphere", *My::Mesh::createSphere(8, 9));
 
-	LibMath::Matrix4 transform = LibMath::Matrix4::translation(-2.5, 0, 2);
-	scene.addEntity(My::Entity(*scene.getMesh("cube"), transform));
+	std::vector<My::Vertex> vertices
+	{
+		{ { -0.5, -0.5, 0 } , My::Color::green},
+		{ { 0.5 ,-0.5 , 0 } , My::Color::red },
+		{ { 0 , 0.5 ,  0 }  , My::Color::blue}
+	};
 
-	transform = LibMath::Matrix4::translation(2.5, 0, 2);
-	scene.addEntity(My::Entity(*scene.getMesh("sphere"), transform));
+	std::vector<size_t> indices
+	{
+		0,
+		1,
+		2
+	};
+
+	My::Mesh triangle = My::Mesh(vertices, indices);
+	LibMath::Matrix4 transform = LibMath::Matrix4::translation(0, 0, 2);
+	scene.addEntity(My::Entity(triangle, transform));
 
 	//transformation tests
 	/**

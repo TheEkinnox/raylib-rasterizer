@@ -7,6 +7,7 @@
 #include "Scene.h"
 #include "Vector/Vector2.h"
 #include "Vector/Vector4.h"
+#include <Interpolation.h>
 
 namespace My
 {
@@ -31,7 +32,7 @@ namespace My
 			const auto vertices = p_entity.getMesh()->getVertices();
 			const auto indices = p_entity.getMesh()->getIndices();
 
-			for (size_t i = 0; i + 3 < indices.size(); i += 3)
+			for (size_t i = 0; i + 2 < indices.size(); i += 3)
 			{
 				Vertex triangle[3]
 				{
@@ -143,9 +144,11 @@ namespace My
 				const float s = q.cross(vs2) / vs1.cross(vs2);
 				const float t = vs1.cross(q) / vs1.cross(vs2);
 
-				// TODO: Support vertex color
+				Color pixelColor = Color::lerp(p_vertices[0].m_color, p_vertices[1].m_color, s);
+				pixelColor = Color::lerp(pixelColor, p_vertices[2].m_color, t);
+
 				if (s >= 0 && t >= 0 && s + t <= 1)
-					p_target.setPixelColor(x, y, Color::white);
+					p_target.setPixelColor(x, y, pixelColor);
 			}
 		}
 	}

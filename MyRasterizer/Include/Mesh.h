@@ -90,17 +90,20 @@ namespace My
 
 		/**
 		 * \brief Creates a cube of side 1
+		 * \param p_color The color of the cube (white by default)
 		 * \return A pointer to the created cube mesh
 		 */
-		static Mesh* createCube();
+		static Mesh* createCube(const Color& p_color = Color::white);
 
 		/**
 		 * \brief Creates a sphere of radius 1 with the given number of subdivisions
 		 * \param p_latitudeCount The number of vertical subdivisions
 		 * \param p_longitudeCount The number of horizontal subdivisions
+		 * \param p_color The color of the sphere (white by default)
 		 * \return A pointer to the created sphere mesh
 		 */
-		static Mesh* createSphere(uint32_t p_latitudeCount, uint32_t p_longitudeCount);
+		static Mesh* createSphere(uint32_t p_latitudeCount, uint32_t p_longitudeCount,
+			const Color& p_color = Color::white);
 
 	private:
 		std::vector<Vertex> m_vertices;

@@ -34,19 +34,19 @@ std::vector<size_t> My::Mesh::getIndices() const
 	return m_indices;
 }
 
-My::Mesh* My::Mesh::createCube()
+My::Mesh* My::Mesh::createCube(const Color& p_color)
 {
 	float nLen = 0.57735027f;	// 1 = sqrt(3 * x2) => sqrt(1/3) = x => 0.57735027f = x
 	const std::vector<Vertex> vertices
 	{
-		{ { -.5f, .5f, .5f }, { -nLen, nLen, nLen } },		// Front-top-left
-		{ { .5f, .5f, .5f }, { nLen, nLen, nLen } },		// Front-top-right
-		{ { -.5f, -.5f, .5f }, { -nLen, -nLen, nLen } },	// Front-bottom-left
-		{ { .5f, -.5f, .5f }, { nLen, -nLen, nLen } },		// Front-bottom-right
-		{ { -.5f, .5f, -.5f }, { -nLen, nLen, -nLen } },	// Back-top-left
-		{ { .5f, .5f, -.5f }, { nLen, nLen, -nLen } },		// Back-top-right
-		{ { -.5f, -.5f, -.5f }, { -nLen, -nLen, -nLen } },	// Back-bottom-left
-		{ { .5f, -.5f, -.5f }, { nLen, -nLen, -nLen } }	// Back-bottom-right
+		{ { -.5f, .5f, .5f }, { -nLen, nLen, nLen }, p_color  },		// Front-top-left
+		{ { .5f, .5f, .5f }, { nLen, nLen, nLen }, p_color  },		// Front-top-right
+		{ { -.5f, -.5f, .5f }, { -nLen, -nLen, nLen }, p_color  },	// Front-bottom-left
+		{ { .5f, -.5f, .5f }, { nLen, -nLen, nLen }, p_color  },		// Front-bottom-right
+		{ { -.5f, .5f, -.5f }, { -nLen, nLen, -nLen }, p_color  },	// Back-top-left
+		{ { .5f, .5f, -.5f }, { nLen, nLen, -nLen }, p_color  },		// Back-top-right
+		{ { -.5f, -.5f, -.5f }, { -nLen, -nLen, -nLen }, p_color  },	// Back-bottom-left
+		{ { .5f, -.5f, -.5f }, { nLen, -nLen, -nLen }, p_color  }	// Back-bottom-right
 	};
 
 	const std::vector<size_t> indices
@@ -76,21 +76,22 @@ My::Mesh* My::Mesh::createCube()
 		4, 0, 1
 	};
 	//normal test
-	auto m1 = new Mesh(vertices, indices);
-	auto m2 = new Mesh(*m1);
+	// auto m1 = new Mesh(vertices, indices);
+	// auto m2 = new Mesh(*m1);
 
-	m2->CalculateNormals();
+	// m2->CalculateNormals();
 
-	for (auto& v : m1->m_vertices)
-		std::cout << v.m_normal << std::endl;
-	std::cout << "my normals" << std::endl;
-	for (auto& v : m2->m_vertices)
-		std::cout << v.m_normal << std::endl;
+	// for (auto& v : m1->m_vertices)
+	// 	std::cout << v.m_normal << std::endl;
+	// std::cout << "my normals" << std::endl;
+	// for (auto& v : m2->m_vertices)
+	// 	std::cout << v.m_normal << std::endl;
 
 	return new Mesh(vertices, indices);
 }
 
-My::Mesh* My::Mesh::createSphere(const uint32_t p_latitudeCount, const uint32_t p_longitudeCount)
+My::Mesh* My::Mesh::createSphere(const uint32_t p_latitudeCount, const uint32_t p_longitudeCount,
+	const Color& p_color)
 {
 	const float deltaPhi = LibMath::g_pi / static_cast<float>(p_latitudeCount);
 	const float deltaTheta = LibMath::g_pi * 2.f / static_cast<float>(p_longitudeCount);
@@ -122,7 +123,7 @@ My::Mesh* My::Mesh::createSphere(const uint32_t p_latitudeCount, const uint32_t 
 			bool test = normal.isUnitVector();
 			float mag = normal.magnitudeSquared();
 				
-			vertices.push_back({ normal * radius, normal });
+			vertices.push_back({ normal * radius, normal, p_color});
 		}
 	}
 	vertices.push_back({ Vec3::down(), Vec3::down() }); //bot vertex

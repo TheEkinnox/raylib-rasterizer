@@ -7,16 +7,10 @@
     <ClInclude Include="Header\Arithmetic.h">
       <Filter>Header</Filter>
     </ClInclude>
-    <ClInclude Include="Header\Intersection.h">
-      <Filter>Header</Filter>
-    </ClInclude>
     <ClInclude Include="Header\Matrix.h">
       <Filter>Header</Filter>
     </ClInclude>
     <ClInclude Include="Header\Matrix4Vector4Operation.h">
-      <Filter>Header</Filter>
-    </ClInclude>
-    <ClInclude Include="Header\Quaternion.h">
       <Filter>Header</Filter>
     </ClInclude>
     <ClInclude Include="Header\Trigonometry.h">
@@ -52,6 +46,7 @@
     <ClInclude Include="Header\Vector\Vector4.h">
       <Filter>Header\Vector</Filter>
     </ClInclude>
+    <ClInclude Include="Header\Interpolation.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source\Angle.cpp">
@@ -60,16 +55,7 @@
     <ClCompile Include="Source\Arithmetic.cpp">
       <Filter>Source</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Interpolation.cpp">
-      <Filter>Source</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Intersection.cpp">
-      <Filter>Source</Filter>
-    </ClCompile>
     <ClCompile Include="Source\Matrix.cpp">
-      <Filter>Source</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Quaternion.cpp">
       <Filter>Source</Filter>
     </ClCompile>
     <ClCompile Include="Source\Trigonometry.cpp">

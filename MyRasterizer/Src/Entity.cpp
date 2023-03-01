@@ -11,19 +11,19 @@ My::Entity::Entity(const Mesh& p_mesh, Mat4 p_transform) :
 	this->m_mesh = &p_mesh;
 }
 
-My::Entity& My::Entity::Translate(float p_x, float p_y, float p_z)
+My::Entity& My::Entity::translate(const float p_x, const float p_y, const float p_z)
 {
 	this->m_transform *= Mat4::translation(p_x, p_y, p_z);
 	return *this;
 }
 
-My::Entity& My::Entity::Scale(float p_x, float p_y, float p_z)
+My::Entity& My::Entity::scale(const float p_x, const float p_y, const float p_z)
 {
 	this->m_transform *= Mat4::scaling(p_x, p_y, p_z);
 	return *this;
 }
 
-My::Entity& My::Entity::RotateEulerAngles(Rad p_x, Rad p_y, Rad p_z)
+My::Entity& My::Entity::rotateEulerAngles(const Rad& p_x, const Rad& p_y, const Rad& p_z)
 {
 	this->m_transform *= Mat4::rotation(p_x, Vec3::right());	//rotate x axis
 	this->m_transform *= Mat4::rotation(p_y, Vec3::up());		//rotate y axis
@@ -31,7 +31,7 @@ My::Entity& My::Entity::RotateEulerAngles(Rad p_x, Rad p_y, Rad p_z)
 	return *this;
 }
 
-My::Entity& My::Entity::SetPosition(float p_x, float p_y, float p_z)
+My::Entity& My::Entity::setPosition(const float p_x, const float p_y, const float p_z)
 {
 	LibMath::Vector3 pos = this->GetPosition();
 	//this->Translate(-pos.m_x, -pos.m_y, -pos.m_z); // back to (0, 0, 0)
@@ -42,7 +42,7 @@ My::Entity& My::Entity::SetPosition(float p_x, float p_y, float p_z)
 	return *this;
 }
 
-My::Entity& My::Entity::SetScale(float p_x, float p_y, float p_z)
+My::Entity& My::Entity::setScale(const float p_x, const float p_y, const float p_z)
 {
 	LibMath::Vector3 scale = this->GetScale();
 	//this->Scale(1 / scale.m_x, 1 / scale.m_y, 1 / scale.m_z); // back to (1, 1, 1)
@@ -54,7 +54,7 @@ My::Entity& My::Entity::SetScale(float p_x, float p_y, float p_z)
 	return *this;
 }
 
-My::Entity& My::Entity::SetRotationEulerAngles(Rad p_x, Rad p_y, Rad p_z)
+My::Entity& My::Entity::setRotationEulerAngles(const Rad& p_x, const Rad& p_y, const Rad& p_z)
 {
 	LibMath::Vector3 rotateAngles = this->GetRotationEulerAngles();
 	//this->RotateEulerAngles(	static_cast<Rad>(-rotateAngles.m_x), 
@@ -68,7 +68,7 @@ My::Entity& My::Entity::SetRotationEulerAngles(Rad p_x, Rad p_y, Rad p_z)
 	return *this;
 }
 
-My::Entity::Vec3 My::Entity::GetPosition() const
+My::Entity::Vec3 My::Entity::getPosition() const
 {
 	/**
 	* 		|		   1		   0		   0		  tx 	 |
@@ -84,7 +84,7 @@ My::Entity::Vec3 My::Entity::GetPosition() const
 					m_transform[11]);
 }
 
-My::Entity::Vec3 My::Entity::GetScale() const
+My::Entity::Vec3 My::Entity::getScale() const
 {
 	/**		
 	* 		|		  sx		   0		   0		   0 	 |
@@ -95,10 +95,10 @@ My::Entity::Vec3 My::Entity::GetScale() const
 	* scalingFactor = sqrt(m00 * m00 + m01 * m01 + m02 * m02);
 	*/
 
-	return Vec3(this->GetScaleX(), this->GetScaleY(), this->GetScaleZ());
+	return Vec3(this->getScaleX(), this->getScaleY(), this->getScaleZ());
 }
 
-float My::Entity::GetScaleX() const
+float My::Entity::getScaleX() const
 {
 	//see GetScale()
 	//
@@ -107,7 +107,7 @@ float My::Entity::GetScaleX() const
 								m_transform[8] * m_transform[8]);
 }
 
-float My::Entity::GetScaleY() const
+float My::Entity::getScaleY() const
 {
 	//see GetScale()
 	//
@@ -116,7 +116,7 @@ float My::Entity::GetScaleY() const
 								m_transform[9] * m_transform[9]);
 }
 
-float My::Entity::GetScaleZ() const
+float My::Entity::getScaleZ() const
 {
 	//see GetScale()
 	//
@@ -125,7 +125,7 @@ float My::Entity::GetScaleZ() const
 								m_transform[10] * m_transform[10]);
 }
 
-My::Entity::Vec3 My::Entity::GetRotationEulerAngles() const
+My::Entity::Vec3 My::Entity::getRotationEulerAngles() const
 {
 	/**
 	*                                          [ m00 m01 m02 ]
@@ -137,16 +137,17 @@ My::Entity::Vec3 My::Entity::GetRotationEulerAngles() const
 	*		|		   0		   0		   0		   1 	 |
 	* http://eecs.qmul.ac.uk/~gslabaugh/publications/euler.pdf
 	*/
-	Vec3 scale(this->GetScale());
+
+	const Vec3 scale(this->getScale());
 	Mat4 rotation(this->m_transform);
 
-	rotation.scaling(1.0f / scale.m_x, 1.0f / scale.m_y, 1.0f / scale.m_z); //un-scale mat
-	//dont have to un-translate mat bcs trans doesnt affect rotation
+	rotation *= Mat4::scaling(1.0f / scale.m_x, 1.0f / scale.m_y, 1.0f / scale.m_z); //un-scale mat
+	//don't have to un-translate mat bcs trans doesn't affect rotation
 
 	LibMath::Radian psi1, teta1, phi1, psi2, teta2, phi2;
 	float cosTeta1, cosTeta2;
 
-	if (LibMath::abs(rotation[8]) != 1) 
+	if (LibMath::abs(rotation[8]) != 1.f)
 	{
 		/**
 		*		|		   0		   1		   2		   3 	 |
@@ -158,18 +159,18 @@ My::Entity::Vec3 My::Entity::GetRotationEulerAngles() const
 		teta1 = -LibMath::asin(rotation[8]);
 		teta2 = static_cast<Rad>(LibMath::g_pi) - teta1;
 
-		cosTeta1 = LibMath::cos(teta1);
-		cosTeta2 = LibMath::cos(teta2);
+		cosTheta1 = LibMath::cos(theta1);
+		cosTheta2 = LibMath::cos(teta2);
 
-		psi1 = LibMath::atan(rotation[9] / cosTeta1, rotation[10] / cosTeta1);
-		psi2 = LibMath::atan(rotation[9] / cosTeta2, rotation[10] / cosTeta2);
+		psi1 = LibMath::atan(rotation[9] / cosTheta1, rotation[10] / cosTheta1);
+		psi2 = LibMath::atan(rotation[9] / cosTheta2, rotation[10] / cosTheta2);
 
-		phi1 = LibMath::atan(rotation[4] / cosTeta1, rotation[0] / cosTeta1);
-		phi2 = LibMath::atan(rotation[4] / cosTeta2, rotation[0] / cosTeta2);
+		phi1 = LibMath::atan(rotation[4] / cosTheta1, rotation[0] / cosTheta1);
+		phi2 = LibMath::atan(rotation[4] / cosTheta2, rotation[0] / cosTheta2);
 	}
 	else //infinity solutions? / gimble lock
 	{
-		// TODO : Gimble lock exception Euler ANGLES, counld only give one?
+		// TODO : Gimble lock exception Euler ANGLES, could only give one?
 	}
 
 	//reverse phi bcs of global orientation
@@ -178,41 +179,41 @@ My::Entity::Vec3 My::Entity::GetRotationEulerAngles() const
 
 	// TODO : Get Rotation return? only 1 or 2 solutions? one is NAN sometimes
 	//if (cosTeta1 != 0) //not NAN
-	return Vec3(psi1.raw(), teta1.raw(), phi1.raw());
+	return {psi1.raw(), theta1.raw(), phi1.raw()};
 	//return Vec3(psi2.raw(), teta2.raw(), phi2.raw());
 }
 
-My::Entity::Vec3 My::Entity::GetRightward() const
+My::Entity::Vec3 My::Entity::getRightward() const
 {
-	float xScale = this->GetScaleX();
-	return Vec3( m_transform[0] / xScale, m_transform[4] / xScale, m_transform[8] / xScale );
+	const float xScale = this->getScaleX();
+	return {m_transform[0] / xScale, m_transform[4] / xScale, m_transform[8] / xScale};
 }
 
-My::Entity::Vec3 My::Entity::GetLeftward() const
+My::Entity::Vec3 My::Entity::getLeftward() const
 {
-	return (- 1 * this->GetRightward());
+	return -this->getRightward();
 }
 
-My::Entity::Vec3 My::Entity::GetUpward() const
+My::Entity::Vec3 My::Entity::getUpward() const
 {
-	float yScale = this->GetScaleY();
-	return Vec3(m_transform[1] / yScale, m_transform[5] / yScale,  m_transform[9] / yScale);
+	const float yScale = this->getScaleY();
+	return {m_transform[1] / yScale, m_transform[5] / yScale,  m_transform[9] / yScale};
 }
 
-My::Entity::Vec3 My::Entity::GetDownward() const
+My::Entity::Vec3 My::Entity::getDownward() const
 {
-	return (-1 * this->GetUpward());
+	return -this->getUpward();
 }
 
-My::Entity::Vec3 My::Entity::GetForward() const
+My::Entity::Vec3 My::Entity::getForward() const
 {
-	float zScale = this->GetScaleZ();
-	return Vec3(m_transform[2] / zScale, m_transform[6] / zScale, m_transform[10] / zScale);
+	const float zScale = this->getScaleZ();
+	return {m_transform[2] / zScale, m_transform[6] / zScale, m_transform[10] / zScale};
 }
 
-My::Entity::Vec3 My::Entity::GetBackward() const
+My::Entity::Vec3 My::Entity::getBackward() const
 {
-	return (-1 * this->GetForward());
+	return -this->getForward();
 }
 
 const My::Mesh* My::Entity::getMesh() const

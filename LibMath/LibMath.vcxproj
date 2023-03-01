@@ -153,6 +153,7 @@
     <ClInclude Include="Header\Angle\Degree.h" />
     <ClInclude Include="Header\Angle\Radian.h" />
     <ClInclude Include="Header\Arithmetic.h" />
+    <ClInclude Include="Header\Interpolation.h" />
     <ClInclude Include="Header\Matrix.h" />
     <ClInclude Include="Header\Matrix4Vector4Operation.h" />
     <ClInclude Include="Header\Matrix\Matrix2.h" />
