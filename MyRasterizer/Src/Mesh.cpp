@@ -1,7 +1,10 @@
 #include "Trigonometry.h"
 #include "Mesh.h"
 #include "Vector/Vector3.h"
+#include "Arithmetic.h"
 #include <map>
+#include <set>
+#include <numeric>
 
 using Vec3 = LibMath::Vector3;
 
@@ -73,11 +76,16 @@ My::Mesh* My::Mesh::createCube()
 		4, 0, 1
 	};
 	//normal test
-	//bool test = vertices[0].m_normal.isUnitVector();
-	//Mesh* m = new Mesh(vertices, indices);
-	//m->CalculateNormals();
+	auto m1 = new Mesh(vertices, indices);
+	auto m2 = new Mesh(*m1);
 
-	//return new Mesh(vertices, indices);
+	m2->CalculateNormals();
+
+	for (auto& v : m1->m_vertices)
+		std::cout << v.m_normal << std::endl;
+	std::cout << "my normals" << std::endl;
+	for (auto& v : m2->m_vertices)
+		std::cout << v.m_normal << std::endl;
 
 	return new Mesh(vertices, indices);
 }
@@ -90,13 +98,14 @@ My::Mesh* My::Mesh::createSphere(const uint32_t p_latitudeCount, const uint32_t 
 	std::vector<Vertex> vertices;
 	std::vector<size_t> indices;
 
-	for (uint32_t i = 0; i < p_latitudeCount; i++)
+	vertices.push_back({ Vec3::up(), Vec3::up() }); //top vertex
+	for (uint32_t i = 1; i < p_latitudeCount; i++) // [1, count - 1) bcs need only 1 vertex at top and bot
 	{
 		const float phi = static_cast<float>(i) * deltaPhi;
 		const float cosPhi = cosf(phi);
 		const float sinPhi = sinf(phi);
 
-		for (uint32_t j = 0; j <= p_longitudeCount; j++)
+		for (uint32_t j = 0; j < p_longitudeCount; j++) //dont nee <= bcs using vertex 
 		{
 			constexpr float radius = 1.f;
 			const float theta = static_cast<float>(j) * deltaTheta;
@@ -116,6 +125,7 @@ My::Mesh* My::Mesh::createSphere(const uint32_t p_latitudeCount, const uint32_t 
 			vertices.push_back({ normal * radius, normal });
 		}
 	}
+	vertices.push_back({ Vec3::down(), Vec3::down() }); //bot vertex
 
 	for (uint32_t i = 0; i < p_longitudeCount; ++i)
 	{
@@ -130,17 +140,17 @@ My::Mesh* My::Mesh::createSphere(const uint32_t p_latitudeCount, const uint32_t 
 		i0 = i + p_longitudeCount * (p_latitudeCount - 2) + 1;
 		i1 = (i + 1) % p_longitudeCount + p_longitudeCount * (p_latitudeCount - 2) + 1;
 		indices.push_back(vertices.size() - 1);
-		indices.push_back(i1);
 		indices.push_back(i0);
+		indices.push_back(i1);
 	}
 
 	// add quads per stack / slice
-	for (uint32_t j = 0; j < p_latitudeCount; j++)
+	for (uint32_t j = 0; j < p_latitudeCount - 2; j++) //top is point
 	{
-		const auto j0 = j * p_longitudeCount;
-		const auto j1 = (j + 1) * p_longitudeCount;
+		const auto j0 = j * p_longitudeCount + 1; //+1 is top point
+		const auto j1 = (j + 1) * p_longitudeCount + 1;
 
-		for (uint32_t i = 0; i < p_longitudeCount; i++)
+		for (uint32_t i = 0; i < p_longitudeCount - 1; i++) //all but last square
 		{
 			const auto i0 = j0 + i;
 			const auto i1 = j0 + (i + 1) % p_longitudeCount;
@@ -148,14 +158,45 @@ My::Mesh* My::Mesh::createSphere(const uint32_t p_latitudeCount, const uint32_t 
 			const auto i3 = j1 + i;
 
 			indices.push_back(i0);
-			indices.push_back(i2);
 			indices.push_back(i1);
+			indices.push_back(i2);
 
 			indices.push_back(i2);
-			indices.push_back(i0);
 			indices.push_back(i3);
+			indices.push_back(i0);
 		}
+		//last square wraps back to first vertex
+		indices.push_back(j0 + p_longitudeCount - 1);
+		indices.push_back(j0);
+		indices.push_back(j1);
+
+		indices.push_back(j1);
+		indices.push_back(j1 + p_longitudeCount - 1);
+		indices.push_back(j0 + p_longitudeCount - 1);
 	}
+
+	//test normals
+	/*auto m1 = new Mesh(vertices, indices);
+	auto m2 = new Mesh(*m1);
+
+	m2->CalculateNormals();
+
+	for (auto& v : m1->m_vertices)
+		std::cout << v.m_normal << std::endl;
+	std::cout << "my normals" << std::endl;
+	for (auto& v : m2->m_vertices)
+		std::cout << v.m_normal << std::endl;
+
+	for (size_t i = 0; i < m1->m_vertices.size(); i++)
+	{
+		if (!LibMath::floatEquals(	m1->m_vertices[i].m_normal.m_x,
+									m2->m_vertices[i].m_normal.m_x))
+		{
+			float dif = LibMath::abs(m2->m_vertices[i].m_normal.m_x - m1->m_vertices[i].m_normal.m_x);
+			int l = 0;
+		}
+		
+	}*/
 
 	return new Mesh(vertices, indices);
 }
@@ -165,7 +206,29 @@ void My::Mesh::CalculateNormals()
 	Vec3* A, *B, *C;
 	Vec3 BC, BA, normal;
 
-	for (size_t i = 0; i < this->m_indices.size() / 3; i += 3)
+	struct Compare
+	{
+		bool operator()(const Vec3& lhs, const Vec3& rhs) const noexcept
+		{
+			if (LibMath::floatGreaterThan(lhs.m_x,rhs.m_x)) //if x is bigger
+				return true;
+
+			if (LibMath::floatGreaterThan(lhs.m_y, rhs.m_y) &&
+				LibMath::floatEquals(lhs.m_x, rhs.m_x)) //if y bigger and x ==
+				return true;
+
+			if (LibMath::floatGreaterThan(lhs.m_z, rhs.m_z) &&
+				LibMath::floatEquals(lhs.m_x, rhs.m_x) && 
+				LibMath::floatEquals(lhs.m_y, rhs.m_y)) //if z bigger and x and y ==
+				return true;
+
+			return false; //if x y z is smaler
+		}
+	};
+	std::set<Vec3, Compare> uniqueNormals;
+	std::map<Vertex*, std::set<const Vec3*>> vertexUniqueNormals; //each Vertex has a its set of unique normals ptrs
+
+	for (size_t i = 0; i < this->m_indices.size(); i += 3)
 	{
 		//triangle ABC
 		A = &this->m_vertices[m_indices[i]].m_position;
@@ -176,28 +239,26 @@ void My::Mesh::CalculateNormals()
 		BC = *C - *B;
 		BA = *A - *B;	
 
-		/**
-		* 
-		*	|	 i		 j		 k	  |
-		*	|	BC.x	BC.y	BC.z  |
-		*	|	BA.x	BA.y	BA.z  |
-		* 
-		*/
 		//get normal
-		normal = {	BC.m_y * BA.m_z - BC.m_z * BA.m_y,
-				  -(BC.m_x * BA.m_z - BC.m_z * BA.m_x),
-					BC.m_x * BA.m_y - BC.m_y * BA.m_x };
+		normal = BC.cross(BA);
 		normal.normalize();
 
-		//add normals to vertex
-		m_vertices[m_indices[i]].m_normal += normal;
-		m_vertices[m_indices[i + 1]].m_normal += normal;
-		m_vertices[m_indices[i + 2]].m_normal += normal;
+		//insert in uniqueNormals, returns pair<it,bool> (bool isNewInsert is ignored)
+		//it is ptr to either new normal or existant normal (no duplicates) 
+		const Vec3* normalPtr = &(*uniqueNormals.insert(normal).first);
+
+		vertexUniqueNormals[&m_vertices[m_indices[i]]].insert(normalPtr);
+		vertexUniqueNormals[&m_vertices[m_indices[i + 1]]].insert(normalPtr);
+		vertexUniqueNormals[&m_vertices[m_indices[i + 2]]].insert(normalPtr);
 	}
 
-	for (auto& vertex : m_vertices) //normalize all normals
+	//accumulate operator : add all the Vec3 ptr's values;
+	auto op = [](const Vec3& v1, const Vec3* v2) { return v1 + *v2; }; 
+
+	for (auto& pair : vertexUniqueNormals)
 	{
-		if (vertex.m_normal != Vec3::zero())
-			vertex.m_normal.normalize();
+		pair.first->m_normal = std::accumulate(	pair.second.begin(), pair.second.end(), 
+												Vec3::zero(), op);
+		pair.first->m_normal.normalize();
 	}
 }

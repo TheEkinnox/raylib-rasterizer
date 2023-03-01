@@ -20,8 +20,8 @@ int main()
 	InitWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "Rasterize me baby");
 
 	My::Scene scene;
-	scene.addMesh("cube", *My::Mesh::createCube());
-	scene.addMesh("sphere", *My::Mesh::createSphere(32, 32));
+	//scene.addMesh("cube", *My::Mesh::createCube());
+	scene.addMesh("sphere", *My::Mesh::createSphere(8, 9));
 
 	LibMath::Matrix4 transform = LibMath::Matrix4::translation(-2.5, 0, 2);
 	scene.addEntity(My::Entity(*scene.getMesh("cube"), transform));
