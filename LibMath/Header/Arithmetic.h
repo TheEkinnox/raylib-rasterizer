@@ -23,6 +23,8 @@ namespace LibMath
 	float	abs(float);					// Return absolute value of the parameter
 
 	bool	floatEquals(float a, float b);
+	bool	floatLessThan(float a, float b);
+	bool	floatGreaterThan(float a, float b);
 }
 
 #endif // !__LIBMATH__ARITHMETIC_H__
