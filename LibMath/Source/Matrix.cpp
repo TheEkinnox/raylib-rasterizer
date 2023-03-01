@@ -314,8 +314,8 @@ namespace LibMath
 
 		mat[mat.getIndex(0, 0)] = 1.f / (aspect * tanHalfFovY);
 		mat[mat.getIndex(1, 1)] = 1.f / tanHalfFovY;
-		mat[mat.getIndex(2, 2)] = -(far + near) / (far - near);
-		mat[mat.getIndex(2, 3)] = -(2.f * far * near) / (far - near);
+		mat[mat.getIndex(2, 2)] = (far + near) / (near - far);
+		mat[mat.getIndex(2, 3)] = (2.f * far * near) / (near - far);
 		mat[mat.getIndex(3, 2)] = -1.f;
 
 		return mat;
