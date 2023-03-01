@@ -33,29 +33,22 @@ namespace My
 
 			for (size_t i = 0; i + 2 < indices.size(); i += 3)
 			{
-				Vertex triangle[3]
+				const Vertex triangle[3]
 				{
 					vertices[indices[i]],
 					vertices[indices[i + 1]],
 					vertices[indices[i + 2]]
 				};
 
-				for (Vertex& vertex : triangle)
-				{
-					auto& pos = vertex.m_position;
-					auto vec4 = LibMath::Vector4{pos.m_x, pos.m_y, pos.m_z, 1.f};
+				const Mat4 mvpMat = p_projectionMatrix * p_entity.getTransform();
 
-					vec4 = p_entity.getTransform() * vec4;
-					pos = {vec4.m_x, vec4.m_y, vec4.m_z};
-				}
-
-				drawTriangle(triangle, p_target, p_projectionMatrix);
+				drawTriangle(triangle, p_target, mvpMat);
 			}
 		}
 	}
 
 	void Rasterizer::drawTriangle(const Vertex p_vertices[3], Texture& p_target,
-		const Mat4& p_projectionMatrix)
+		const Mat4& p_mvpMatrix)
 	{
 		// Create an array of vector4 for the positions
 		LibMath::Vector4 points[3]
@@ -70,7 +63,7 @@ namespace My
 
 		// Project each point on the screen
 		for (LibMath::Vector4& pos : points)
-			pos = worldToPixel(pos, p_target, p_projectionMatrix);
+			pos = worldToPixel(pos, p_target, p_mvpMatrix);
 
 		/* get the bounding box of the triangle */
 		const int minX = static_cast<int>(LibMath::max(0.f, LibMath::min(points[0].m_x,
@@ -102,6 +95,12 @@ namespace My
 				const float s = q.cross(vs2) / vs1.cross(vs2);
 				const float t = vs1.cross(q) / vs1.cross(vs2);
 
+				float pixelZ = LibMath::lerp(points[0].m_z, points[1].m_z, s);
+				pixelZ = LibMath::lerp(pixelZ, points[2].m_z, t);
+
+				if (LibMath::abs(pixelZ) > 1)
+					continue;
+
 				Color pixelColor = Color::lerp(p_vertices[0].m_color, p_vertices[1].m_color, s);
 				pixelColor = Color::lerp(pixelColor, p_vertices[2].m_color, t);
 
@@ -111,13 +110,18 @@ namespace My
 		}
 	}
 
-	LibMath::Vector4 Rasterizer::worldToPixel(const Vec4& p_pos,
-		const Texture& p_target, const Mat4& p_projectionMatrix)
+	LibMath::Vector4 Rasterizer::worldToPixel(const Vec4& p_pos, const Texture& p_target,
+		const Mat4& p_mvpMatrix)
 	{
+		// Apply model view projection matrix
+		Vec4 projectedVec = p_mvpMatrix * p_pos;
+
+		// Convert projected coordinates to ndc
+		projectedVec /= projectedVec.m_w;
+
+		// Convert ndc coordinates to pixel
 		const float floatWidth = static_cast<float>(p_target.getWidth());
 		const float floatHeight = static_cast<float>(p_target.getHeight());
-
-		Vec4 projectedVec = p_projectionMatrix * p_pos;
 
 		projectedVec.m_x = (projectedVec.m_x + 1.f) / (2.f / floatWidth);
 		projectedVec.m_y = (1.f - projectedVec.m_y) / (2.f / floatHeight);

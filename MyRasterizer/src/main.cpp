@@ -24,13 +24,13 @@ int main()
 	InitWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "Rasterize me baby");
 
 	My::Scene scene;
-	scene.addMesh("cube", *My::Mesh::createCube());
-	scene.addMesh("sphere", *My::Mesh::createSphere(32, 32));
+	scene.addMesh("cube", *My::Mesh::createCube(My::Color::red));
+	scene.addMesh("sphere", *My::Mesh::createSphere(32, 32, My::Color::blue));
 
-	Mat4 transform = Mat4::translation(-2.5, 0, 2);
+	Mat4 transform = Mat4::translation(-.5f, 0, -2);
 	scene.addEntity(My::Entity(*scene.getMesh("cube"), transform));
 
-	transform = Mat4::translation(2.5, 0, 2);
+	transform = Mat4::translation(.5f, 0, -2);
 	scene.addEntity(My::Entity(*scene.getMesh("sphere"), transform));
 
 	//transformation tests
@@ -73,7 +73,7 @@ int main()
 
 	My::Texture texture(SCREEN_WIDTH, SCREEN_HEIGHT);
 	
-	const Mat4 projMat = Mat4::perspectiveProjection(145_deg, ASPECT, 0.f, 2.f);
+	const Mat4 projMat = Mat4::perspectiveProjection(145_deg, ASPECT, 0.1f, 2.f);
 
 	My::Rasterizer::renderScene(scene, texture, projMat);
 
