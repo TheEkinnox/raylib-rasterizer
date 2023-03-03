@@ -7,9 +7,6 @@
 #include "Rasterizer.h"
 #include "Texture.h"
 #include "Matrix/Matrix4.h"
-#include "Angle/Radian.h"
-#include "Angle/Degree.h"
-#include "Arithmetic.h"
 
 constexpr auto SCREEN_WIDTH = 800;
 constexpr auto SCREEN_HEIGHT = 600;
@@ -30,12 +27,8 @@ int main()
 		{ {    0,  0.5, 0 }, LibMath::Vector3::back(), My::Color::blue}
 	};
 
-	std::vector<size_t> indices
-	{
-		0,
-		1,
-		2
-	};
+	LibMath::Matrix4 transform = LibMath::Matrix4::translation(-0.5f, 0, 2);
+	scene.addEntity(My::Entity(*scene.getMesh("cube"), transform));
 
 	My::Mesh* triangle = new My::Mesh(vertices, indices);
 	//scene.addMesh("triangle", *triangle);
@@ -97,7 +90,8 @@ int main()
 
 	My::Texture texture(SCREEN_WIDTH, SCREEN_HEIGHT);
 
-	My::Rasterizer::renderScene(scene, texture);
+	My::Rasterizer rasterizer;
+	rasterizer.renderScene(scene, texture);
 
 	// Create the texture
 	const RenderTexture2D target = LoadRenderTexture(static_cast<int>(texture.getWidth()), static_cast<int>(texture.getHeight()));
