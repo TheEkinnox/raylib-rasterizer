@@ -121,8 +121,8 @@ namespace My
 				if (s >= 0 && t >= 0 && s + t <= 1)
 				{
 					const size_t bufferIndex = static_cast<size_t>(y) * p_target.getWidth() + x;
-					float pixelZ = LibMath::lerp(p_vertices[0].m_position.m_z, p_vertices[1].m_position.m_z, s);
-					pixelZ = LibMath::lerp(pixelZ, p_vertices[2].m_position.m_z, t);
+					float pixelZ = LibMath::lerp(points[0].m_z, points[1].m_z, s);
+					pixelZ = LibMath::lerp(pixelZ, points[2].m_z, t);
 
 					if (pixelZ < m_zBuffer[bufferIndex])
 					{
