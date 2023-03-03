@@ -17,9 +17,8 @@ My::Color My::Light::CalculateLightingPhong(	const Vertex& p_vertex, const Vec3&
 												size_t p_shinyness)const
 {
 	// https://fr.wikipedia.org/wiki/Ombrage_de_Phong
-	//float ka = 1, kd = 1, ks = 1; // material constants for percent of ambiante, diffuse and specular
 
-	const float viewAngle = LibMath::clamp(	p_vertex.m_normal.dot(this->m_position - p_vertex.m_position), 
+	const float lightAngle = LibMath::clamp(	p_vertex.m_normal.dot(this->m_position - p_vertex.m_position), 
 											0.0f, 1.0f);
 	Vec3 halfVector = p_observer + this->m_position - 2 * p_vertex.m_position;
 	halfVector.normalize();
@@ -29,12 +28,12 @@ My::Color My::Light::CalculateLightingPhong(	const Vertex& p_vertex, const Vec3&
 	Vec3 ia = p_vertex.m_color.rgb() * m_ambientComponent;
 
 	// Intensity diffuse
-	Vec3 id = p_vertex.m_color.rgb() * m_diffuseComponent * nDotH;
+	Vec3 id = p_vertex.m_color.rgb() * m_diffuseComponent * nDotH; // TODO : remove * nDotH
 
 	// Intensity specular
 	Vec3 is = Color::white.rgb() * LibMath::pow(nDotH, static_cast<int>(p_shinyness)) * m_specularComponent;
 
-	return Color(	ia + (id + is) * viewAngle * m_intensity,
+	return Color(	ia + (id + is) * lightAngle * m_intensity,
 					255);
 }
 
