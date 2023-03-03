@@ -18,6 +18,12 @@ namespace My
 			for (uint32_t y = 0; y < p_target.getHeight(); y++)
 				p_target.setPixelColor(x, y, Color::black);
 
+		const size_t textureSize = static_cast<size_t>(p_target.getWidth())
+			* p_target.getHeight();
+
+		m_zBuffer.clear();
+		m_zBuffer.resize(textureSize, INFINITY);
+
 		for (const auto& entity : p_scene.getEntities())
 			drawEntity(entity, p_target);
 	}
@@ -62,6 +68,7 @@ namespace My
 			{p_vertices[2].m_position.m_x, p_vertices[2].m_position.m_y, p_vertices[2].m_position.m_z, 1.f}
 		};
 
+		// Create our projection matrix
 		LibMath::Matrix4 projMat;
 		projMat[projMat.getIndex(0, 0)] = .2f;
 		projMat[projMat.getIndex(0, 3)] = 1.f;
@@ -81,7 +88,7 @@ namespace My
 			pos.m_y = floatHeight - pos.m_y * 0.5f * floatHeight;
 		}
 
-		/* get the bounding box of the triangle */
+		// Get the bounding box of the triangle
 		const int minX = static_cast<int>(LibMath::min(points[0].m_x,
 			LibMath::min(points[1].m_x, points[2].m_x)));
 
@@ -94,7 +101,7 @@ namespace My
 		const int maxY = static_cast<int>(LibMath::max(points[0].m_y,
 			LibMath::max(points[1].m_y, points[2].m_y)));
 
-		/* spanning vectors of edge (v1,v2) and (v1,v3) */
+		// Spanning vectors of edge (v1,v2) and (v1,v3)
 		const LibMath::Vector2 vs1(points[1].m_x - points[0].m_x,
 			points[1].m_y - points[0].m_y);
 
@@ -111,11 +118,21 @@ namespace My
 				const float s = q.cross(vs2) / vs1.cross(vs2);
 				const float t = vs1.cross(q) / vs1.cross(vs2);
 
-				Color pixelColor = Color::lerp(p_vertices[0].m_color, p_vertices[1].m_color, s);
-				pixelColor = Color::lerp(pixelColor, p_vertices[2].m_color, t);
-
 				if (s >= 0 && t >= 0 && s + t <= 1)
-					p_target.setPixelColor(x, y, pixelColor);
+				{
+					const size_t bufferIndex = static_cast<size_t>(y) * p_target.getWidth() + x;
+					float pixelZ = LibMath::lerp(points[0].m_z, points[1].m_z, s);
+					pixelZ = LibMath::lerp(pixelZ, points[2].m_z, t);
+
+					if (pixelZ < m_zBuffer[bufferIndex])
+					{
+						Color pixelColor = Color::lerp(p_vertices[0].m_color, p_vertices[1].m_color, s);
+						pixelColor = Color::lerp(pixelColor, p_vertices[2].m_color, t);
+
+						p_target.setPixelColor(x, y, pixelColor);
+						m_zBuffer[bufferIndex] = pixelZ;
+					}
+				}
 			}
 		}
 	}
