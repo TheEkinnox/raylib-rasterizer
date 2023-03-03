@@ -83,6 +83,8 @@ namespace LibMath
 	 * \return True if a can be considered equal to b. False otherwise.
 	 */
 	bool	floatEquals(float a, float b);
+	bool	floatLessThan(float a, float b);
+	bool	floatGreaterThan(float a, float b);
 }
 
 #endif // !__LIBMATH__ARITHMETIC_H__
