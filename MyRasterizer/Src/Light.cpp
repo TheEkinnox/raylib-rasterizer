@@ -32,7 +32,7 @@ My::Color My::Light::CalculateLightingPhong(	const Vertex& p_vertex, const Vec3&
 	Vec3 id = p_vertex.m_color.rgb() * m_diffuseComponent * nDotH;
 
 	// Intensity specular
-	Vec3 is = Color::white.rgb() * LibMath::pow(nDotH, p_shinyness) * m_specularComponent;
+	Vec3 is = Color::white.rgb() * LibMath::pow(nDotH, static_cast<int>(p_shinyness)) * m_specularComponent;
 
 	return Color(	ia + (id + is) * viewAngle * m_intensity,
 					255);
