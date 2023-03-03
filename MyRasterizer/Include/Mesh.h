@@ -1,6 +1,7 @@
 #pragma once
 #include <vector>
 #include "Vertex.h"
+#include "Texture.h"
 
 namespace My
 {
@@ -34,6 +35,12 @@ namespace My
 	class Mesh
 	{
 	public:
+
+		/**
+		 * \brief default constructor, we use it to initialize all of our private members
+		 * \param No parameters
+		 * */
+		Mesh();
 		/**
 		 * \brief Creates a mesh with the given set of vertices and indices
 		 * \param p_vertices The vertex buffer of the mesh
@@ -100,9 +107,16 @@ namespace My
 		static Mesh* createSphere(uint32_t p_latitudeCount, uint32_t p_longitudeCount,
 			const Color& p_color = Color::white);
 
+		/*
+		* *\brief We use it to give a texture to our Mesh
+		 * \param textture is the name of the texture we want to give him
+		 * */
+		void SetTexture(My::Texture* texture);
+
 	private:
 		std::vector<Vertex> m_vertices;
 		std::vector<size_t> m_indices;
+		My::Texture* pTexture;
 	};
 
 }

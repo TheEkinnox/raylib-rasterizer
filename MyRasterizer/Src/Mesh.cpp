@@ -151,14 +151,8 @@ My::Mesh* My::Mesh::createSphere(const uint32_t p_latitudeCount, const uint32_t 
 	return new Mesh(vertices, indices);
 }
 
-void My::Mesh::setTexture(My::Texture* texture)
+void My::Mesh::SetTexture(My::Texture* texture)
 {
 	pTexture = texture;
-}
-void My::Mesh::CreateTexture()
-{
-	Texture* texture = new Texture("img/container.jpg");
-	Mesh* mesh = new Mesh();
-	mesh->setTexture(texture);
 }
 

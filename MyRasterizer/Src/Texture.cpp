@@ -1,7 +1,7 @@
 #include "Texture.h"
 
 #include <stdexcept>
-#include <string>
+#include <cstring>
 
 #include "Color.h"
 
@@ -19,7 +19,7 @@ My::Texture::Texture(const uint32_t p_width, const uint32_t p_height)
 		m_pixels[i] = Color::black;
 }
 
-My::Texture::Texture(std::string image_path)
+My::Texture::Texture(std::string imagePath)
 {
 
 }

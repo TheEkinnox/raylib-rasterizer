@@ -12,6 +12,7 @@ namespace My
 		Texture(uint32_t p_width, uint32_t p_height);
 		Texture(const Texture&) = default;
 		Texture(Texture&&) = default;
+		Texture(std::string image_path);
 		~Texture() = default;
 
 		Texture&	operator=(const Texture&) = default;
