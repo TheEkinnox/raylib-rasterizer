@@ -8,9 +8,5 @@ namespace My
 	{
 		LibMath::Vector3	m_position;
 		Color				m_color;
-		float				u;
-		float				v;
-		float				x;
-		float				y;
 	};
 }

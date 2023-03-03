@@ -11,22 +11,16 @@
 
 namespace My
 {
-	//void Rasterizer::renderScene(const Scene& p_scene, Texture& p_target)
-	//{
-	//	// Set every pixel to black
-	//	for (uint32_t x = 0; x < p_target.getWidth(); x++)
-	//		for (uint32_t y = 0; y < p_target.getHeight(); y++)
-	//			p_target.setPixelColor(x, y, Color::black);
+	void Rasterizer::renderScene(const Scene& p_scene, Texture& p_target)
+	{
+		// Set every pixel to black
+		for (uint32_t x = 0; x < p_target.getWidth(); x++)
+			for (uint32_t y = 0; y < p_target.getHeight(); y++)
+				p_target.setPixelColor(x, y, Color::black);
 
-	//	for (const auto& entity : p_scene.getEntities())
-	//		drawEntity(entity, p_target);
-	//}
-	//void Rasterizer::renderScene(Scene* pScene, Texture* pTarget, const LibMath::Matrix4 projectionMatrix)
-	//{
-	//	My::Entity entity;
-	//	Vertex vertex;
-	//	//LibMath::Vector4 projectedVertex = projectionMatrix * entity.getTransform() * vertex.m_position;
-	//}
+		for (const auto& entity : p_scene.getEntities())
+			drawEntity(entity, p_target);
+	}
 
 	void Rasterizer::drawEntity(const Entity& p_entity, Texture& p_target)
 	{
@@ -52,6 +46,7 @@ namespace My
 					vec4 = p_entity.getTransform() * vec4;
 					pos = {vec4.m_x, vec4.m_y, vec4.m_z};
 				}
+
 				drawTriangle(triangle, p_target);
 			}
 		}

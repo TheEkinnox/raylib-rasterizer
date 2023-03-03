@@ -1,6 +1,5 @@
 #pragma once
 #include "Entity.h"
-#include <Rasterizer.h>
 
 namespace My
 {
@@ -24,8 +23,7 @@ namespace My
 		 * \param p_scene The scene to render
 		 * \param p_target The texture on which the scene should be rendered
 		 */
-		static void renderScene(Scene& pScene, Texture& pTarget)
-			{}
+		static void renderScene(const Scene& p_scene, Texture& p_target);
 
 		/**
 		 * \brief Draws the received entity on the target texture

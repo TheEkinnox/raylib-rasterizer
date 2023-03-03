@@ -1,7 +1,6 @@
 #pragma once
 #include <vector>
 #include "Vertex.h"
-#include "Texture.h"
 
 namespace My
 {
@@ -104,7 +103,6 @@ namespace My
 	private:
 		std::vector<Vertex> m_vertices;
 		std::vector<size_t> m_indices;
-		Texture* pTexture = nullptr;
 	};
 
 }
