@@ -26,6 +26,7 @@
     <ClInclude Include="Include\Mesh.h" />
     <ClInclude Include="Include\Vertex.h" />
     <ClInclude Include="Include\Texture.h" />
+    <ClInclude Include="stb_image.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Color.cpp" />

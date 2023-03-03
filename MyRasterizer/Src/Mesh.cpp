@@ -1,6 +1,10 @@
 #include "Trigonometry.h"
 #include "Mesh.h"
 
+My::Mesh::Mesh()
+{
+	pTexture = nullptr;
+}
 My::Mesh::Mesh(const std::vector<Vertex>& p_vertices, const std::vector<size_t>& p_indices)
 {
 	// Make sure the index buffer is a set of triangles
@@ -146,3 +150,15 @@ My::Mesh* My::Mesh::createSphere(const uint32_t p_latitudeCount, const uint32_t 
 
 	return new Mesh(vertices, indices);
 }
+
+void My::Mesh::setTexture(My::Texture* texture)
+{
+	pTexture = texture;
+}
+void My::Mesh::CreateTexture()
+{
+	Texture* texture = new Texture("img/container.jpg");
+	Mesh* mesh = new Mesh();
+	mesh->setTexture(texture);
+}
+

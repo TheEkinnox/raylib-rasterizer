@@ -19,6 +19,10 @@ My::Texture::Texture(const uint32_t p_width, const uint32_t p_height)
 		m_pixels[i] = Color::black;
 }
 
+My::Texture::Texture(std::string image_path)
+{
+
+}
 uint32_t My::Texture::getWidth() const
 {
 	return m_width;
