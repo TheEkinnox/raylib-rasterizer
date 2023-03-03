@@ -60,14 +60,14 @@ namespace My
 		 * \param p_target The texture on which the entity should be drawn
 		 * \param 
 		 */
-		static void drawEntity(const Entity& p_entity, Texture& p_target, const Light& p_light);
+		void drawEntity(const Entity& p_entity, Texture& p_target, const Light& p_light);
 
 		/**
 		 * \brief Draws the entity's normals on the target texture
 		 * \param p_entity The entity to draw
 		 * \param p_target The texture on which the entity should be drawn
 		 */
-		static void drawNormals(const Entity& p_entity, Texture& p_target);
+		void drawNormals(const Entity& p_entity, Texture& p_target, const Light& p_light);
 
 		/**
 		 * \brief Draws the received triangle on the target texture

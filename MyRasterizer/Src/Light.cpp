@@ -21,20 +21,20 @@ My::Color My::Light::CalculateLightingPhong(	const Vertex& p_vertex, const Vec3&
 
 	const float viewAngle = LibMath::clamp(	p_vertex.m_normal.dot(this->m_position - p_vertex.m_position), 
 											0.0f, 1.0f);
+	Vec3 halfVector = p_observer + this->m_position - 2 * p_vertex.m_position;
+	halfVector.normalize();
+	float nDotH = LibMath::clamp(p_vertex.m_normal.dot(halfVector), 0.0, 1.0); 
+
 	// Intensity ambiante
 	Vec3 ia = p_vertex.m_color.rgb() * m_ambientComponent;
 
 	// Intensity diffuse
-	Vec3 id = p_vertex.m_color.rgb() * m_diffuseComponent;
+	Vec3 id = p_vertex.m_color.rgb() * m_diffuseComponent * nDotH;
 
 	// Intensity specular
-	Vec3 halfVector = p_observer + this->m_position - 2 * p_vertex.m_position;
-	halfVector.normalize();
-
-	float nDotH = LibMath::clamp(p_vertex.m_normal.dot(halfVector), 0.0, 1.0); 
 	Vec3 is = Color::white.rgb() * LibMath::pow(nDotH, p_shinyness) * m_specularComponent;
 
-	return Color(	ia + (id + is) * viewAngle * m_intensity.m_x,
+	return Color(	ia + (id + is) * viewAngle * m_intensity,
 					255);
 }
 

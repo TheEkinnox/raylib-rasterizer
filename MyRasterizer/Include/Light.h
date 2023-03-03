@@ -21,7 +21,7 @@ namespace My
 		Light(Vec3 p_position, float p_ambientComponent, float p_diffuseComponent, float p_specularComponent);
 		~Light() = default;
 
-		Color CalculateLightingPhong(const Vertex& p_vertex, const Vec3& p_observer, size_t p_shinyness = 10)const;
+		Color CalculateLightingPhong(const Vertex& p_vertex, const Vec3& p_observer, size_t p_shinyness = 5)const;
 
 		//Color static ApplyLightToColor(const Color& p_color, float lightValue);
 

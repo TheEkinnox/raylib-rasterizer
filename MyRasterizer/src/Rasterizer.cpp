@@ -28,7 +28,7 @@ namespace My
 		for (const auto& entity : p_scene.getEntities())
 		{
 			drawEntity(entity, p_target, p_scene.getLights()[0]);
-			//drawNormals(entity, p_target);
+			//drawNormals(entity, p_target, p_scene.getLights()[0]);
 		}
 	}
 
@@ -66,15 +66,15 @@ namespace My
 	{
 		if (p_entity.getMesh() != nullptr)
 		{
-			const auto vertices = p_entity.getMesh()->getVertices();
-			const auto indices = p_entity.getMesh()->getIndices();
+			auto vertices = p_entity.getMesh()->getVertices();
+			auto indices = p_entity.getMesh()->getIndices();
 
-			std::map<const Vertex*, Color> vertexLightColor;
+			std::map<size_t, Color> vertexLightColor;
 
 			//calculate light
-			for (const Vertex& vertex : vertices)
+			for (size_t i = 0; i < vertices.size(); i++)
 			{
-				Vertex v = vertex;
+				Vertex& v = vertices[i];
 
 				{
 					auto& pos = v.m_position; //update pos
@@ -90,7 +90,7 @@ namespace My
 					nor = { vec4.m_x, vec4.m_y, vec4.m_z };
 				}
 
-				vertexLightColor[&vertex] = p_light.CalculateLightingPhong(v, LibMath::Vector3::zero());
+				v.m_color = p_light.CalculateLightingPhong(v, LibMath::Vector3::zero());
 			}
 
 			for (size_t i = 0; i + 2 < indices.size(); i += 3)
@@ -102,25 +102,25 @@ namespace My
 					vertices[indices[i + 2]]
 				};
 
-				triangle[0].m_color = vertexLightColor[&vertices[indices[i]]];
-				triangle[1].m_color = vertexLightColor[&vertices[indices[i + 1]]];
-				triangle[2].m_color = vertexLightColor[&vertices[indices[i + 2]]];
+				//triangle[0].m_color = vertexLightColor[indices[i]];
+				//triangle[1].m_color = vertexLightColor[indices[i + 1]];
+				//triangle[2].m_color = vertexLightColor[indices[i + 2]];
 
-				for (Vertex& vertex : triangle)
-				{
-					auto& pos = vertex.m_position;
-					auto vec4 = LibMath::Vector4{ pos.m_x, pos.m_y, pos.m_z, 1.f };
+				//for (Vertex& vertex : triangle)
+				//{
+				//	auto& pos = vertex.m_position;
+				//	auto vec4 = LibMath::Vector4{ pos.m_x, pos.m_y, pos.m_z, 1.f };
 
-					vec4 = p_entity.getTransform() * vec4;
-					pos = { vec4.m_x, vec4.m_y, vec4.m_z };
-				}
+				//	vec4 = p_entity.getTransform() * vec4;
+				//	pos = { vec4.m_x, vec4.m_y, vec4.m_z };
+				//}
 
 				drawTriangle(triangle, p_target);
 			}
 		}
 	}
 
-	void Rasterizer::drawNormals(const Entity& p_entity, Texture& p_target)
+	void Rasterizer::drawNormals(const Entity& p_entity, Texture& p_target, const Light& p_light)
 	{
 		if (p_entity.getMesh() != nullptr)
 		{
@@ -144,20 +144,22 @@ namespace My
 					nor = { vec4.m_x, vec4.m_y, vec4.m_z };
 				}
 
+				Color color = p_light.CalculateLightingPhong(v, LibMath::Vector3::zero());
+
 				Vertex triangle1[3]
 				{
-					Vertex{v.m_position + LibMath::Vector3(0.02f), LibMath::Vector3::zero(), Color::white},
-					Vertex{v.m_position + v.m_normal,LibMath::Vector3::zero(),Color::white},
-					Vertex{v.m_position,LibMath::Vector3::zero(),Color::white}
+					Vertex{v.m_position + LibMath::Vector3(0.02f), LibMath::Vector3::zero(), color},
+					Vertex{v.m_position + v.m_normal,LibMath::Vector3::zero(),color},
+					Vertex{v.m_position,LibMath::Vector3::zero(),color}
 				};
 
 				drawTriangle(triangle1, p_target);
 
 				Vertex triangle2[3]
 				{
-					Vertex{v.m_position + LibMath::Vector3(0.02f),LibMath::Vector3::zero(),Color::white},
-					Vertex{v.m_position + v.m_normal,LibMath::Vector3::zero(),Color::white},
-					Vertex{v.m_position + v.m_normal + LibMath::Vector3(0.02f),LibMath::Vector3::zero(),Color::white }
+					Vertex{v.m_position + LibMath::Vector3(0.02f),LibMath::Vector3::zero(), color},
+					Vertex{v.m_position + v.m_normal,LibMath::Vector3::zero(),color},
+					Vertex{v.m_position + v.m_normal + LibMath::Vector3(0.02f),LibMath::Vector3::zero(),color }
 				};
 
 				drawTriangle(triangle2, p_target);
