@@ -9,6 +9,19 @@ namespace My
 	const Color Color::green	= { 0, 255, 0, 255 };
 	const Color Color::blue		= { 0, 0, 255, 255 };
 
+	Color Color::rgbMultiply(float f) const
+	{
+		return Color(	static_cast<uint8_t>(m_r * f), 
+						static_cast<uint8_t>(m_g * f), 
+						static_cast<uint8_t>(m_b * f), 
+						m_a);
+	}
+
+	LibMath::Vector3 Color::rgb() const
+	{
+		return LibMath::Vector3(m_r, m_g, m_b);
+	}
+
 	Color Color::lerp(const Color& a, const Color& b, float t)
 	{
 		return

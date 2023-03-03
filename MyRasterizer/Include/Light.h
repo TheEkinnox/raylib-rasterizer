@@ -14,17 +14,22 @@ namespace My
 		using Rad =  LibMath::Radian;
 
 	public: 
-		Light() = default;
+		/// <summary>
+		/// Light source to illumanate entites.
+		/// components are clamped [0,1]
+		/// </summary>
+		Light(Vec3 p_position, float p_ambientComponent, float p_diffuseComponent, float p_specularComponent);
 		~Light() = default;
 
-		float CalculateLightingPhong(const Vertex& p_vertex, const Vec3& p_observer, size_t, Vec3);
+		Color CalculateLightingPhong(const Vertex& p_vertex, const Vec3& p_observer, size_t p_shinyness = 10)const;
 
-		Color static ApplyLightToVertex(const Color& p_color, float lightValue);
+		//Color static ApplyLightToColor(const Color& p_color, float lightValue);
 
 	private:
 		Vec3 m_position;
 		float m_ambientComponent;
 		float m_diffuseComponent;
 		float m_specularComponent;
+		Vec3 m_intensity; //rgb light color
 	};
 }

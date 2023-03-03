@@ -3,37 +3,43 @@
 #include "Trigonometry.h"
 #include "Arithmetic.h"
 
-float My::Light::CalculateLightingPhong(	const Vertex& p_vertex, const Vec3& p_observer, 
-											size_t p_shinyness = 10,	Vec3 p_matCaracPercent = Vec3(1, 1, 1))
+My::Light::Light(Vec3 p_position, float p_ambientComponent, float p_diffuseComponent, float p_specularComponent)
+{
+	m_position = p_position;
+	m_ambientComponent = LibMath::clamp(p_ambientComponent, 0, 1);
+	m_diffuseComponent = LibMath::clamp(p_diffuseComponent, 0, 1);
+	m_specularComponent = LibMath::clamp(p_specularComponent, 0, 1);
+
+	m_intensity = Vec3(1); //how much rgb light it emits [0,1]
+}
+
+My::Color My::Light::CalculateLightingPhong(	const Vertex& p_vertex, const Vec3& p_observer,
+												size_t p_shinyness)const
 {
 	// https://fr.wikipedia.org/wiki/Ombrage_de_Phong
 	//float ka = 1, kd = 1, ks = 1; // material constants for percent of ambiante, diffuse and specular
 
-	float Ia, Id, Is;		// Intensity ambiante, diffuse and specular
-	Vec3 L, N, V, R;		// light, normal, observer, reflexion
-	Rad teta, omega;		// normal from light, observer from reflexion
+	const float viewAngle = LibMath::clamp(	p_vertex.m_normal.dot(this->m_position - p_vertex.m_position), 
+											0.0f, 1.0f);
+	// Intensity ambiante
+	Vec3 ia = p_vertex.m_color.rgb() * m_ambientComponent;
 
-	L = (this->m_position - p_vertex.m_position);
-	N = p_vertex.m_normal;
-	V = p_observer - p_vertex.m_position;
+	// Intensity diffuse
+	Vec3 id = p_vertex.m_color.rgb() * m_diffuseComponent;
 
-	L.normalize();
-	N.normalize();
-	V.normalize();
+	// Intensity specular
+	Vec3 halfVector = p_observer + this->m_position - 2 * p_vertex.m_position;
+	halfVector.normalize();
 
-	teta =	N.angleFrom(L);
-	R =		(2 * LibMath::cos(teta)) * (N - L);
-	omega = V.angleFrom(R);
+	float nDotH = LibMath::clamp(p_vertex.m_normal.dot(halfVector), 0.0, 1.0); 
+	Vec3 is = Color::white.rgb() * LibMath::pow(nDotH, p_shinyness) * m_specularComponent;
 
-	Ia = (m_ambientComponent  * p_matCaracPercent.m_x);
-	Id = (m_diffuseComponent  * p_matCaracPercent.m_y) * LibMath::cos(teta);
-	Is = (m_specularComponent * p_matCaracPercent.m_z) * LibMath::pow(LibMath::cos(omega), p_shinyness);
-
-	return Ia + Is + Id;
+	return Color(	ia + (id + is) * viewAngle * m_intensity.m_x,
+					255);
 }
 
-My::Color My::Light::ApplyLightToVertex(const Color& p_color, float lightValue)
-{
-	return Color(	static_cast<uint8_t>(p_color.m_r * lightValue), static_cast<uint8_t>(p_color.m_g * lightValue),
-					static_cast<uint8_t>(p_color.m_b * lightValue), p_color.m_a);
-}
+//My::Color My::Light::ApplyLightToColor(const Color& p_color, float lightValue)
+//{
+//	return Color(	static_cast<uint8_t>(p_color.m_r * lightValue), static_cast<uint8_t>(p_color.m_g * lightValue),
+//					static_cast<uint8_t>(p_color.m_b * lightValue), p_color.m_a);
+//}

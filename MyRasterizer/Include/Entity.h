@@ -1,5 +1,6 @@
 #pragma once
 #include "Matrix/Matrix4.h"
+#include "Matrix/Matrix3.h"
 #include "Vector/Vector3.h"
 #include "Angle/Radian.h"
 
@@ -36,6 +37,7 @@ namespace My
 		float getScaleY() const;
 		float getScaleZ() const;
 		Vec3 getRotationEulerAngles()const;
+		Mat4 getRotation() const;
 
 		Vec3 getRightward()const;
 		Vec3 getLeftward()const;

@@ -21,13 +21,13 @@ int main()
 
 	My::Scene scene;
 	//scene.addMesh("cube", *My::Mesh::createCube());
-	scene.addMesh("sphere", *My::Mesh::createSphere(8, 9));
+	scene.addMesh("sphere", *My::Mesh::createSphere(32, 32, My::Color::red));
 
 	std::vector<My::Vertex> vertices
 	{
-		{ { -0.5, -0.5, 0 } , My::Color::green},
-		{ { 0.5 ,-0.5 , 0 } , My::Color::red },
-		{ { 0 , 0.5 ,  0 }  , My::Color::blue}
+		{ { -0.5, -0.5, 0 }, LibMath::Vector3::back(), My::Color::green},
+		{ {  0.5, -0.5, 0 }, LibMath::Vector3::back(), My::Color::red },
+		{ {    0,  0.5, 0 }, LibMath::Vector3::back(), My::Color::blue}
 	};
 
 	std::vector<size_t> indices
@@ -37,9 +37,17 @@ int main()
 		2
 	};
 
-	My::Mesh triangle = My::Mesh(vertices, indices);
-	LibMath::Matrix4 transform = LibMath::Matrix4::translation(0, 0, 2);
-	scene.addEntity(My::Entity(triangle, transform));
+	My::Mesh* triangle = new My::Mesh(vertices, indices);
+	//scene.addMesh("triangle", *triangle);
+	LibMath::Matrix4 transform = LibMath::Matrix4::translation(0, 0, 0);
+	//scene.addEntity(My::Entity(*triangle, transform));
+
+	scene.addEntity(My::Entity(*scene.getMesh("sphere"), transform));
+
+	//light
+	scene.addLight(My::Light(LibMath::Vector3(5, 0, 0), 0.2f, 0.4f, 0.4f));
+	scene.getEntity(0).translate(-3, 0, 5);
+	scene.getEntity(0).rotateEulerAngles((LibMath::Radian)(3.1416f/2), (LibMath::Radian)(3.1416f / 4), (LibMath::Radian)0);
 
 	//transformation tests
 	/**

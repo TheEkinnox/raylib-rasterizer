@@ -22,6 +22,8 @@ My::Mesh::Mesh(const std::vector<Vertex>& p_vertices, const std::vector<size_t>&
 
 	this->m_vertices = p_vertices;
 	this->m_indices = p_indices;
+
+	//this->CalculateNormals();
 }
 
 std::vector<My::Vertex> My::Mesh::getVertices() const
@@ -99,7 +101,7 @@ My::Mesh* My::Mesh::createSphere(const uint32_t p_latitudeCount, const uint32_t 
 	std::vector<Vertex> vertices;
 	std::vector<size_t> indices;
 
-	vertices.push_back({ Vec3::up(), Vec3::up() }); //top vertex
+	vertices.push_back({ Vec3::up(), Vec3::up(), p_color }); //top vertex
 	for (uint32_t i = 1; i < p_latitudeCount; i++) // [1, count - 1) bcs need only 1 vertex at top and bot
 	{
 		const float phi = static_cast<float>(i) * deltaPhi;
@@ -126,7 +128,7 @@ My::Mesh* My::Mesh::createSphere(const uint32_t p_latitudeCount, const uint32_t 
 			vertices.push_back({ normal * radius, normal, p_color});
 		}
 	}
-	vertices.push_back({ Vec3::down(), Vec3::down() }); //bot vertex
+	vertices.push_back({ Vec3::down(), Vec3::down(), p_color }); //bot vertex
 
 	for (uint32_t i = 0; i < p_longitudeCount; ++i)
 	{

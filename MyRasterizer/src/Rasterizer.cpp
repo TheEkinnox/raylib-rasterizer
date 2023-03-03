@@ -5,6 +5,7 @@
 #include "Mesh.h"
 #include "Texture.h"
 #include "Scene.h"
+#include "Light.h"
 #include "Vector/Vector2.h"
 #include "Vector/Vector4.h"
 #include <Interpolation.h>
@@ -20,8 +21,8 @@ namespace My
 
 		for (const auto& entity : p_scene.getEntities())
 		{
-			//drawEntity(entity, p_target);
-			drawNormals(entity, p_target);
+			drawEntity(entity, p_target, p_scene.getLights()[0]);
+			//drawNormals(entity, p_target);
 		}
 	}
 
@@ -55,6 +56,64 @@ namespace My
 		}
 	}
 
+	void Rasterizer::drawEntity(const Entity& p_entity, Texture& p_target, const Light& p_light)
+	{
+		if (p_entity.getMesh() != nullptr)
+		{
+			const auto vertices = p_entity.getMesh()->getVertices();
+			const auto indices = p_entity.getMesh()->getIndices();
+
+			std::map<const Vertex*, Color> vertexLightColor;
+
+			//calculate light
+			for (const Vertex& vertex : vertices)
+			{
+				Vertex v = vertex;
+
+				{
+					auto& pos = v.m_position; //update pos
+					auto vec4 = LibMath::Vector4{ pos.m_x, pos.m_y, pos.m_z, 1.f };
+					vec4 = p_entity.getTransform() * vec4;
+					pos = { vec4.m_x, vec4.m_y, vec4.m_z };
+				}
+
+				{
+					auto& nor = v.m_normal; //update normal
+					auto vec4 = LibMath::Vector4{ nor.m_x, nor.m_y, nor.m_z, 1.f };
+					vec4 = p_entity.getRotation() * vec4;
+					nor = { vec4.m_x, vec4.m_y, vec4.m_z };
+				}
+
+				vertexLightColor[&vertex] = p_light.CalculateLightingPhong(v, LibMath::Vector3::zero());
+			}
+
+			for (size_t i = 0; i + 2 < indices.size(); i += 3)
+			{
+				Vertex triangle[3]
+				{
+					vertices[indices[i]],
+					vertices[indices[i + 1]],
+					vertices[indices[i + 2]]
+				};
+
+				triangle[0].m_color = vertexLightColor[&vertices[indices[i]]];
+				triangle[1].m_color = vertexLightColor[&vertices[indices[i + 1]]];
+				triangle[2].m_color = vertexLightColor[&vertices[indices[i + 2]]];
+
+				for (Vertex& vertex : triangle)
+				{
+					auto& pos = vertex.m_position;
+					auto vec4 = LibMath::Vector4{ pos.m_x, pos.m_y, pos.m_z, 1.f };
+
+					vec4 = p_entity.getTransform() * vec4;
+					pos = { vec4.m_x, vec4.m_y, vec4.m_z };
+				}
+
+				drawTriangle(triangle, p_target);
+			}
+		}
+	}
+
 	void Rasterizer::drawNormals(const Entity& p_entity, Texture& p_target)
 	{
 		if (p_entity.getMesh() != nullptr)
@@ -62,22 +121,37 @@ namespace My
 			const auto vertices = p_entity.getMesh()->getVertices();
 			const auto indices = p_entity.getMesh()->getIndices();
 
-			for (auto& v : vertices)
+			for (auto v : vertices)
 			{
+
+				{
+					auto& pos = v.m_position; //update pos
+					auto vec4 = LibMath::Vector4{ pos.m_x, pos.m_y, pos.m_z, 1.f };
+					vec4 = p_entity.getTransform() * vec4;
+					pos = { vec4.m_x, vec4.m_y, vec4.m_z };
+				}
+
+				{
+					auto& nor = v.m_normal; //update normal
+					auto vec4 = LibMath::Vector4{ nor.m_x, nor.m_y, nor.m_z, 1.f };
+					vec4 = p_entity.getRotation() * vec4;
+					nor = { vec4.m_x, vec4.m_y, vec4.m_z };
+				}
+
 				Vertex triangle1[3]
 				{
-					Vertex{v.m_position + LibMath::Vector3(0.02f)},
-					Vertex{v.m_position + v.m_normal},
-					Vertex{v.m_position}
+					Vertex{v.m_position + LibMath::Vector3(0.02f), LibMath::Vector3::zero(), Color::white},
+					Vertex{v.m_position + v.m_normal,LibMath::Vector3::zero(),Color::white},
+					Vertex{v.m_position,LibMath::Vector3::zero(),Color::white}
 				};
 
 				drawTriangle(triangle1, p_target);
 
 				Vertex triangle2[3]
 				{
-					Vertex{v.m_position + LibMath::Vector3(0.02f)},
-					Vertex{v.m_position + v.m_normal},
-					Vertex{v.m_position + v.m_normal + LibMath::Vector3(0.02f) }
+					Vertex{v.m_position + LibMath::Vector3(0.02f),LibMath::Vector3::zero(),Color::white},
+					Vertex{v.m_position + v.m_normal,LibMath::Vector3::zero(),Color::white},
+					Vertex{v.m_position + v.m_normal + LibMath::Vector3(0.02f),LibMath::Vector3::zero(),Color::white }
 				};
 
 				drawTriangle(triangle2, p_target);
@@ -144,6 +218,7 @@ namespace My
 				const float s = q.cross(vs2) / vs1.cross(vs2);
 				const float t = vs1.cross(q) / vs1.cross(vs2);
 
+				//modif color 
 				Color pixelColor = Color::lerp(p_vertices[0].m_color, p_vertices[1].m_color, s);
 				pixelColor = Color::lerp(pixelColor, p_vertices[2].m_color, t);
 

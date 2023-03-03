@@ -41,8 +41,11 @@ namespace My
 		const Mesh*			getMesh(const std::string& p_name);
 
 		void				addEntity(const Entity& p_entity);
+		void				addLight(const Light& p_light);
+
 		std::vector<Entity>	getEntities() const;
 		Entity&				getEntity(size_t index);
+		std::vector<Light>	getLights() const;
 
 		//const Orientation GlobalOrientation = {	LibMath::Vector3::right(),
 		//										LibMath::Vector3::up(),

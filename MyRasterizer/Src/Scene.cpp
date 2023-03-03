@@ -34,6 +34,11 @@ void My::Scene::addEntity(const Entity& p_entity)
 	m_entities.push_back(p_entity);
 }
 
+void My::Scene::addLight(const Light& p_light)
+{
+	m_lights.push_back(p_light);
+}
+
 std::vector<My::Entity> My::Scene::getEntities() const
 {
 	return m_entities;
@@ -45,4 +50,9 @@ My::Entity& My::Scene::getEntity(size_t index)
 		throw "index out of range Scene.h l.44";
 
 	return m_entities[index];
+}
+
+std::vector<My::Light> My::Scene::getLights() const
+{
+	return m_lights;
 }
