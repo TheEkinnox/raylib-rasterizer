@@ -18,66 +18,27 @@ int main()
 
 	My::Scene scene;
 	//scene.addMesh("cube", *My::Mesh::createCube());
-	scene.addMesh("sphere", *My::Mesh::createSphere(16, 16, My::Color::red));
+	scene.addMesh("sphereR", *My::Mesh::createSphere(32, 32, My::Color::red));
+	scene.addMesh("sphereG", *My::Mesh::createSphere(32, 32, My::Color::green));
+	scene.addMesh("sphereB", *My::Mesh::createSphere(32, 32, My::Color::blue));
 
 
 	//LibMath::Matrix4 transform = LibMath::Matrix4::translation(-0.5f, 0, 2);
 	//scene.addEntity(My::Entity(*scene.getMesh("cube"), transform));
 
-	LibMath::Matrix4 transform = LibMath::Matrix4::translation(0, 0, 0);
+	LibMath::Matrix4 transform = LibMath::Matrix4::translation(0, 1, 0);
+	scene.addEntity(My::Entity(*scene.getMesh("sphereR"), transform));
 
-	scene.addEntity(My::Entity(*scene.getMesh("sphere"), transform));
+	transform = LibMath::Matrix4::translation(-1, -1, 0);
+	scene.addEntity(My::Entity(*scene.getMesh("sphereG"), transform));
+
+	transform = LibMath::Matrix4::translation(1, -1, 0);
+	scene.addEntity(My::Entity(*scene.getMesh("sphereB"), transform));
 
 	//light
-	scene.addLight(My::Light(LibMath::Vector3(5, 0, 0), 0.2f, 0.4f, 0.4f));
-	scene.getEntity(0).translate(-2, 0, 7);
-	scene.getEntity(0).rotateEulerAngles((LibMath::Radian)(-3.1416f/2), (LibMath::Radian)(3.1416f / 2), (LibMath::Radian)(3.1416f / 7));
+	scene.addLight(My::Light(LibMath::Vector3(0, 0, -10), 0.2f, 0.4f, 0.4f));
 
-	//transformation tests
-	/**
-	scene.getEntity(0).Translate(0, 1, 0);
-	scene.getEntity(1).Translate(0, -1, 0);
 
-	scene.getEntity(0).Scale(2, 1, 2);
-	scene.getEntity(1).Scale(2.0f, 2.0f, 1.0f);
-
-	LibMath::Vector3 s1 = scene.getEntity(0).GetScale();
-	LibMath::Vector3 s2 = scene.getEntity(1).GetScale();
-	*/
-	/**
-	LibMath::Vector3 vR = scene.getEntity(0).GetRightward();
-	LibMath::Vector3 vU = scene.getEntity(0).GetUpward();
-	LibMath::Vector3 vF = scene.getEntity(0).GetForward();
-
-	scene.getEntity(0).RotateEulerAngles((LibMath::Radian)0, (LibMath::Radian)0, (LibMath::Radian)(3.1416f / 2));
-	vR = scene.getEntity(0).GetRightward();
-	vU = scene.getEntity(0).GetUpward();
-	vF = scene.getEntity(0).GetForward();
-	*/
-	/*
-	scene.getEntity(0).Translate(0, 3, 0);
-	scene.getEntity(0).SetPosition(0, 0, 0);
-
-	scene.getEntity(0).Scale(3, 3, 3);
-	scene.getEntity(0).SetScale(1.0f, 1.0f, 1.0f);
-	
-	scene.getEntity(0).RotateEulerAngles((LibMath::Radian)(3.1416f/8), (LibMath::Radian)(-3.1416f/4), (LibMath::Radian)(3.1416f));
-	scene.getEntity(0).SetRotationEulerAngles((LibMath::Radian)(0), (LibMath::Radian)(0), (LibMath::Radian)(3.1416f/20.0f));
-	LibMath::Vector3 rot = scene.getEntity(0).GetRotationEulerAngles();
-	*/
-	/**
-	
-	scene.getEntity(0).RotateEulerAngles((LibMath::Radian)(0), (LibMath::Radian)0, (LibMath::Radian)(3.1416f));
-	LibMath::Vector3 v = scene.getEntity(0).GetRotationEulerAngles();
-	scene.getEntity(0).RotateEulerAngles((LibMath::Radian)(-v.m_x), (LibMath::Radian)(-v.m_y), (LibMath::Radian)(-v.m_z));
-	LibMath::Vector3 v2 = scene.getEntity(0).GetRotationEulerAngles();
-
-	float pres = 0.001f;
-	bool isZero = true;
-	isZero = LibMath::abs(v2.m_x) > pres ? false : isZero;
-	isZero = LibMath::abs(v2.m_y) > pres ? false : isZero;
-	isZero = LibMath::abs(v2.m_z) > pres ? false : isZero;
-	*/
 
 	My::Texture texture(SCREEN_WIDTH, SCREEN_HEIGHT);
 

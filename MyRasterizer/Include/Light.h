@@ -34,7 +34,7 @@ namespace My
 		/// <param name="p_observer">: camera position</param>
 		/// <param name="p_shinyness">: material shinyness constant </param>
 		/// <returns></returns>
-		Color CalculateLightingPhong(const Vertex& p_vertex, const Vec3& p_observer, size_t p_shinyness = 5)const;
+		Color CalculateLightingPhong(const Vertex& p_vertex, const Vec3& p_observer, size_t p_shinyness = 10)const;
 
 		//Color static ApplyLightToColor(const Color& p_color, float lightValue);
 
