@@ -102,7 +102,7 @@ My::Mesh* My::Mesh::createSphere(const uint32_t p_latitudeCount, const uint32_t 
 	std::vector<size_t> indices;
 
 	vertices.push_back({ Vec3::up(), Vec3::up(), p_color }); //top vertex
-	for (uint32_t i = 1; i < p_latitudeCount; i++) // [1, count - 1) bcs need only 1 vertex at top and bot
+	for (uint32_t i = 1; i < p_latitudeCount; i++) // [1, count) bcs need only 1 vertex at top and bot
 	{
 		const float phi = static_cast<float>(i) * deltaPhi;
 		const float cosPhi = cosf(phi);
@@ -148,7 +148,7 @@ My::Mesh* My::Mesh::createSphere(const uint32_t p_latitudeCount, const uint32_t 
 	}
 
 	// add quads per stack / slice
-	for (uint32_t j = 0; j < p_latitudeCount - 2; j++) //top is point
+	for (uint32_t j = 0; j < p_latitudeCount - 2; j++) //dit top and bot cones
 	{
 		const auto j0 = j * p_longitudeCount + 1; //+1 is top point
 		const auto j1 = (j + 1) * p_longitudeCount + 1;
