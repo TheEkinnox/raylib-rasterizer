@@ -23,7 +23,7 @@ My::Mesh::Mesh(const std::vector<Vertex>& p_vertices, const std::vector<size_t>&
 	this->m_vertices = p_vertices;
 	this->m_indices = p_indices;
 
-	//this->CalculateNormals();
+	//this->calculateVertexNormals();
 }
 
 std::vector<My::Vertex> My::Mesh::getVertices() const
@@ -34,6 +34,11 @@ std::vector<My::Vertex> My::Mesh::getVertices() const
 std::vector<size_t> My::Mesh::getIndices() const
 {
 	return m_indices;
+}
+
+std::vector<LibMath::Vector3> My::Mesh::getNormals() const
+{
+	return this->m_normals;
 }
 
 My::Mesh* My::Mesh::createCube(const Color& p_color)
@@ -81,7 +86,7 @@ My::Mesh* My::Mesh::createCube(const Color& p_color)
 	// auto m1 = new Mesh(vertices, indices);
 	// auto m2 = new Mesh(*m1);
 
-	// m2->CalculateNormals();
+	// m2->calculateVertexNormals();
 
 	// for (auto& v : m1->m_vertices)
 	// 	std::cout << v.m_normal << std::endl;
@@ -182,7 +187,7 @@ My::Mesh* My::Mesh::createSphere(const uint32_t p_latitudeCount, const uint32_t 
 	/*auto m1 = new Mesh(vertices, indices);
 	auto m2 = new Mesh(*m1);
 
-	m2->CalculateNormals();
+	m2->calculateVertexNormals();
 
 	for (auto& v : m1->m_vertices)
 		std::cout << v.m_normal << std::endl;
@@ -201,10 +206,14 @@ My::Mesh* My::Mesh::createSphere(const uint32_t p_latitudeCount, const uint32_t 
 		
 	}*/
 
-	return new Mesh(vertices, indices);
+
+	auto m = new Mesh(vertices, indices);
+	m->calculateTriangleNormals(); //calculate triangle normals based on triangles
+
+	return m;
 }
 
-void My::Mesh::CalculateNormals()
+void My::Mesh::calculateVertexNormals()
 {
 	Vec3* A, *B, *C;
 	Vec3 BC, BA, normal;
@@ -263,5 +272,31 @@ void My::Mesh::CalculateNormals()
 		pair.first->m_normal = std::accumulate(	pair.second.begin(), pair.second.end(), 
 												Vec3::zero(), op);
 		pair.first->m_normal.normalize();
+	}
+}
+
+void My::Mesh::calculateTriangleNormals()
+{
+	Vec3* A, * B, * C;
+	Vec3 BC, BA, normal;
+
+	this->m_normals.reserve(this->m_indices.size() / 3); //3 indices = 1 trangle
+
+	for (size_t i = 0; i < this->m_indices.size(); i += 3)
+	{
+		//triangle ABC
+		A = &this->m_vertices[m_indices[i]].m_position;
+		B = &this->m_vertices[m_indices[i + 1]].m_position;
+		C = &this->m_vertices[m_indices[i + 2]].m_position;
+
+		//create plane
+		BC = *C - *B;
+		BA = *A - *B;
+
+		//get normal
+		normal = BC.cross(BA);
+		normal.normalize();
+
+		m_normals.push_back(normal);
 	}
 }

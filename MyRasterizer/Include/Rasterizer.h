@@ -9,9 +9,11 @@ namespace My
 	struct Vertex;
 	class Texture;
 	class Scene;
+	class Vector3;
 
 	class Rasterizer
 	{
+		using Vec3 = LibMath::Vector3;
 	public:
 		Rasterizer() = default;
 
@@ -78,5 +80,16 @@ namespace My
 
 	private:
 		std::vector<float>	m_zBuffer;
+		
+		/// <summary>
+		/// Checks if triangle should be rendered
+		/// </summary>
+		/// <param name="p_trianglePos">: triangle's position</param>
+		/// <param name="p_triangleNormal">: direction that the triangle is facing</param>
+		/// <param name="p_observerPos">: observer's position</param>
+		/// <param name="p_observerDir">: direction that the observer is loocking at</param>
+		/// <returns></returns>
+		bool checkBackFaceCulling(	const Vec3& p_trianglePos, const Vec3& p_triangleNormal, 
+									const Vec3& p_observerPos, const Vec3& p_observerDir)const;
 	};
 }

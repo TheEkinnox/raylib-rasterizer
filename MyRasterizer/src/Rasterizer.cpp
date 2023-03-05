@@ -68,6 +68,7 @@ namespace My
 		{
 			auto vertices = p_entity.getMesh()->getVertices();
 			auto indices = p_entity.getMesh()->getIndices();
+			auto normals = p_entity.getMesh()->getNormals();
 
 			std::map<size_t, Color> vertexLightColor;
 
@@ -93,7 +94,7 @@ namespace My
 				v.m_color = p_light.CalculateLightingPhong(v, LibMath::Vector3::zero());
 			}
 
-			for (size_t i = 0; i + 2 < indices.size(); i += 3)
+			for (size_t i = 0; i + 2 < indices.size(); i += 3) // triangle is 3 indices
 			{
 				Vertex triangle[3]
 				{
@@ -102,20 +103,10 @@ namespace My
 					vertices[indices[i + 2]]
 				};
 
-				//triangle[0].m_color = vertexLightColor[indices[i]];
-				//triangle[1].m_color = vertexLightColor[indices[i + 1]];
-				//triangle[2].m_color = vertexLightColor[indices[i + 2]];
+				Vec3 centerPt = (triangle[0].m_position + triangle[1].m_position + triangle[2].m_position) / 3;
 
-				//for (Vertex& vertex : triangle)
-				//{
-				//	auto& pos = vertex.m_position;
-				//	auto vec4 = LibMath::Vector4{ pos.m_x, pos.m_y, pos.m_z, 1.f };
-
-				//	vec4 = p_entity.getTransform() * vec4;
-				//	pos = { vec4.m_x, vec4.m_y, vec4.m_z };
-				//}
-
-				drawTriangle(triangle, p_target);
+				if (checkBackFaceCulling(centerPt, normals[i/3], Vec3(1.5f,3,3), Vec3(-1,0,0))) //TODO : put camera values for back-face culling
+					drawTriangle(triangle, p_target);
 			}
 		}
 	}
@@ -244,5 +235,17 @@ namespace My
 				}
 			}
 		}
+	}
+	bool Rasterizer::checkBackFaceCulling(	const Vec3& p_trianglePos, const Vec3& p_triangleNormal,
+											const Vec3& p_observerPos, const Vec3& p_observerDir) const
+	{
+		/*
+		* https://en.wikipedia.org/wiki/Back-face_culling
+		*/
+		Vec3 deltaPos = p_trianglePos; //bcs constant
+		deltaPos -= p_observerPos;
+
+		return	deltaPos.dot(p_triangleNormal) <= 0 &&
+				(p_observerDir == Vec3::zero() || deltaPos.dot(p_observerDir) >= 0);
 	}
 }

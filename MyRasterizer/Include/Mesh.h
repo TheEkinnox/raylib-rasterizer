@@ -1,6 +1,7 @@
 #pragma once
 #include <vector>
 #include "Vertex.h"
+#include "Vector/Vector3.h"
 
 namespace My
 {
@@ -83,10 +84,21 @@ namespace My
 		 */
 		std::vector<size_t>	getIndices() const;
 
+		/// <summary>
+		/// Gives read acces to the mesh's normal buffer
+		/// </summary>
+		/// <returns></returns>
+		std::vector<LibMath::Vector3> getNormals() const;
+
 		/**
-		* \brief Calculates the normal of each Vertex
+		* \brief Calculates the normal of each Vertex based on triangle normals
 		*/
-		void CalculateNormals();
+		void calculateVertexNormals();
+
+		/**
+		* \brief Calculates the normal of each Triangle
+		*/
+		void calculateTriangleNormals();
 
 		/**
 		 * \brief Creates a cube of side 1
@@ -108,6 +120,7 @@ namespace My
 	private:
 		std::vector<Vertex> m_vertices;
 		std::vector<size_t> m_indices;
+		std::vector<LibMath::Vector3> m_normals;
 	};
 
 }
