@@ -1,6 +1,5 @@
 #include "Light.h"
 #include "Vertex.h"
-#include "Trigonometry.h"
 #include "Arithmetic.h"
 
 My::Light::Light(Vec3 p_position, float p_ambientComponent, float p_diffuseComponent, float p_specularComponent)
@@ -35,6 +34,38 @@ My::Color My::Light::CalculateLightingPhong(	const Vertex& p_vertex, const Vec3&
 
 	return Color(	ia + (id + is) * lightAngle * m_intensity,
 					255);
+}
+
+My::Color My::Light::calculateLightingBlinnPhong(const Vec3& p_position,
+	const Color& p_color, const Vec3& p_normal,
+	const int p_shininess) const
+{
+	const Vec3 lightDir = (m_position - p_position).normalized();
+	const float squaredDist = m_position.distanceSquaredFrom(p_position);
+
+	const float lambertian = LibMath::max(lightDir.dot(p_normal), 0.f);
+	float specular = 0.f;
+
+	if (lambertian > 0.f)
+	{
+		const Vec3 viewDir = (-p_position).normalized();
+		const Vec3 halfDir = (lightDir + viewDir).normalized();
+		const float specularAngle = LibMath::max(halfDir.dot(p_normal), 0.f);
+
+		specular = LibMath::pow(specularAngle, p_shininess);
+	}
+
+	const Color ambientColor = p_color * m_ambientComponent;
+	const Color diffuseColor = p_color * m_diffuseComponent;
+	const Color specularColor = p_color * m_specularComponent;
+
+	Color color = ambientColor
+		+ diffuseColor * lambertian * m_intensity / squaredDist
+		+ specularColor * specular * m_intensity / squaredDist;
+
+	color.m_a = p_color.m_a;
+
+	return color;
 }
 
 //My::Color My::Light::ApplyLightToColor(const Color& p_color, float lightValue)

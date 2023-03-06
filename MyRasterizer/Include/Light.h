@@ -13,8 +13,7 @@ namespace My
 		using Vec3 = LibMath::Vector3;
 		using Rad =  LibMath::Radian;
 
-	public: 
-		
+	public:
 		/// <summary>
 		/// Light source to illumanate entites at p_position. 
 		/// Components are percents that must add to 1
@@ -26,7 +25,6 @@ namespace My
 		Light(Vec3 p_position, float p_ambientComponent, float p_diffuseComponent, float p_specularComponent);
 		~Light() = default;
 
-
 		/// <summary>
 		/// Calucale the limunosity/color of a vertex based on the Phong method
 		/// </summary>
@@ -34,7 +32,18 @@ namespace My
 		/// <param name="p_observer">: camera position</param>
 		/// <param name="p_shinyness">: material shinyness constant </param>
 		/// <returns></returns>
-		Color CalculateLightingPhong(const Vertex& p_vertex, const Vec3& p_observer, size_t p_shinyness = 10)const;
+		Color CalculateLightingPhong(const Vertex& p_vertex, const Vec3& p_observer, size_t p_shinyness = 10) const;
+
+		/**
+		 * \brief Calculates the lit color of a vertex using the Blinn-Phong reflection model
+		 * \param p_position the position at which the calculation should be done
+		 * \param p_color the interpolated color to use
+		 * \param p_normal the interpolated normal to use
+		 * \param p_shininess the material's shininess
+		 * \return The lit color of the received vertex
+		 */
+		Color calculateLightingBlinnPhong(const Vec3& p_position,
+			const Color& p_color, const Vec3& p_normal, int p_shininess = 10) const;
 
 		//Color static ApplyLightToColor(const Color& p_color, float lightValue);
 

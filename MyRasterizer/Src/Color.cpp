@@ -1,4 +1,6 @@
 #include "Color.h"
+
+#include "Arithmetic.h"
 #include "Interpolation.h"
 
 namespace My
@@ -25,10 +27,10 @@ namespace My
 	Color Color::operator+(const Color& p_other) const
 	{
 		return {
-			static_cast<uint8_t>(static_cast<short>(m_r) + p_other.m_r),
-			static_cast<uint8_t>(static_cast<short>(m_g) + p_other.m_g),
-			static_cast<uint8_t>(static_cast<short>(m_b) + p_other.m_b),
-			static_cast<uint8_t>(static_cast<short>(m_a) + p_other.m_a)
+			static_cast<uint8_t>(LibMath::min(static_cast<short>(m_r) + p_other.m_r, 255)),
+			static_cast<uint8_t>(LibMath::min(static_cast<short>(m_g) + p_other.m_g, 255)),
+			static_cast<uint8_t>(LibMath::min(static_cast<short>(m_b) + p_other.m_b, 255)),
+			static_cast<uint8_t>(LibMath::min(static_cast<short>(m_a) + p_other.m_a, 255))
 		};
 	}
 
@@ -45,9 +47,9 @@ namespace My
 	Color Color::operator*(const LibMath::Vector3& p_vec3) const
 	{
 		return {
-			static_cast<uint8_t>(static_cast<float>(m_r) * p_vec3.m_x),
-			static_cast<uint8_t>(static_cast<float>(m_g) * p_vec3.m_y),
-			static_cast<uint8_t>(static_cast<float>(m_b) * p_vec3.m_z),
+			static_cast<uint8_t>(LibMath::clamp(static_cast<float>(m_r) * p_vec3.m_x, 0, 255)),
+			static_cast<uint8_t>(LibMath::clamp(static_cast<float>(m_g) * p_vec3.m_y, 0, 255)),
+			static_cast<uint8_t>(LibMath::clamp(static_cast<float>(m_b) * p_vec3.m_z, 0, 255)),
 			m_a
 		};
 	}
@@ -55,10 +57,10 @@ namespace My
 	Color Color::operator*(const float p_scalar) const
 	{
 		return {
-			static_cast<uint8_t>(static_cast<float>(m_r) * p_scalar),
-			static_cast<uint8_t>(static_cast<float>(m_g) * p_scalar),
-			static_cast<uint8_t>(static_cast<float>(m_b) * p_scalar),
-			static_cast<uint8_t>(static_cast<float>(m_a) * p_scalar)
+			static_cast<uint8_t>(LibMath::clamp(static_cast<float>(m_r) * p_scalar, 0, 255)),
+			static_cast<uint8_t>(LibMath::clamp(static_cast<float>(m_g) * p_scalar, 0, 255)),
+			static_cast<uint8_t>(LibMath::clamp(static_cast<float>(m_b) * p_scalar, 0, 255)),
+			static_cast<uint8_t>(LibMath::clamp(static_cast<float>(m_a) * p_scalar, 0, 255))
 		};
 	}
 
@@ -72,7 +74,7 @@ namespace My
 		};
 	}
 
-	Color Color::lerp(const Color& a, const Color& b, float t)
+	Color Color::lerp(const Color& a, const Color& b, const float t)
 	{
 		return
 		{

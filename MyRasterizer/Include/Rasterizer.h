@@ -73,8 +73,9 @@ namespace My
 		 * \brief Draws the received triangle on the target texture
 		 * \param p_vertices The triangle to draw
 		 * \param p_target The texture on which the triangle should be drawn
+		 * \param p_light The light used to shade the triangle
 		 */
-		void				drawTriangle(const Vertex p_vertices[3], Texture& p_target);
+		void				drawTriangle(const Vertex p_vertices[3], Texture& p_target, const Light& p_light);
 
 	private:
 		std::vector<float>	m_zBuffer;

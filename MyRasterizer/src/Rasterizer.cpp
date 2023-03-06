@@ -57,7 +57,7 @@ namespace My
 					pos = {vec4.m_x, vec4.m_y, vec4.m_z};
 				}
 
-				drawTriangle(triangle, p_target);
+				drawTriangle(triangle, p_target, Light(LibMath::Vector3::zero(), 0, 0, 0));
 			}
 		}
 	}
@@ -90,7 +90,7 @@ namespace My
 					nor = { vec4.m_x, vec4.m_y, vec4.m_z };
 				}
 
-				v.m_color = p_light.CalculateLightingPhong(v, LibMath::Vector3::zero());
+				//v.m_color = p_light.CalculateLightingPhong(v, LibMath::Vector3::zero());
 			}
 
 			for (size_t i = 0; i + 2 < indices.size(); i += 3)
@@ -115,7 +115,7 @@ namespace My
 				//	pos = { vec4.m_x, vec4.m_y, vec4.m_z };
 				//}
 
-				drawTriangle(triangle, p_target);
+				drawTriangle(triangle, p_target, p_light);
 			}
 		}
 	}
@@ -144,30 +144,30 @@ namespace My
 					nor = { vec4.m_x, vec4.m_y, vec4.m_z };
 				}
 
-				Color color = p_light.CalculateLightingPhong(v, LibMath::Vector3::zero());
+				const Color color = p_light.CalculateLightingPhong(v, LibMath::Vector3::zero());
 
-				Vertex triangle1[3]
+				const Vertex triangle1[3]
 				{
 					Vertex{v.m_position + LibMath::Vector3(0.02f), LibMath::Vector3::zero(), color},
 					Vertex{v.m_position + v.m_normal,LibMath::Vector3::zero(),color},
 					Vertex{v.m_position,LibMath::Vector3::zero(),color}
 				};
 
-				drawTriangle(triangle1, p_target);
+				drawTriangle(triangle1, p_target, p_light);
 
-				Vertex triangle2[3]
+				const Vertex triangle2[3]
 				{
 					Vertex{v.m_position + LibMath::Vector3(0.02f),LibMath::Vector3::zero(), color},
 					Vertex{v.m_position + v.m_normal,LibMath::Vector3::zero(),color},
 					Vertex{v.m_position + v.m_normal + LibMath::Vector3(0.02f),LibMath::Vector3::zero(),color }
 				};
 
-				drawTriangle(triangle2, p_target);
+				drawTriangle(triangle2, p_target, p_light);
 			}
 		}
 	}
 
-	void Rasterizer::drawTriangle(const Vertex p_vertices[3], Texture& p_target)
+	void Rasterizer::drawTriangle(const Vertex p_vertices[3], Texture& p_target, const Light& p_light)
 	{
 		// Create an array of vector4 for the positions
 		LibMath::Vector4 points[3]
@@ -238,9 +238,13 @@ namespace My
 
 					if (pos.m_z < m_zBuffer[bufferIndex])
 					{
-						const Color pixelColor = p_vertices[0].m_color * s
+						Color pixelColor = p_vertices[0].m_color * s
 							+ p_vertices[1].m_color * t
 							+ p_vertices[2].m_color * w;
+
+						LibMath::Vector3 normal = (p_vertices[0].m_normal * s + p_vertices[1].m_normal * t + p_vertices[2].m_normal * w).normalized();
+
+						pixelColor = p_light.calculateLightingBlinnPhong(pos, pixelColor, normal);
 
 						p_target.setPixelColor(x, y, pixelColor);
 						m_zBuffer[bufferIndex] = pos.m_z;
