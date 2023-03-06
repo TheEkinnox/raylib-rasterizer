@@ -22,7 +22,7 @@ My::Color My::Light::calculateLightingPhong(const Vertex& p_vertex, const Vec3& 
 											0.0f, 1.0f);
 	Vec3 halfVector = p_observer + this->m_position - 2 * p_vertex.m_position;
 	halfVector.normalize();
-	float nDotH = LibMath::clamp(p_vertex.m_normal.dot(halfVector), 0.0, 1.0);
+	float nDotH = LibMath::clamp(p_vertex.m_normal.dot(halfVector), 0.0, 1.0); 
 
 	// Intensity ambient
 	Vec3 ia = p_vertex.m_color.rgb() * m_ambientComponent;

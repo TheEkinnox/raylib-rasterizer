@@ -48,6 +48,12 @@ namespace My
 		Rasterizer&			operator=(Rasterizer&& p_other) = default;
 
 		/**
+		 * \brief Moves the given rasterizer into the current one
+		 * \param p_other The rasterizer to move
+		 */
+		Rasterizer&			operator=(Rasterizer&& p_other) = default;
+
+		/**
 		 * \brief Draws the scene in 3D on the target texture
 		 * \param p_scene The scene to render
 		 * \param p_target The texture on which the scene should be rendered
