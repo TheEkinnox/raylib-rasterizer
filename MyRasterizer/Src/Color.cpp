@@ -19,4 +19,14 @@ namespace My
 			static_cast<uint8_t>(LibMath::lerp(a.m_a, b.m_a, t))
 		};
 	}
+
+	Color& Color::operator*=(const Color& color)
+	{
+		m_r = (m_r * color.m_r) / 255;
+		m_g = (m_g * color.m_g) / 255;
+		m_b = (m_b * color.m_b) / 255;
+		m_a = (m_a * color.m_a) / 255;
+
+		return *this;
+	}
 }

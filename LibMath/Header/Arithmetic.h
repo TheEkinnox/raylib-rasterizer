@@ -19,6 +19,13 @@ namespace LibMath
 	float	ceil(float value);
 
 	/**
+	 * \brief Returns the rounded value
+	 * \param value The value to round
+	 * \return The received value rounded
+	*/
+	float round(const float value);
+
+	/**
 	 * \brief Returns the received value limited to the given range
 	 * \param value The value to clamp
 	 * \param a The first value of the range

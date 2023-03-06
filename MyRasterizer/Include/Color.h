@@ -17,6 +17,8 @@ namespace My
 		static const Color blue;
 
 		static Color	lerp(const Color& a, const Color& b, float t);
+
+		Color& operator*=(const Color& color);
 	};
 }
 

@@ -54,7 +54,7 @@ namespace My
 
 	void Rasterizer::drawTriangle(const Vertex p_vertices[3], Texture& p_target, const Texture* p_texture)
 	{
-		Vertex p_vertex;
+
 		// Create an array of vector4 for the positions
 		LibMath::Vector4 points[3]
 		{
@@ -112,16 +112,29 @@ namespace My
 				const float s = q.cross(vs2) / vs1.cross(vs2);
 				const float t = vs1.cross(q) / vs1.cross(vs2);
 
-				/*x = p_vertex.u * floatWidth;
-				y = p_vertex.v * floatHeight;*/
+				if (s >= 0 && t >= 0 && s + t <= 1)
+				{
+					Color pixelColor = Color::lerp(p_vertices[0].m_color, p_vertices[1].m_color, s);
+					pixelColor = Color::lerp(pixelColor, p_vertices[2].m_color, t);
 
-				p_vertex.u = LibMath::lerp(p_vertices[0].u, p_vertices[1].u, s);
-				p_vertex.u = LibMath::lerp(p_vertex.u, p_vertices[2].u, t);
+					if (p_texture != nullptr)
+					{
+						const float tmp = 1 - s - t;
+						/*float u = LibMath::lerp(p_vertices[0].u, p_vertices[1].u, s);*/
+						const float u = p_vertices[0].m_u * tmp + p_vertices[1].m_u * s + p_vertices[2].m_u * t;
+						
 
-				// Même principe pour v
+						/*float v = LibMath::lerp(p_vertices[0].v, p_vertices[1].v, s);*/
+						const float v = p_vertices[0].m_v * tmp + p_vertices[1].m_v * s + p_vertices[2].m_v * t;
 
-				textureX = LibMath::wrap(u, 0, 1) * textureWidth;
-				textureY = LibMath::wrap(v, 0, 1) * textureHeight;
+						float textureX = (u - LibMath::floor(u)) * p_texture->getWidth();
+						float textureY = (v - LibMath::floor(v)) * p_texture->getHeight();
+
+						pixelColor *= p_texture->getPixelColor((uint32_t)LibMath::round(textureX), (uint32_t)LibMath::round(textureY));
+					}
+
+					p_target.setPixelColor(x, y, pixelColor);
+				}
 			}
 		}
 	}

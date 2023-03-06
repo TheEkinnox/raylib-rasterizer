@@ -34,14 +34,16 @@ My::Mesh* My::Mesh::createCube(const Color& p_color)
 {
 	const std::vector<Vertex> vertices
 	{
-		{ { -.5f, .5f, .5f }, p_color },		// Front-top-left
-		{ { .5f, .5f, .5f }, p_color },		// Front-top-right
-		{ { -.5f, -.5f, .5f }, p_color },	// Front-bottom-left
-		{ { .5f, -.5f, .5f }, p_color },		// Front-bottom-right
-		{ { -.5f, .5f, -.5f }, p_color },	// Back-top-left
-		{ { .5f, .5f, -.5f }, p_color },		// Back-top-right
-		{ { -.5f, -.5f, -.5f }, p_color },	// Back-bottom-left
-		{ { .5f, -.5f, -.5f }, p_color }		// Back-bottom-right
+		{ { -.5f, .5f, .5f }, p_color, 0, 0 },	// Front-top-left
+		{ { .5f, .5f, .5f }, p_color, 1, 0 },		// Front-top-right
+		{ { -.5f, -.5f, .5f }, p_color , 0, 1 },	// Front-bottom-left
+		{ { .5f, -.5f, .5f }, p_color , 1, 1 },	// Front-bottom-right
+		{ { -.5f, .5f, -.5f }, p_color , 1, 0 },	// Back-top-left
+		{ { .5f, .5f, -.5f }, p_color , 0, 0 },	// Back-top-right
+		{ { -.5f, -.5f, -.5f }, p_color, 1, 1 },	// Back-bottom-left
+		{ { .5f, -.5f, -.5f }, p_color , 0, 1 }	// Back-bottom-right
+
+
 	};
 
 	const std::vector<size_t> indices

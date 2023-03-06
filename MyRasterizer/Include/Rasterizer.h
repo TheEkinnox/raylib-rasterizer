@@ -38,5 +38,6 @@ namespace My
 		 * \param p_target The texture on which the triangle should be drawn
 		 */
 		static void drawTriangle(const Vertex p_vertices[3], Texture& p_target, const Texture* p_texture);
+
 	};
 }
