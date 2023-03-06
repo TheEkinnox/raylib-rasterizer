@@ -34,11 +34,16 @@ int main()
 		1,
 		2
 	};
-	My::Texture texture("img/container.jpg");
+
 	My::Mesh triangle = My::Mesh(vertices, indices);
 	LibMath::Matrix4 transform = LibMath::Matrix4::translation(0, 0, 2);
 	scene.addEntity(My::Entity(triangle, transform));
 
+	My::Mesh* cube = My::Mesh::createCube();
+	My::Texture texture("img/container.jpg");
+	cube->setTexture(&texture);
+	transform = LibMath::Matrix4::translation(0, 0, 2);
+	scene.addEntity(My::Entity(*cube, transform));
 	//transformation tests
 	/**
 	scene.getEntity(0).Translate(0, 1, 0);

@@ -1,11 +1,9 @@
 #include "Trigonometry.h"
 #include "Mesh.h"
+#include "Texture.h"
 
-My::Mesh::Mesh()
-{
-	pTexture = nullptr;
-}
-My::Mesh::Mesh(const std::vector<Vertex>& p_vertices, const std::vector<size_t>& p_indices)
+My::Mesh::Mesh(const std::vector<Vertex>& p_vertices,
+	const std::vector<size_t>& p_indices, const Texture* p_texture)
 {
 	// Make sure the index buffer is a set of triangles
 	if (p_indices.size() % 3 != 0)
@@ -19,6 +17,7 @@ My::Mesh::Mesh(const std::vector<Vertex>& p_vertices, const std::vector<size_t>&
 
 	this->m_vertices = p_vertices;
 	this->m_indices = p_indices;
+	this->m_texture = p_texture;
 }
 
 std::vector<My::Vertex> My::Mesh::getVertices() const
@@ -151,8 +150,13 @@ My::Mesh* My::Mesh::createSphere(const uint32_t p_latitudeCount, const uint32_t 
 	return new Mesh(vertices, indices);
 }
 
-void My::Mesh::SetTexture(My::Texture* texture)
+const My::Texture* My::Mesh::getTexture() const
 {
-	pTexture = texture;
+	return m_texture;
+}
+
+void My::Mesh::setTexture(My::Texture* texture)
+{
+	m_texture = texture;
 }
 

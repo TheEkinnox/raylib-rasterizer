@@ -47,13 +47,14 @@ namespace My
 					pos = {vec4.m_x, vec4.m_y, vec4.m_z};
 				}
 
-				drawTriangle(triangle, p_target);
+				drawTriangle(triangle, p_target, p_entity.getMesh()->getTexture());
 			}
 		}
 	}
 
-	void Rasterizer::drawTriangle(const Vertex p_vertices[3], Texture& p_target)
+	void Rasterizer::drawTriangle(const Vertex p_vertices[3], Texture& p_target, const Texture* p_texture)
 	{
+		Vertex p_vertex;
 		// Create an array of vector4 for the positions
 		LibMath::Vector4 points[3]
 		{
@@ -111,11 +112,16 @@ namespace My
 				const float s = q.cross(vs2) / vs1.cross(vs2);
 				const float t = vs1.cross(q) / vs1.cross(vs2);
 
-				Color pixelColor = Color::lerp(p_vertices[0].m_color, p_vertices[1].m_color, s);
-				pixelColor = Color::lerp(pixelColor, p_vertices[2].m_color, t);
+				/*x = p_vertex.u * floatWidth;
+				y = p_vertex.v * floatHeight;*/
 
-				if (s >= 0 && t >= 0 && s + t <= 1)
-					p_target.setPixelColor(x, y, pixelColor);
+				p_vertex.u = LibMath::lerp(p_vertices[0].u, p_vertices[1].u, s);
+				p_vertex.u = LibMath::lerp(p_vertex.u, p_vertices[2].u, t);
+
+				// Même principe pour v
+
+				textureX = LibMath::wrap(u, 0, 1) * textureWidth;
+				textureY = LibMath::wrap(v, 0, 1) * textureHeight;
 			}
 		}
 	}

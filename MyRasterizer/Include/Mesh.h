@@ -35,18 +35,13 @@ namespace My
 	class Mesh
 	{
 	public:
-
-		/**
-		 * \brief default constructor, we use it to initialize all of our private members
-		 * \param No parameters
-		 * */
-		Mesh();
 		/**
 		 * \brief Creates a mesh with the given set of vertices and indices
 		 * \param p_vertices The vertex buffer of the mesh
 		 * \param p_indices The index buffer of the mesh
+		 * \param p_texture The texture of the mesh (nullptr by default)
 		 */
-		Mesh(const std::vector<Vertex>& p_vertices, const std::vector<size_t>& p_indices);
+		Mesh(const std::vector<Vertex>& p_vertices, const std::vector<size_t>& p_indices, const Texture* p_texture = nullptr);
 
 		/**
 		 * \brief Creates a copy of the given mesh
@@ -111,12 +106,18 @@ namespace My
 		* *\brief We use it to give a texture to our Mesh
 		 * \param textture is the name of the texture we want to give him
 		 * */
-		void SetTexture(My::Texture* texture);
+		const Texture* getTexture() const;
+
+		/*
+		* *\brief We use it to give a texture to our Mesh
+		 * \param textture is the name of the texture we want to give him
+		 * */
+		void setTexture(My::Texture* texture);
 
 	private:
 		std::vector<Vertex> m_vertices;
 		std::vector<size_t> m_indices;
-		My::Texture* pTexture;
+		const My::Texture* m_texture;
 	};
 
 }
