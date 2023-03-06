@@ -36,7 +36,7 @@
     <ClInclude Include="Include\Rasterizer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="stb_image.h">
+    <ClInclude Include="Include\Light.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -60,6 +60,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\Color.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Light.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

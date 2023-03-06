@@ -132,4 +132,14 @@ namespace LibMath
 
 		return abs(a - b) <= std::numeric_limits<float>::epsilon() * maxXYOne;
 	}
+
+	bool floatLessThan(float a, float b)
+	{
+		return (a - b) < std::numeric_limits<float>::epsilon();
+	}
+
+	bool floatGreaterThan(float a, float b)
+	{
+		return !floatEquals(a, b) && !floatLessThan(a, b);
+	}
 }

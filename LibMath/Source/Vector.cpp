@@ -578,7 +578,7 @@ namespace LibMath
 
 	bool Vector3::isUnitVector() const
 	{
-		return 1.f == this->magnitudeSquared();
+		return floatEquals(1.f, this->magnitudeSquared());
 	}
 
 	float Vector3::magnitude() const

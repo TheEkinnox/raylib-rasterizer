@@ -57,7 +57,7 @@ namespace My
 					pos = {vec4.m_x, vec4.m_y, vec4.m_z};
 				}
 
-				drawTriangle(triangle, p_target, p_entity.getMesh()->getTexture());
+				drawTriangle(triangle, p_target);
 			}
 		}
 	}
@@ -167,9 +167,8 @@ namespace My
 		}
 	}
 
-	void Rasterizer::drawTriangle(const Vertex p_vertices[3], Texture& p_target, const Texture* p_texture)
+	void Rasterizer::drawTriangle(const Vertex p_vertices[3], Texture& p_target)
 	{
-
 		// Create an array of vector4 for the positions
 		LibMath::Vector4 points[3]
 		{
@@ -243,24 +242,9 @@ namespace My
 							+ p_vertices[1].m_color * t
 							+ p_vertices[2].m_color * w;
 
-					if (p_texture != nullptr)
-					{
-						const float tmp = 1 - s - t;
-						/*float u = LibMath::lerp(p_vertices[0].u, p_vertices[1].u, s);*/
-						const float u = p_vertices[0].m_u * tmp + p_vertices[1].m_u * s + p_vertices[2].m_u * t;
-						
-
-						/*float v = LibMath::lerp(p_vertices[0].v, p_vertices[1].v, s);*/
-						const float v = p_vertices[0].m_v * tmp + p_vertices[1].m_v * s + p_vertices[2].m_v * t;
-
-						float textureX = (u - LibMath::floor(u)) * p_texture->getWidth();
-						float textureY = (v - LibMath::floor(v)) * p_texture->getHeight();
-
-						pixelColor *= p_texture->getPixelColor((uint32_t)LibMath::round(textureX), (uint32_t)LibMath::round(textureY));
+						p_target.setPixelColor(x, y, pixelColor);
+						m_zBuffer[bufferIndex] = pos.m_z;
 					}
-
-					p_target.setPixelColor(x, y, pixelColor);
-					m_zBuffer[bufferIndex] = pos.m_z;
 				}
 			}
 		}
