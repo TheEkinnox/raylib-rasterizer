@@ -1,11 +1,64 @@
 #pragma once
 #include "Matrix/Matrix4.h"
+#include "Matrix/Matrix3.h"
 #include "Vector/Vector3.h"
 #include "Angle/Radian.h"
 
 
 namespace My
 {
+	namespace Exceptions
+	{
+		class DivideByZero : public std::exception
+		{
+		public:
+			/**
+			 * \brief Creates a divide by zero exception with a default message
+			 */
+			DivideByZero() :
+				std::exception("Divide By Zero") {}
+
+			/**
+			 * \brief Creates a divide by zero exception with a given message
+			 * \param message The message of the exception
+			 */
+			DivideByZero(char const* message) :
+				std::exception(message) {}
+
+			/**
+			 * \brief Creates a divide by zero exception with a given message
+			 * \param message The message of the exception
+			 */
+			DivideByZero(const std::string& message) :
+				std::exception(message.c_str()) {}
+		};
+
+		class GimbleLock : public std::exception
+		{
+		public:
+			/**
+			 * \brief Creates an invalid index buffer exception with a default message
+			 */
+			GimbleLock() :
+				std::exception("Gimble Lock") {}
+
+
+			/**
+			 * \brief Creates a Gimble Lock exception with a given message
+			 * \param message The message of the exception
+			 */
+			GimbleLock(char const* message) :
+				std::exception(message) {}
+
+			/**
+			 * \brief Creates a Gimble Lock exception with a given message
+			 * \param message The message of the exception
+			 */
+			GimbleLock(const std::string& message) :
+				std::exception(message.c_str()) {}
+		};
+	}
+
 	class Mesh;
 
 	class Entity
@@ -16,41 +69,190 @@ namespace My
 		using Rad = LibMath::Radian;
 
 	public:
-		explicit	Entity(const Mesh& p_mesh, Mat4 p_transform = Mat4());
-					Entity(const Entity& p_other) = default;
-					Entity(Entity&& p_other) = default;
-					~Entity() = default;
+		#pragma region Constructors
+		explicit	Entity(const Mesh& p_mesh, Mat4 p_transform = Mat4()); // TODO : Finish Entity comments
+		Entity(const Entity& p_other) = default;
+		Entity(Entity&& p_other) = default;
+		~Entity() = default;
+		#pragma endregion
 
-		Entity& translate(float p_x, float p_y, float p_z);
-		//Entity& translateLocally(float p_x, float p_y, float p_z); // ???
-		Entity& scale(float p_x, float p_y, float p_z);
-		Entity& rotateEulerAngles(const Rad& p_x, const Rad& p_y, const Rad& p_z);
+		#pragma region Getters
+		/// <summary>
+		/// Get the mesh the entity is based on
+		/// </summary>
+		/// <returns></returns>
+		const Mesh* getMesh() const;
 
-		Entity& setPosition(float p_x, float p_y, float p_z);
-		Entity& setScale(float p_x, float p_y, float p_z);
-		Entity& setRotationEulerAngles(const Rad& p_x, const Rad& p_y, const Rad& p_z);
+		#pragma region Transforms
+		/// <summary>
+		/// Get the Mat4 that Scales, Rotates and Translates the Mesh
+		/// </summary>
+		/// <returns></returns>
+		Mat4 getTransform() const;
 
+		/// <summary>
+		/// Get the Entity's global position
+		/// </summary>
+		/// <returns></returns>
 		Vec3 getPosition()const;
+
+		/// <summary>
+		/// Get the xyz's scaling factors as a Vector3
+		/// </summary>
+		/// <returns></returns>
 		Vec3 getScale()const;
+
+		/// <summary>
+		/// Get the x axis' scaling factor
+		/// </summary>
+		/// <returns></returns>
 		float getScaleX() const;
+
+		/// <summary>
+		/// Get the y axis' scaling factor
+		/// </summary>
+		/// <returns></returns>
 		float getScaleY() const;
+
+		/// <summary>
+		/// Get the z axis' scaling factor
+		/// </summary>
+		/// <returns></returns>
 		float getScaleZ() const;
+
+		/// <summary>
+		/// Get the Entity's rotation arround each axis in radians in a Vector3
+		/// </summary>
+		/// <returns></returns>
 		Vec3 getRotationEulerAngles()const;
 
+		/// <summary>
+		/// Get the Rightwards, Upwards and Forwards Vectors in a Mat4
+		/// </summary>
+		/// <returns></returns>
+		Mat4 getRotation() const;
+		#pragma endregion
+
+		#pragma region LocalDirections
+		/// <summary>
+		/// Get local rightward Vector3
+		/// </summary>
+		/// <returns></returns>
 		Vec3 getRightward()const;
+
+		/// <summary>
+		/// Get the inverse of the rightward Vector3
+		/// </summary>
+		/// <returns></returns>
 		Vec3 getLeftward()const;
+
+		/// <summary>
+		/// Get local upward Vector3
+		/// </summary>
+		/// <returns></returns>
 		Vec3 getUpward()const;
+
+		/// <summary>
+		/// Get the inverse of the upwards Vector3
+		/// </summary>
+		/// <returns></returns>
 		Vec3 getDownward()const;
+
+		/// <summary>
+		/// Get local foward Vector3
+		/// </summary>
+		/// <returns></returns>
 		Vec3 getForward()const;
+
+		/// <summary>
+		/// Get the inverse of the upwards Vector3
+		/// </summary>
+		/// <returns></returns>
 		Vec3 getBackward()const;
+#pragma endregion
 
+#pragma endregion
 
-		const Mesh*	getMesh() const;
-		Mat4		getTransform() const;
-		void		setTransform(const Mat4& p_transform);
+		#pragma region Transformations
+		/// <summary>
+		/// Replaces transform Mat4
+		/// </summary>
+		/// <param name="p_transform">: Copy Mat4</param>
+		/// <returns></returns>
+		void	setTransform(const Mat4& p_transform);
 
-		Entity&		operator=(const Entity& p_other) = default;
-		Entity&		operator=(Entity&& p_other) = default;
+		/// <summary>
+		/// Translate Entity's position by paramaters
+		/// </summary>
+		/// <param name="p_x">: global x axis</param>
+		/// <param name="p_y">: global y axis</param>
+		/// <param name="p_z">: global z axis</param>
+		/// <returns></returns>
+		Entity& translate(float p_x, float p_y, float p_z);
+
+		//Entity& translateLocally(float p_x, float p_y, float p_z); // ???
+
+		/// <summary>
+		/// Multiply Entity's Scaling factor by paramaters
+		/// </summary>
+		/// <param name="p_x">: local x axis</param>
+		/// <param name="p_y">: local y axis</param>
+		/// <param name="p_z">: local z axis</param>
+		/// <returns></returns>
+		Entity& scale(float p_x, float p_y, float p_z);
+
+		/// <summary>
+		/// Rotate Entity around axes by paramaters in Radiants
+		/// </summary>
+		/// <param name="p_x">: local x axis</param>
+		/// <param name="p_y">: local y axis</param>
+		/// <param name="p_z">: local z axis</param>
+		/// <returns></returns>
+		Entity& rotateEulerAngles(const Rad& p_x, const Rad& p_y, const Rad& p_z);
+
+		/// <summary>
+		/// Overrides Entity's position with paramaters
+		/// </summary>
+		/// <param name="p_x">: global x axis</param>
+		/// <param name="p_y">: global y axis</param>
+		/// <param name="p_z">: global z axis</param>
+		/// <returns></returns>
+		Entity& setPosition(float p_x, float p_y, float p_z);
+
+		/// <summary>
+		/// Overrides Entity's Scaling factor with paramaters
+		/// </summary>
+		/// <param name="p_x">: local x axis</param>
+		/// <param name="p_y">: local y axis</param>
+		/// <param name="p_z">: local z axis</param>
+		/// <returns></returns>
+		Entity& setScale(float p_x, float p_y, float p_z);
+
+		/// <summary>
+		/// Overrides Enity's rotation around axes with paramaters in Radiants
+		/// </summary>
+		/// <param name="p_x">: local x axis</param>
+		/// <param name="p_y">: local y axis</param>
+		/// <param name="p_z">: local z axis</param>
+		/// <returns></returns>
+		Entity& setRotationEulerAngles(const Rad& p_x, const Rad& p_y, const Rad& p_z);
+#pragma endregion
+
+		#pragma region Operators
+		/// <summary>
+		/// Copy operator
+		/// </summary>
+		/// <param name="p_other"></param>
+		/// <returns></returns>
+		Entity& operator=(const Entity& p_other) = default;
+
+		/// <summary>
+		/// Move operator
+		/// </summary>
+		/// <param name="p_other"></param>
+		/// <returns></returns>
+		Entity& operator=(Entity&& p_other) = default;
+#pragma endregion
 
 	private:
 		const Mesh* m_mesh = nullptr;

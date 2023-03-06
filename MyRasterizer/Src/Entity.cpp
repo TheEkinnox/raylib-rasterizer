@@ -27,33 +27,40 @@ My::Entity& My::Entity::rotateEulerAngles(const Rad& p_x, const Rad& p_y, const 
 {
 	this->m_transform *= Mat4::rotation(p_x, Vec3::right());	//rotate x axis
 	this->m_transform *= Mat4::rotation(p_y, Vec3::up());		//rotate y axis
-	this->m_transform *= Mat4::rotation(p_z, Vec3::front());	//rotate z axis
+	this->m_transform *= Mat4::rotation(p_z, Vec3::back());		//rotate z axis
 	return *this;
 }
 
 My::Entity& My::Entity::setPosition(const float p_x, const float p_y, const float p_z)
 {
-	const Vec3 pos = this->getPosition();
-	this->translate(-pos.m_x, -pos.m_y, -pos.m_z); // back to (0, 0, 0)
-
-	this->translate(p_x, p_y, p_z); // to SetPos
-
+	LibMath::Vector3 pos = this->getPosition();
+	this->translate(	p_x - pos.m_x,
+						p_y - pos.m_y, 
+						p_z - pos.m_z);
 	return *this;
 }
 
 My::Entity& My::Entity::setScale(const float p_x, const float p_y, const float p_z)
 {
-	const Vec3 scale = this->getScale();
-	this->scale(1 / scale.m_x, 1 / scale.m_y, 1 / scale.m_z); // back to (1, 1, 1)
+	LibMath::Vector3 scale = this->getScale();
 
-	this->scale(p_x, p_y, p_z); // to Setscale
+	if (scale.m_x == 0 || scale.m_y == 0 || scale.m_z == 0)
+		throw Exceptions::DivideByZero("Divide by zero, scale = " + scale.string());
+
+	this->scale(	p_x / scale.m_x, 
+					p_y / scale.m_y, 
+					p_z / scale.m_z);
 
 	return *this;
 }
 
 My::Entity& My::Entity::setRotationEulerAngles(const Rad& p_x, const Rad& p_y, const Rad& p_z)
 {
-	// TODO: set rotation
+	LibMath::Vector3 rotateAngles = this->getRotationEulerAngles();
+	this->rotateEulerAngles(	p_x - static_cast<Rad>(rotateAngles.m_x),
+								p_y - static_cast<Rad>(rotateAngles.m_y),
+								p_z - static_cast<Rad>(rotateAngles.m_z));
+
 	return *this;
 }
 
@@ -68,12 +75,9 @@ My::Entity::Vec3 My::Entity::getPosition() const
 	* translationVector = [ m13 ]
     *	                  [ m23 ]
 	*/
-
-	return {
-		m_transform[3],
-		m_transform[7],
-		m_transform[11]
-	};
+	return Vec3(	m_transform[3], 
+					m_transform[7], 
+					m_transform[11]);
 }
 
 My::Entity::Vec3 My::Entity::getScale() const
@@ -133,12 +137,14 @@ My::Entity::Vec3 My::Entity::getRotationEulerAngles() const
 	const Vec3 scale(this->getScale());
 	Mat4 rotation(this->m_transform);
 
+	if (scale.m_x == 0 || scale.m_y == 0 || scale.m_z == 0)
+		throw Exceptions::DivideByZero("Divide by zero, scale = " + scale.string());
+
 	rotation *= Mat4::scaling(1.0f / scale.m_x, 1.0f / scale.m_y, 1.0f / scale.m_z); //un-scale mat
 	//don't have to un-translate mat bcs trans doesn't affect rotation
 
-	LibMath::Radian psi1, theta1, phi1, psi2, teta2, phi2;
-	float cosTheta1, cosTheta2;
-	const LibMath::Radian pi(LibMath::g_pi);
+	LibMath::Radian psi1, theta1, phi1; //, psi2, theta2, phi2;
+	float cosTheta1; //, cosTheta2;
 
 	if (LibMath::abs(rotation[8]) != 1.f)
 	{
@@ -150,33 +156,59 @@ My::Entity::Vec3 My::Entity::getRotationEulerAngles() const
 		*/
 
 		theta1 = -LibMath::asin(rotation[8]);
-		teta2 = pi - theta1;
+		//theta2 = static_cast<Rad>(LibMath::g_pi) - theta1;
 
 		cosTheta1 = LibMath::cos(theta1);
-		cosTheta2 = LibMath::cos(teta2);
+		//cosTheta2 = LibMath::cos(theta2);
 
 		psi1 = LibMath::atan(rotation[9] / cosTheta1, rotation[10] / cosTheta1);
-		psi2 = LibMath::atan(rotation[9] / cosTheta2, rotation[10] / cosTheta2);
+		//psi2 = LibMath::atan(rotation[9] / cosTheta2, rotation[10] / cosTheta2);
 
 		phi1 = LibMath::atan(rotation[4] / cosTheta1, rotation[0] / cosTheta1);
-		phi2 = LibMath::atan(rotation[4] / cosTheta2, rotation[0] / cosTheta2);
+		//phi2 = LibMath::atan(rotation[4] / cosTheta2, rotation[0] / cosTheta2);
 	}
-	else //infinity solutions? / gimble lock
+	else //infinity solutions / gimble lock
 	{
-		// TODO : Gimble lock exception Euler ANGLES, could only give one?
+		throw Exceptions::GimbleLock("Detected a Gimble Lock");
 	}
 
-	// TODO : Get Rotation return? only 1 or 2 solutions? one is NAN sometimes
+	//reverse phi bcs of global orientation
+	phi1 *= -1;
+	//phi2 *= -1;
 
-	//if (cosTeta1 != 0) //not NAN
-	return {psi1.raw(), theta1.raw(), phi1.raw()};
-	//return Vec3(psi2.raw(), teta2.raw(), phi2.raw());
+	return {psi1.radian(), theta1.radian(), phi1.radian()};
+}
 
+My::Entity::Mat4 My::Entity::getRotation() const
+{
+	Mat4 mat;
+
+	Vec3 v = this->getRightward();
+	mat[0] = v.m_x;
+	mat[4] = v.m_y;
+	mat[8] = v.m_z;
+
+	v = this->getUpward();
+	mat[1] = v.m_x;
+	mat[5] = v.m_y;
+	mat[9] = v.m_z;
+
+	v = this->getForward();
+	mat[2] = v.m_x;
+	mat[6] = v.m_y;
+	mat[10] = v.m_z;
+
+	mat[15] = 1.0f;
+
+	return mat;
 }
 
 My::Entity::Vec3 My::Entity::getRightward() const
 {
 	const float xScale = this->getScaleX();
+	if (xScale == 0)
+		throw Exceptions::DivideByZero("Divide by zero, xScale = " + std::to_string(xScale));
+
 	return {m_transform[0] / xScale, m_transform[4] / xScale, m_transform[8] / xScale};
 }
 
@@ -188,6 +220,9 @@ My::Entity::Vec3 My::Entity::getLeftward() const
 My::Entity::Vec3 My::Entity::getUpward() const
 {
 	const float yScale = this->getScaleY();
+	if (yScale == 0)
+		throw Exceptions::DivideByZero("Divide by zero, yScale = " + std::to_string(yScale));
+
 	return {m_transform[1] / yScale, m_transform[5] / yScale,  m_transform[9] / yScale};
 }
 
@@ -199,6 +234,9 @@ My::Entity::Vec3 My::Entity::getDownward() const
 My::Entity::Vec3 My::Entity::getForward() const
 {
 	const float zScale = this->getScaleZ();
+	if (zScale == 0)
+		throw Exceptions::DivideByZero("Divide by zero, zScale = " + std::to_string(zScale));
+
 	return {m_transform[2] / zScale, m_transform[6] / zScale, m_transform[10] / zScale};
 }
 

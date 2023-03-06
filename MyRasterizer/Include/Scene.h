@@ -2,6 +2,7 @@
 #include <map>
 #include <string>
 #include <vector>
+#include "Light.h"
 
 namespace My
 {
@@ -18,6 +19,13 @@ namespace My
 	class Mesh;
 	class Entity;
 
+	//struct Orientation
+	//{
+	//	LibMath::Vector3 right;
+	//	LibMath::Vector3 up;
+	//	LibMath::Vector3 front;
+	//};
+
 	class Scene
 	{
 	public:
@@ -33,11 +41,19 @@ namespace My
 		const Mesh*			getMesh(const std::string& p_name);
 
 		void				addEntity(const Entity& p_entity);
+		void				addLight(const Light& p_light);
+
 		std::vector<Entity>	getEntities() const;
 		Entity&				getEntity(size_t index);
+		std::vector<Light>	getLights() const;
+
+		//const Orientation GlobalOrientation = {	LibMath::Vector3::right(),
+		//										LibMath::Vector3::up(),
+		//										LibMath::Vector3::front() };
 
 	private:
 		std::map<std::string, Mesh*> m_meshes;
 		std::vector<Entity> m_entities;
+		std::vector<Light> m_lights;
 	};
 }

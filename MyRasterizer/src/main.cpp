@@ -27,55 +27,21 @@ int main()
 	scene.addMesh("cube", *My::Mesh::createCube(My::Color::red));
 	scene.addMesh("sphere", *My::Mesh::createSphere(32, 32, My::Color::blue));
 
-	Mat4 transform = Mat4::translation(-.5f, 0, -2);
+	Mat4 transform = Mat4::translation(-.5f, 0, -2.f);
 	scene.addEntity(My::Entity(*scene.getMesh("cube"), transform));
 
-	transform = Mat4::translation(.5f, 0, -2);
+	transform = Mat4::translation(.5f, 0, -2.f);
 	scene.addEntity(My::Entity(*scene.getMesh("sphere"), transform));
 
-	//transformation tests
-	/**
-	scene.getEntity(0).Translate(0, 1, 0);
-	scene.getEntity(1).Translate(0, -1, 0);
-
-	scene.getEntity(0).Scale(2, 1, 2);
-	scene.getEntity(1).Scale(2.0f, 2.0f, 1.0f);
-
-	LibMath::Vector3 s1 = scene.getEntity(0).GetScale();
-	LibMath::Vector3 s2 = scene.getEntity(1).GetScale();
-	
-	LibMath::Vector3 vR = scene.getEntity(0).GetRightward();
-	LibMath::Vector3 vU = scene.getEntity(0).GetUpward();
-	LibMath::Vector3 vF = scene.getEntity(0).GetForward();
-
-	scene.getEntity(0).RotateEulerAngles((LibMath::Radian)0, (LibMath::Radian)0, (LibMath::Radian)(3.1416f / 2));
-	vR = scene.getEntity(0).GetRightward();
-	vU = scene.getEntity(0).GetUpward();
-	vF = scene.getEntity(0).GetForward();
-
-	scene.getEntity(0).Translate(0, 3, 0);
-	scene.getEntity(0).SetPosition(0, 0, 0);
-
-	scene.getEntity(0).Scale(3, 3, 3);
-	scene.getEntity(0).SetScale(1.0f, 1.0f, 1.0f);
-	
-	scene.getEntity(0).RotateEulerAngles((LibMath::Radian)(3.1416f/ 4), (LibMath::Radian)0, (LibMath::Radian)(3.1416f / 4));
-	LibMath::Vector3 v = scene.getEntity(0).GetRotationEulerAngles();
-	scene.getEntity(0).RotateEulerAngles((LibMath::Radian)(-v.m_x), (LibMath::Radian)(-v.m_y), (LibMath::Radian)(-v.m_z));
-	LibMath::Vector3 v2 = scene.getEntity(0).GetRotationEulerAngles();
-
-	float pres = 0.001f;
-	bool isZero = true;
-	isZero = LibMath::abs(v2.m_x) > pres ? false : isZero;
-	isZero = LibMath::abs(v2.m_y) > pres ? false : isZero;
-	isZero = LibMath::abs(v2.m_z) > pres ? false : isZero;
-	*/
+	//light
+	scene.addLight(My::Light(LibMath::Vector3(0, 0, 10), 0.2f, 0.4f, 0.4f));
 
 	My::Texture texture(SCREEN_WIDTH, SCREEN_HEIGHT);
-	
-	const Mat4 projMat = Mat4::perspectiveProjection(145_deg, ASPECT, 0.1f, 2.f);
 
-	My::Rasterizer::renderScene(scene, texture, projMat);
+	const Mat4 projMat = Mat4::perspectiveProjection(145_deg, ASPECT, 0.1f, 200.f);
+
+	My::Rasterizer rasterizer;
+	rasterizer.renderScene(scene, texture, projMat);
 
 	// Create the texture
 	const RenderTexture2D target = LoadRenderTexture(static_cast<int>(texture.getWidth()),
