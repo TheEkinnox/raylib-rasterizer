@@ -22,8 +22,6 @@ My::Mesh::Mesh(const std::vector<Vertex>& p_vertices, const std::vector<size_t>&
 
 	this->m_vertices = p_vertices;
 	this->m_indices = p_indices;
-
-	//this->CalculateNormals();
 }
 
 std::vector<My::Vertex> My::Mesh::getVertices() const
@@ -38,20 +36,55 @@ std::vector<size_t> My::Mesh::getIndices() const
 
 My::Mesh* My::Mesh::createCube(const Color& p_color)
 {
-	float nLen = 0.57735027f;	// 1 = sqrt(3 * x2) => sqrt(1/3) = x => 0.57735027f = x
 	const std::vector<Vertex> vertices
 	{
-		{ { -.5f, .5f, .5f }, { -nLen, nLen, nLen }, p_color  },		// Front-top-left
-		{ { .5f, .5f, .5f }, { nLen, nLen, nLen }, p_color  },		// Front-top-right
-		{ { -.5f, -.5f, .5f }, { -nLen, -nLen, nLen }, p_color  },	// Front-bottom-left
-		{ { .5f, -.5f, .5f }, { nLen, -nLen, nLen }, p_color  },		// Front-bottom-right
-		{ { -.5f, .5f, -.5f }, { -nLen, nLen, -nLen }, p_color  },	// Back-top-left
-		{ { .5f, .5f, -.5f }, { nLen, nLen, -nLen }, p_color  },		// Back-top-right
-		{ { -.5f, -.5f, -.5f }, { -nLen, -nLen, -nLen }, p_color  },	// Back-bottom-left
-		{ { .5f, -.5f, -.5f }, { nLen, -nLen, -nLen }, p_color  }	// Back-bottom-right
+		//up
+		{ { -.5f, .5f, -.5f }, Vec3::up(), p_color},		// Back-top-left
+		{ { .5f, .5f, -.5f }, Vec3::up(), p_color  },		// Back-top-right
+		{ { -.5f, .5f, .5f }, Vec3::up(), p_color  },		// Front-top-left
+		{ { .5f, .5f, .5f }, Vec3::up(), p_color  },		// Front-top-right
+		//front
+		{ { -.5f, .5f, .5f }, Vec3::front(), p_color},		// Front-top-left
+		{ { .5f, .5f, .5f }, Vec3::front(), p_color  },		// Front-top-right
+		{ { -.5f, -.5f, .5f }, Vec3::front(), p_color  },	// Front-bottom-left
+		{ { .5f, -.5f, .5f }, Vec3::front(), p_color  },	// Front-bottom-right
+		//right
+		{ { .5f, .5f, .5f }, Vec3::right(), p_color  },		// Front-top-right
+		{ { .5f, .5f, -.5f }, Vec3::right(), p_color  },	// Back-top-right
+		{ { .5f, -.5f, .5f }, Vec3::right(), p_color  },	// Front-bottom-right
+		{ { .5f, -.5f, -.5f }, Vec3::right(), p_color  },	// Back-bottom-right
+		//back
+		{ { -.5f, .5f, -.5f }, Vec3::back(), p_color},		// Back-top-left
+		{ { .5f, .5f, -.5f }, Vec3::back(), p_color  },		// Back-top-right
+		{ { -.5f, -.5f, -.5f }, Vec3::back(), p_color  },	// Back-bottom-left
+		{ { .5f, -.5f, -.5f }, Vec3::back(), p_color  },	// Back-bottom-right
+		//left
+		{ { -.5f, .5f, -.5f }, Vec3::left(), p_color},		// Back-top-left
+		{ { -.5f, .5f, .5f }, Vec3::left(), p_color},		// Front-top-left
+		{ { -.5f, -.5f, -.5f }, Vec3::left(), p_color  },	// Back-bottom-left
+		{ { -.5f, -.5f, .5f }, Vec3::left(), p_color  },	// Front-bottom-left
+		//down
+		{ { -.5f, -.5f, .5f }, Vec3::down(), p_color  },	// Front-bottom-left
+		{ { .5f, -.5f, .5f }, Vec3::down(), p_color  },		// Front-bottom-right
+		{ { -.5f, -.5f, -.5f }, Vec3::down(), p_color  },	// Back-bottom-left
+		{ { .5f, -.5f, -.5f }, Vec3::down(), p_color  }		// Back-bottom-right
 	};
 
-	const std::vector<size_t> indices
+	std::vector<size_t> indices(36); // 6 faces * 2 triangles * 3 points
+
+	for (size_t i = 0; i < vertices.size(); i += 4) //4 vertex is one face
+	{
+		//triangle 1
+		indices.push_back(i);
+		indices.push_back(i + 2);
+		indices.push_back(i + 1);
+		//triangle 2
+		indices.push_back(i + 1);
+		indices.push_back(i + 2);
+		indices.push_back(i + 3);
+	}
+
+	/*
 	{
 		// Front
 		1, 0, 2,
@@ -77,6 +110,7 @@ My::Mesh* My::Mesh::createCube(const Color& p_color)
 		1, 5, 4,
 		4, 0, 1
 	};
+	*/
 	//normal test
 	// auto m1 = new Mesh(vertices, indices);
 	// auto m2 = new Mesh(*m1);
