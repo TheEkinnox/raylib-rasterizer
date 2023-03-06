@@ -51,10 +51,10 @@ namespace My
 				for (Vertex& vertex : triangle)
 				{
 					auto& pos = vertex.m_position;
-					auto vec4 = LibMath::Vector4{pos.m_x, pos.m_y, pos.m_z, 1.f};
+					auto vec4 = LibMath::Vector4{ pos.m_x, pos.m_y, pos.m_z, 1.f };
 
 					vec4 = p_entity.getTransform() * vec4;
-					pos = {vec4.m_x, vec4.m_y, vec4.m_z};
+					pos = { vec4.m_x, vec4.m_y, vec4.m_z };
 				}
 
 				drawTriangle(triangle, p_target, p_entity.getMesh()->getTexture());
@@ -115,7 +115,7 @@ namespace My
 				//	pos = { vec4.m_x, vec4.m_y, vec4.m_z };
 				//}
 
-				drawTriangle(triangle, p_target);
+				drawTriangle(triangle, p_target, p_entity.getMesh()->getTexture());
 			}
 		}
 	}
@@ -169,7 +169,6 @@ namespace My
 
 	void Rasterizer::drawTriangle(const Vertex p_vertices[3], Texture& p_target, const Texture* p_texture)
 	{
-
 		// Create an array of vector4 for the positions
 		LibMath::Vector4 points[3]
 		{
@@ -239,28 +238,24 @@ namespace My
 
 					if (pos.m_z < m_zBuffer[bufferIndex])
 					{
-						const Color pixelColor = p_vertices[0].m_color * s
+						Color pixelColor = p_vertices[0].m_color * s
 							+ p_vertices[1].m_color * t
 							+ p_vertices[2].m_color * w;
 
-					if (p_texture != nullptr)
-					{
-						const float tmp = 1 - s - t;
-						/*float u = LibMath::lerp(p_vertices[0].u, p_vertices[1].u, s);*/
-						const float u = p_vertices[0].m_u * tmp + p_vertices[1].m_u * s + p_vertices[2].m_u * t;
-						
+						if (p_texture != nullptr)
+						{
+							const float u = p_vertices[0].m_u * s + p_vertices[1].m_u * t + p_vertices[2].m_u * w;
+							const float v = p_vertices[0].m_v * s + p_vertices[1].m_v * t + p_vertices[2].m_v * w;
 
-						/*float v = LibMath::lerp(p_vertices[0].v, p_vertices[1].v, s);*/
-						const float v = p_vertices[0].m_v * tmp + p_vertices[1].m_v * s + p_vertices[2].m_v * t;
+							float textureX = (u - LibMath::floor(u)) * p_texture->getWidth();
+							float textureY = (v - LibMath::floor(v)) * p_texture->getHeight();
 
-						float textureX = (u - LibMath::floor(u)) * p_texture->getWidth();
-						float textureY = (v - LibMath::floor(v)) * p_texture->getHeight();
+							pixelColor *= p_texture->getPixelColor((uint32_t)LibMath::round(textureX), (uint32_t)LibMath::round(textureY));
+						}
 
-						pixelColor *= p_texture->getPixelColor((uint32_t)LibMath::round(textureX), (uint32_t)LibMath::round(textureY));
+						p_target.setPixelColor(x, y, pixelColor);
+						m_zBuffer[bufferIndex] = pos.m_z;
 					}
-
-					p_target.setPixelColor(x, y, pixelColor);
-					m_zBuffer[bufferIndex] = pos.m_z;
 				}
 			}
 		}

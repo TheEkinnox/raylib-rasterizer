@@ -7,9 +7,12 @@
 #include "Rasterizer.h"
 #include "Texture.h"
 #include "Matrix/Matrix4.h"
+#include "Angle.h"
 
 constexpr auto SCREEN_WIDTH = 800;
 constexpr auto SCREEN_HEIGHT = 800;
+
+using namespace LibMath::Literal;
 
 int main()
 {
@@ -18,24 +21,17 @@ int main()
 
 	My::Scene scene;
 	
+	
 	My::Mesh* cube = My::Mesh::createCube();
 	const char* path = GetWorkingDirectory();
 	My::Texture textureWrapper("../img/container.png");
 	cube->setTexture(&textureWrapper);
 	LibMath::Matrix4 transform = LibMath::Matrix4::translation(0, 0, 2) * LibMath::Matrix4::scaling(2,2,2);
 	scene.addEntity(My::Entity(*cube, transform));
-	//transformation tests
-	/**
-	scene.getEntity(0).Translate(0, 1, 0);
-	scene.getEntity(1).Translate(0, -1, 0);
-
-	transform = LibMath::Matrix4::translation(1, -1, 0);
-	scene.addEntity(My::Entity(*scene.getMesh("sphereB"), transform));
+	scene.getEntity(0).setRotationEulerAngles(45_deg, 0_rad, 0_rad);
 
 	//light
 	scene.addLight(My::Light(LibMath::Vector3(0, 0, -10), 0.2f, 0.4f, 0.4f));
-
-
 
 	My::Texture texture(SCREEN_WIDTH, SCREEN_HEIGHT);
 

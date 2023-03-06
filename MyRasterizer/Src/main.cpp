@@ -7,9 +7,12 @@
 #include "Rasterizer.h"
 #include "Texture.h"
 #include "Matrix/Matrix4.h"
+#include "Angle.h"
 
 constexpr auto SCREEN_WIDTH = 800;
-constexpr auto SCREEN_HEIGHT = 600;
+constexpr auto SCREEN_HEIGHT = 800;
+
+using namespace LibMath::Literal;
 
 int main()
 {
@@ -17,28 +20,18 @@ int main()
 	InitWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "Rasterize me baby");
 
 	My::Scene scene;
-	//scene.addMesh("cube", *My::Mesh::createCube());
-	scene.addMesh("sphereR", *My::Mesh::createSphere(32, 32, My::Color::red));
-	scene.addMesh("sphereG", *My::Mesh::createSphere(32, 32, My::Color::green));
-	scene.addMesh("sphereB", *My::Mesh::createSphere(32, 32, My::Color::blue));
-
-
-	//LibMath::Matrix4 transform = LibMath::Matrix4::translation(-0.5f, 0, 2);
-	//scene.addEntity(My::Entity(*scene.getMesh("cube"), transform));
-
-	LibMath::Matrix4 transform = LibMath::Matrix4::translation(0, 1, 0);
-	scene.addEntity(My::Entity(*scene.getMesh("sphereR"), transform));
-
-	transform = LibMath::Matrix4::translation(-1, -1, 0);
-	scene.addEntity(My::Entity(*scene.getMesh("sphereG"), transform));
-
-	transform = LibMath::Matrix4::translation(1, -1, 0);
-	scene.addEntity(My::Entity(*scene.getMesh("sphereB"), transform));
+	
+	
+	My::Mesh* cube = My::Mesh::createCube();
+	const char* path = GetWorkingDirectory();
+	My::Texture textureWrapper("../img/container.png");
+	cube->setTexture(&textureWrapper);
+	LibMath::Matrix4 transform = LibMath::Matrix4::translation(0, 0, 2) * LibMath::Matrix4::scaling(2,2,2);
+	scene.addEntity(My::Entity(*cube, transform));
+	scene.getEntity(0).setRotationEulerAngles(45_deg, 0_rad, 0_rad);
 
 	//light
 	scene.addLight(My::Light(LibMath::Vector3(0, 0, -10), 0.2f, 0.4f, 0.4f));
-
-
 
 	My::Texture texture(SCREEN_WIDTH, SCREEN_HEIGHT);
 
