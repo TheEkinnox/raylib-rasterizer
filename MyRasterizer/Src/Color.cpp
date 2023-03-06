@@ -9,17 +9,67 @@ namespace My
 	const Color Color::green	= { 0, 255, 0, 255 };
 	const Color Color::blue		= { 0, 0, 255, 255 };
 
-	Color Color::rgbMultiply(float f) const
+	Color Color::rgbMultiply(const float f) const
 	{
-		return Color(	static_cast<uint8_t>(m_r * f), 
-						static_cast<uint8_t>(m_g * f), 
-						static_cast<uint8_t>(m_b * f), 
-						m_a);
+		return Color(static_cast<uint8_t>(m_r * f),
+			static_cast<uint8_t>(m_g * f),
+			static_cast<uint8_t>(m_b * f),
+			m_a);
 	}
 
 	LibMath::Vector3 Color::rgb() const
 	{
 		return LibMath::Vector3(m_r, m_g, m_b);
+	}
+
+	Color Color::operator+(const Color& p_other) const
+	{
+		return {
+			static_cast<uint8_t>(static_cast<short>(m_r) + p_other.m_r),
+			static_cast<uint8_t>(static_cast<short>(m_g) + p_other.m_g),
+			static_cast<uint8_t>(static_cast<short>(m_b) + p_other.m_b),
+			static_cast<uint8_t>(static_cast<short>(m_a) + p_other.m_a)
+		};
+	}
+
+	Color Color::operator*(const Color& p_other) const
+	{
+		return {
+			static_cast<uint8_t>(static_cast<short>(m_r) * p_other.m_r / 255),
+			static_cast<uint8_t>(static_cast<short>(m_g) * p_other.m_g / 255),
+			static_cast<uint8_t>(static_cast<short>(m_b) * p_other.m_b / 255),
+			static_cast<uint8_t>(static_cast<short>(m_a) * p_other.m_a / 255)
+		};
+	}
+
+	Color Color::operator*(const LibMath::Vector3& p_vec3) const
+	{
+		return {
+			static_cast<uint8_t>(static_cast<float>(m_r) * p_vec3.m_x),
+			static_cast<uint8_t>(static_cast<float>(m_g) * p_vec3.m_y),
+			static_cast<uint8_t>(static_cast<float>(m_b) * p_vec3.m_z),
+			m_a
+		};
+	}
+
+	Color Color::operator*(const float p_scalar) const
+	{
+		return {
+			static_cast<uint8_t>(static_cast<float>(m_r) * p_scalar),
+			static_cast<uint8_t>(static_cast<float>(m_g) * p_scalar),
+			static_cast<uint8_t>(static_cast<float>(m_b) * p_scalar),
+			static_cast<uint8_t>(static_cast<float>(m_a) * p_scalar)
+		};
+	}
+
+	Color Color::operator/(const float p_scalar) const
+	{
+		return {
+			static_cast<uint8_t>(static_cast<float>(m_r) / p_scalar),
+			static_cast<uint8_t>(static_cast<float>(m_g) / p_scalar),
+			static_cast<uint8_t>(static_cast<float>(m_b) / p_scalar),
+			static_cast<uint8_t>(static_cast<float>(m_a) / p_scalar)
+		};
 	}
 
 	Color Color::lerp(const Color& a, const Color& b, float t)
