@@ -7,9 +7,12 @@
 #include "Rasterizer.h"
 #include "Texture.h"
 #include "Matrix/Matrix4.h"
+#include "Angle.h"
 
 constexpr auto SCREEN_WIDTH = 800;
 constexpr auto SCREEN_HEIGHT = 600;
+
+using namespace LibMath::Literal;
 
 int main()
 {
@@ -18,22 +21,46 @@ int main()
 
 	My::Scene scene;
 	//scene.addMesh("cube", *My::Mesh::createCube());
-	scene.addMesh("sphereR", *My::Mesh::createSphere(32, 32, My::Color::red));
-	scene.addMesh("sphereG", *My::Mesh::createSphere(32, 32, My::Color::green));
-	scene.addMesh("sphereB", *My::Mesh::createSphere(32, 32, My::Color::blue));
+	scene.addMesh("cubeW", *My::Mesh::createCube(My::Color::white));
+	scene.addMesh("cubeR", *My::Mesh::createCube(My::Color::red));
+	scene.addMesh("cubeG", *My::Mesh::createCube(My::Color::green));
+	scene.addMesh("cubeB", *My::Mesh::createCube(My::Color::blue));
 
+	std::vector<My::Vertex> vertex
+	{
+		{{-1,2,0},{0,0,-1}, My::Color::white},
+		{{2,1,0},{0,0,-1}, My::Color::white},
+		{{-0,-2,0},{0,0,-1}, My::Color::white},
+		{{4,-3,0},{0,0,-1}, My::Color::white},
+	};
 
-	//LibMath::Matrix4 transform = LibMath::Matrix4::translation(-0.5f, 0, 2);
-	//scene.addEntity(My::Entity(*scene.getMesh("cube"), transform));
+	std::vector<size_t> indices
+	{
+		0, 2, 1,
+		1, 2, 3
+	};
 
-	LibMath::Matrix4 transform = LibMath::Matrix4::translation(0, 1, 0);
-	scene.addEntity(My::Entity(*scene.getMesh("sphereR"), transform));
+	auto square = new My::Mesh(vertex, indices);
+	scene.addMesh("square", *square);
 
-	transform = LibMath::Matrix4::translation(-1, -1, 0);
-	scene.addEntity(My::Entity(*scene.getMesh("sphereG"), transform));
+	LibMath::Matrix4 transform = LibMath::Matrix4::translation(-0.5f, 0, 2);
+	scene.addEntity(My::Entity(*scene.getMesh("cube"), transform));
+	
+	transform = LibMath::Matrix4::translation(-0.5f, 0, 0) * LibMath::Matrix4::rotationEuler(60_deg, 45_deg, 0_deg);
+	scene.addEntity(My::Entity(*scene.getMesh("cubeG"), 0.2f, transform));
 
-	transform = LibMath::Matrix4::translation(1, -1, 0);
-	scene.addEntity(My::Entity(*scene.getMesh("sphereB"), transform));
+	transform = LibMath::Matrix4::translation(0, 0, 5) * LibMath::Matrix4::scaling(2, 2, 1);
+	scene.addEntity(My::Entity(*scene.getMesh("cubeW"), transform));
+
+	transform = LibMath::Matrix4::translation(0.5f, 0, 0) * LibMath::Matrix4::rotationEuler(60_deg, 45_deg, 0_deg);
+	scene.addEntity(My::Entity(*scene.getMesh("cubeB"), 0.2f, transform));
+
+	transform = LibMath::Matrix4::translation(0, 0, 0) * LibMath::Matrix4::rotationEuler(60_deg, 45_deg, 0_deg);
+	scene.addEntity(My::Entity(*scene.getMesh("cubeR"), 0.2f, transform));
+	
+
+	//LibMath::Matrix4 transform = LibMath::Matrix4::translation(0,0,0);
+	//scene.addEntity(My::Entity(*scene.getMesh("square"), transform));
 
 	//light
 	scene.addLight(My::Light(LibMath::Vector3(0, 0, -10), 0.2f, 0.4f, 0.4f));

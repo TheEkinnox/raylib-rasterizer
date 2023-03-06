@@ -227,7 +227,8 @@ namespace My
 				const float s = q.cross(vs2) / vs1.cross(vs2);
 				const float t = vs1.cross(q) / vs1.cross(vs2);
 
-				if (s >= 0 && t >= 0 && s + t <= 1)
+				if (s >= 0 && t >= 0 && s + t <= 1.0f)
+					//(s <= 0.01f || t <= 0.01f || s + t >= 0.99f))
 				{
 					const size_t bufferIndex = static_cast<size_t>(y) * p_target.getWidth() + x;
 					float pixelZ = LibMath::lerp(p_vertices[0].m_position.m_z, p_vertices[1].m_position.m_z, s);
@@ -238,8 +239,18 @@ namespace My
 						Color pixelColor = Color::lerp(p_vertices[0].m_color, p_vertices[1].m_color, s);
 						pixelColor = Color::lerp(pixelColor, p_vertices[2].m_color, t);
 
+						if (pixelColor.m_a != 255.0f) //if transparent lerp from current color to new color
+						{
+							float percentNewColor = static_cast<float>(pixelColor.m_a) / 255.0f;
+							pixelColor.rgbMultiply(percentNewColor);
+
+							pixelColor.rgbAditionClamp(p_target.getPixelColor(x, y).rgbMultiply(1.0f - percentNewColor));
+							pixelColor.m_a = 255;
+						}
+						else //update zBuffer if not transparent
+							m_zBuffer[bufferIndex] = pixelZ;
+							
 						p_target.setPixelColor(x, y, pixelColor);
-						m_zBuffer[bufferIndex] = pixelZ;
 					}
 				}
 			}
