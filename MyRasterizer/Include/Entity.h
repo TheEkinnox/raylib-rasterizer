@@ -71,6 +71,7 @@ namespace My
 	public:
 		#pragma region Constructors
 		explicit	Entity(const Mesh& p_mesh, Mat4 p_transform = Mat4()); // TODO : Finish Entity comments
+		Entity(const Mesh& p_mesh, float p_transparency, Mat4 p_transform = Mat4());
 		Entity(const Entity& p_other) = default;
 		Entity(Entity&& p_other) = default;
 		~Entity() = default;
@@ -82,6 +83,12 @@ namespace My
 		/// </summary>
 		/// <returns></returns>
 		const Mesh* getMesh() const;
+
+		/// <summary>
+		/// Get the entity's transparency value
+		/// </summary>
+		/// <returns>Transparency in percent [0,1]</returns>
+		float getTransparency() const;
 
 		#pragma region Transforms
 		/// <summary>
@@ -257,6 +264,7 @@ namespace My
 	private:
 		const Mesh* m_mesh = nullptr;
 		Mat4		m_transform;
+		float		m_transparency;
 		
 		/*
 		* d = M * s

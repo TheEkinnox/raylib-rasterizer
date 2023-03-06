@@ -28,10 +28,15 @@ namespace My
 			m_b(static_cast<uint8_t>(p_rgb.m_z)), 
 			m_a(p_a) {}
 
+		Color& rgbMultiply(float);
+
+		Color& rgbAdition(uint8_t);
+
+		Color& rgbAditionClamp(const Color& other);
+
 		/// <summary>
 		/// Get the Red, Green and Blue values in a Vector3
 		/// </summary>
-		Color rgbMultiply(float) const; 
 		LibMath::Vector3 rgb()const;
 
 

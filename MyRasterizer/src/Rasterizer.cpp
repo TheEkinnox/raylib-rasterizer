@@ -25,11 +25,20 @@ namespace My
 		m_zBuffer.clear();
 		m_zBuffer.resize(textureSize, INFINITY);
 
-		for (const auto& entity : p_scene.getEntities())
+		std::vector<Entity*> transparentEntities;
+		auto entities = p_scene.getEntities();
+
+		for (auto& entity : entities)
 		{
-			drawEntity(entity, p_target, p_scene.getLights()[0]);
-			//drawNormals(entity, p_target, p_scene.getLights()[0]);
+			if (entity.getTransparency() == 1.0f)
+				drawEntity(entity, p_target, p_scene.getLights()[0]);
+			else
+				transparentEntities.push_back(&entity);
 		}
+
+		for (auto& entity : transparentEntities)
+			drawEntity(*entity, p_target, p_scene.getLights()[0]);
+
 	}
 
 	void Rasterizer::drawEntity(const Entity& p_entity, Texture& p_target)
@@ -69,7 +78,7 @@ namespace My
 			auto vertices = p_entity.getMesh()->getVertices();
 			auto indices = p_entity.getMesh()->getIndices();
 
-			std::map<size_t, Color> vertexLightColor;
+			std::map<size_t, Color> updatedColorBuffer;
 
 			//calculate light
 			for (size_t i = 0; i < vertices.size(); i++)
@@ -91,6 +100,8 @@ namespace My
 				}
 
 				v.m_color = p_light.CalculateLightingPhong(v, LibMath::Vector3::zero());
+				float val = p_entity.getTransparency();
+				v.m_color.m_a = static_cast<uint8_t>(static_cast<float>(v.m_color.m_a) * p_entity.getTransparency());
 			}
 
 			for (size_t i = 0; i + 2 < indices.size(); i += 3)
@@ -101,19 +112,6 @@ namespace My
 					vertices[indices[i + 1]],
 					vertices[indices[i + 2]]
 				};
-
-				//triangle[0].m_color = vertexLightColor[indices[i]];
-				//triangle[1].m_color = vertexLightColor[indices[i + 1]];
-				//triangle[2].m_color = vertexLightColor[indices[i + 2]];
-
-				//for (Vertex& vertex : triangle)
-				//{
-				//	auto& pos = vertex.m_position;
-				//	auto vec4 = LibMath::Vector4{ pos.m_x, pos.m_y, pos.m_z, 1.f };
-
-				//	vec4 = p_entity.getTransform() * vec4;
-				//	pos = { vec4.m_x, vec4.m_y, vec4.m_z };
-				//}
 
 				drawTriangle(triangle, p_target);
 			}
@@ -238,8 +236,18 @@ namespace My
 						Color pixelColor = Color::lerp(p_vertices[0].m_color, p_vertices[1].m_color, s);
 						pixelColor = Color::lerp(pixelColor, p_vertices[2].m_color, t);
 
+						if (pixelColor.m_a != 255.0f) //if transparent lerp from current color to new color
+						{
+							float percentNewColor = static_cast<float>(pixelColor.m_a) / 255.0f;
+							pixelColor.rgbMultiply(percentNewColor);
+
+							pixelColor.rgbAditionClamp(p_target.getPixelColor(x, y).rgbMultiply(1.0f - percentNewColor));
+							pixelColor.m_a = 255;
+						}
+						else //update zBuffer
+							m_zBuffer[bufferIndex] = pixelZ;
+							
 						p_target.setPixelColor(x, y, pixelColor);
-						m_zBuffer[bufferIndex] = pixelZ;
 					}
 				}
 			}
