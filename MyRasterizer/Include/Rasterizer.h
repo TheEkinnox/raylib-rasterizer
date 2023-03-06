@@ -82,7 +82,7 @@ namespace My
 		std::vector<float>	m_zBuffer;
 		
 		/// <summary>
-		/// Checks if triangle should be rendered
+		/// Checks if triangle should be rendered based on normal
 		/// </summary>
 		/// <param name="p_trianglePos">: triangle's position</param>
 		/// <param name="p_triangleNormal">: direction that the triangle is facing</param>
@@ -90,6 +90,16 @@ namespace My
 		/// <param name="p_observerDir">: direction that the observer is loocking at</param>
 		/// <returns></returns>
 		bool checkBackFaceCulling(	const Vec3& p_trianglePos, const Vec3& p_triangleNormal, 
-									const Vec3& p_observerPos, const Vec3& p_observerDir)const;
+									const Vec3& p_observerPos)const;
+
+		/// <summary>
+		/// Checks if triangle should be rendered based on the observer's view direction
+		/// </summary>
+		/// <param name="p_trianglePos">: triangle's position</param>
+		/// <param name="p_observerPos">: observer's position</param>
+		/// <param name="p_observerDir">: direction that the observer is loocking at</param>
+		/// <returns></returns>
+		bool checkFacingDirection(	const Vec3& p_trianglePos, const Vec3& p_observerPos,
+									const Vec3& p_observerDir)const;
 	};
 }

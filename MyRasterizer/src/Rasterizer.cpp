@@ -105,7 +105,8 @@ namespace My
 
 				Vec3 centerPt = (triangle[0].m_position + triangle[1].m_position + triangle[2].m_position) / 3;
 
-				if (checkBackFaceCulling(centerPt, normals[i/3], Vec3(1.5f,3,3), Vec3(-1,0,0))) //TODO : put camera values for back-face culling
+				if (checkBackFaceCulling(centerPt, normals[i / 3], Vec3( 1.5f, 3.0f, 3.0f)) &&	//TODO : put camera pos and dir for culling
+					checkFacingDirection(centerPt, Vec3(1.5f, 3.0f, 3.0f), Vec3(-1.0f, 0, 0)))
 					drawTriangle(triangle, p_target);
 			}
 		}
@@ -237,7 +238,7 @@ namespace My
 		}
 	}
 	bool Rasterizer::checkBackFaceCulling(	const Vec3& p_trianglePos, const Vec3& p_triangleNormal,
-											const Vec3& p_observerPos, const Vec3& p_observerDir) const
+											const Vec3& p_observerPos) const
 	{
 		/*
 		* https://en.wikipedia.org/wiki/Back-face_culling
@@ -245,7 +246,15 @@ namespace My
 		Vec3 deltaPos = p_trianglePos; //bcs constant
 		deltaPos -= p_observerPos;
 
-		return	deltaPos.dot(p_triangleNormal) <= 0 &&
-				(p_observerDir == Vec3::zero() || deltaPos.dot(p_observerDir) >= 0);
+		return	deltaPos.dot(p_triangleNormal) <= 0;
+	}
+
+	bool Rasterizer::checkFacingDirection(	const Vec3& p_trianglePos, const Vec3& p_observerPos, 
+											const Vec3& p_observerDir) const
+	{
+		Vec3 deltaPos = p_trianglePos; //bcs constant
+		deltaPos -= p_observerPos;
+
+		return	deltaPos.dot(p_observerDir) >= 0;
 	}
 }
