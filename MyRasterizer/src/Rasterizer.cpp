@@ -240,7 +240,7 @@ namespace My
 				const float w = vs1.cross(q) / vs1.cross(vs2);
 				const float s = 1 - t - w;
 
-				if (s >= 0 && t >= 0 && s + t <= 1)
+				if (s >= 0 && t >= 0 && w >= 0 && t + w <= 1)
 				{
 					const size_t bufferIndex = static_cast<size_t>(y) * p_target.getWidth() + x;
 
@@ -266,7 +266,6 @@ namespace My
 							m_zBuffer[bufferIndex] = pixelZ;
 							
 						p_target.setPixelColor(x, y, pixelColor);
-						m_zBuffer[bufferIndex] = pixelZ;
 					}
 				}
 			}
