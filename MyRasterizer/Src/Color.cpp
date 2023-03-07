@@ -10,13 +10,13 @@ namespace My
 	const Color Color::green	= { 0, 255, 0, 255 };
 	const Color Color::blue		= { 0, 0, 255, 255 };
 
-	Color Color::rgbMultiply(float f) const
+	Color& Color::aditionClamp(const LibMath::Vector3& p_rgb)
 	{
-		this->m_r = static_cast<uint8_t>(LibMath::clamp(static_cast<float>(this->m_r) + static_cast<float>(other.m_r), 
+		this->m_r = static_cast<uint8_t>(LibMath::clamp(static_cast<float>(this->m_r) + p_rgb.m_x,
 														0.0f, 255.0f));
-		this->m_g = static_cast<uint8_t>(LibMath::clamp(static_cast<float>(this->m_g) + static_cast<float>(other.m_g),
+		this->m_g = static_cast<uint8_t>(LibMath::clamp(static_cast<float>(this->m_g) + p_rgb.m_y,
 														0.0f, 255.0f));		
-		this->m_b = static_cast<uint8_t>(LibMath::clamp(static_cast<float>(this->m_b) + static_cast<float>(other.m_b),
+		this->m_b = static_cast<uint8_t>(LibMath::clamp(static_cast<float>(this->m_b) + p_rgb.m_z,
 														0.0f, 255.0f));
 
 		return *this;

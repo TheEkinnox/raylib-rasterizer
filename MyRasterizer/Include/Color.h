@@ -28,17 +28,12 @@ namespace My
 			m_b(static_cast<uint8_t>(p_rgb.m_z)),
 			m_a(p_a) {}
 
-		Color& rgbMultiply(float);
-
-		Color& rgbAdition(uint8_t);
-
-		Color& rgbAditionClamp(const Color& other);
-
 		/// <summary>
-		/// Multiplies the red, green and blue components by the given amount
+		/// Clamps sum [0,255]
 		/// </summary>
-		/// <param name="f">The value by which each element should be multiplied</param>
-		Color rgbMultiply(float f) const;
+		/// <param name="other"></param>
+		/// <returns></returns>
+		Color& aditionClamp(const LibMath::Vector3& p_rgb);
 
 		/// <summary>
 		/// Get the Red, Green and Blue values in a Vector3
@@ -95,6 +90,13 @@ namespace My
 		/// <param name="t"> :  t=0 => Color = a; t=1 => Color = b; </param>
 		/// <returns></returns>
 		static Color	lerp(const Color& a, const Color& b, float t);
+
+		/// <summary>
+		/// bilinear interpolation
+		/// </summary>
+		//static Color bLerp(	const Color p_colors[4], const LibMath::Vector2& p_point,
+		//					const LibMath::Vector2& p_min, const LibMath::Vector2& p_max);
+		//static Color bLerp(const Color p_colors[4], const LibMath::Vector2& p_point);
 	};
 }
 

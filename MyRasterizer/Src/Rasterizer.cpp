@@ -250,22 +250,23 @@ namespace My
 
 					if (pos.m_z < m_zBuffer[bufferIndex])
 					{
-						const Color pixelColor = p_vertices[0].m_color * s
+						Color pixelColor = p_vertices[0].m_color * s
 							+ p_vertices[1].m_color * t
 							+ p_vertices[2].m_color * w;
 
 						if (pixelColor.m_a != 255.0f) //if transparent lerp from current color to new color
 						{
 							float percentNewColor = static_cast<float>(pixelColor.m_a) / 255.0f;
-							pixelColor.rgbMultiply(percentNewColor);
+							pixelColor = pixelColor * (percentNewColor);
 
-							pixelColor.rgbAditionClamp(p_target.getPixelColor(x, y).rgbMultiply(1.0f - percentNewColor));
+							pixelColor.aditionClamp((p_target.getPixelColor(x, y) * (1.0f - percentNewColor)).rgb());
 							pixelColor.m_a = 255;
 						}
 						else //update zBuffer if not transparent
-							m_zBuffer[bufferIndex] = pixelZ;
+							m_zBuffer[bufferIndex] = pos.m_z;
 							
 						p_target.setPixelColor(x, y, pixelColor);
+						//m_zBuffer[bufferIndex] = pixelZ;
 					}
 				}
 			}
