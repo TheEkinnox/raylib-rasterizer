@@ -26,6 +26,9 @@ int main()
 	scene.addMesh("cubeG", *My::Mesh::createCube(My::Color::green));
 	scene.addMesh("cubeB", *My::Mesh::createCube(My::Color::blue));
 
+	scene.addMesh("sphere", *My::Mesh::createSphere(8,8, My::Color::blue));
+	//scene.addMesh("sphere", *My::Mesh::createSphere(8,8, My::Color(255, 255, 255, 127)));
+
 	std::vector<My::Vertex> vertex
 	{
 		{{-1,2,0},{0,0,-1}, My::Color::white},
@@ -40,24 +43,24 @@ int main()
 		1, 2, 3
 	};
 
-	auto square = new My::Mesh(vertex, indices);
-	scene.addMesh("square", *square);
-
-	LibMath::Matrix4 transform = LibMath::Matrix4::translation(-0.5f, 0, 2);
-	scene.addEntity(My::Entity(*scene.getMesh("cube"), transform));
+	//LibMath::Matrix4 transform = LibMath::Matrix4::translation(-0.5f, 0, 2);
+	//scene.addEntity(My::Entity(*scene.getMesh("cube"), transform));
 	
-	transform = LibMath::Matrix4::translation(-0.5f, 0, 0) * LibMath::Matrix4::rotationEuler(60_deg, 45_deg, 0_deg);
-	scene.addEntity(My::Entity(*scene.getMesh("cubeG"), 0.2f, transform));
+	LibMath::Matrix4 transform = LibMath::Matrix4::translation(0, 0, 0) * LibMath::Matrix4::rotationEuler(0_deg, 10_deg, 45_deg);
+	scene.addEntity(My::Entity(*scene.getMesh("cubeG"), 1.f, transform));
 
-	transform = LibMath::Matrix4::translation(0, 0, 5) * LibMath::Matrix4::scaling(2, 2, 1);
-	scene.addEntity(My::Entity(*scene.getMesh("cubeW"), transform));
+	transform = LibMath::Matrix4::translation(0, 0, -3);
+	scene.addEntity(My::Entity(*scene.getMesh("sphere"), 0.5f, transform));
 
-	transform = LibMath::Matrix4::translation(0.5f, 0, 0) * LibMath::Matrix4::rotationEuler(60_deg, 45_deg, 0_deg);
-	scene.addEntity(My::Entity(*scene.getMesh("cubeB"), 0.2f, transform));
+	//transform = LibMath::Matrix4::translation(0, 0, 5) * LibMath::Matrix4::scaling(2, 2, 1);
+	//scene.addEntity(My::Entity(*scene.getMesh("cubeW"), transform));
 
-	transform = LibMath::Matrix4::translation(0, 0, 0) * LibMath::Matrix4::rotationEuler(60_deg, 45_deg, 0_deg);
-	scene.addEntity(My::Entity(*scene.getMesh("cubeR"), 0.2f, transform));
-	
+	//transform = LibMath::Matrix4::translation(0.5f, 0, 0) * LibMath::Matrix4::rotationEuler(60_deg, 45_deg, 0_deg);
+	//scene.addEntity(My::Entity(*scene.getMesh("cubeB"), 0.2f, transform));
+
+	//transform = LibMath::Matrix4::translation(0, 0, 0) * LibMath::Matrix4::rotationEuler(60_deg, 45_deg, 0_deg);
+	//scene.addEntity(My::Entity(*scene.getMesh("cubeR"), 0.2f, transform));
+	//
 
 	//LibMath::Matrix4 transform = LibMath::Matrix4::translation(0,0,0);
 	//scene.addEntity(My::Entity(*scene.getMesh("square"), transform));
@@ -79,6 +82,11 @@ int main()
 	while (!WindowShouldClose())
 	{
 		// Update
+		if (IsKeyPressed(KEY_F1))
+		{
+			rasterizer.toggleWireFrameMode();
+			rasterizer.renderScene(scene, texture);
+		}
 
 		// Draw
 		BeginDrawing();

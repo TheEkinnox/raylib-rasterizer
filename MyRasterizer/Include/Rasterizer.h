@@ -3,12 +3,15 @@
 
 #include "Entity.h"
 #include "Light.h"
+#include <functional>
 
 namespace My
 {
 	struct Vertex;
 	class Texture;
 	class Scene;
+
+	typedef std::function<void(const Vertex p_vertices[3], Texture& p_target, std::vector<float>& p_zBuffer)> drawFunc;
 
 	class Rasterizer
 	{
@@ -60,7 +63,7 @@ namespace My
 		 * \param p_target The texture on which the entity should be drawn
 		 * \param 
 		 */
-		void drawEntity(const Entity& p_entity, Texture& p_target, const Light& p_light);
+		void drawEntity(const Entity& p_entity, Texture& p_target, const Light& p_light, drawFunc p_draw);
 
 		/**
 		 * \brief Draws the entity's normals on the target texture
@@ -74,9 +77,29 @@ namespace My
 		 * \param p_vertices The triangle to draw
 		 * \param p_target The texture on which the triangle should be drawn
 		 */
-		void				drawTriangle(const Vertex p_vertices[3], Texture& p_target);
+		static void drawTriangleFill(		const Vertex p_vertices[3], Texture& p_target, std::vector<float>& p_zBuffer);
+		static void drawTriangleWireFrame(	const Vertex p_vertices[3], Texture& p_target, std::vector<float>& p_zBuffer);
+
+		void toggleWireFrameMode();
+
 
 	private:
-		std::vector<float>	m_zBuffer;
+		std::vector<float> m_zBuffer;
+
+		enum class e_drawMode
+		{
+			E_FILL,
+			E_WIRE_FRAME
+		};
+
+		e_drawMode m_drawMode;
+		drawFunc m_drawTriangle = &Rasterizer::drawTriangleFill;
+
+		static LibMath::Vector2 pointOnTriangleEdge(	LibMath::Vector2 p_point, const LibMath::Vector2& p_triangleP1,
+														const LibMath::Vector2& p_triangleP2);
+
+		static bool wireFrameCanDrawPixel(	const LibMath::Vector2& p_pixelPos, const LibMath::Vector2 p_trianglePoints[3],
+											const LibMath::Vector3&);
+		static bool fillCanDrawPixel( const LibMath::Vector3&);
 	};
 }

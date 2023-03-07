@@ -71,6 +71,7 @@ My::Mesh* My::Mesh::createCube(const Color& p_color)
 	};
 
 	std::vector<size_t> indices(36); // 6 faces * 2 triangles * 3 points
+	//std::vector<size_t> indices; // 6 faces * 2 triangles * 3 points
 
 	for (size_t i = 0; i < vertices.size(); i += 4) //4 vertex is one face
 	{
@@ -83,45 +84,6 @@ My::Mesh* My::Mesh::createCube(const Color& p_color)
 		indices.push_back(i + 2);
 		indices.push_back(i + 3);
 	}
-
-	/*
-	{
-		// Front
-		1, 0, 2,
-		2, 3, 1,
-
-		// Bottom
-		3, 2, 7,
-		7, 2, 6,
-
-		// Left
-		6, 2, 0,
-		6, 0, 4,
-
-		// Back
-		6, 4, 5,
-		5, 7, 6,
-
-		// Right
-		7, 5, 3,
-		3, 5, 1,
-
-		// Top
-		1, 5, 4,
-		4, 0, 1
-	};
-	*/
-	//normal test
-	// auto m1 = new Mesh(vertices, indices);
-	// auto m2 = new Mesh(*m1);
-
-	// m2->CalculateNormals();
-
-	// for (auto& v : m1->m_vertices)
-	// 	std::cout << v.m_normal << std::endl;
-	// std::cout << "my normals" << std::endl;
-	// for (auto& v : m2->m_vertices)
-	// 	std::cout << v.m_normal << std::endl;
 
 	return new Mesh(vertices, indices);
 }
