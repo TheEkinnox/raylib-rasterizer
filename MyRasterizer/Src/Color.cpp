@@ -1,6 +1,7 @@
 #include "Color.h"
 #include "Interpolation.h"
 #include "Arithmetic.h"
+#include "Vector/Vector2.h"
 
 namespace My
 {
@@ -86,5 +87,34 @@ namespace My
 			static_cast<uint8_t>(LibMath::lerp(a.m_b, b.m_b, t)),
 			static_cast<uint8_t>(LibMath::lerp(a.m_a, b.m_a, t))
 		};
+	}
+	Color Color::bLerp(	const Color p_colors[4], LibMath::Vector2 p_point, 
+						const LibMath::Vector2& p_min, const LibMath::Vector2& p_max)
+	{
+		/*
+		* https://en.wikipedia.org/wiki/Bilinear_interpolation
+		*/
+		Color c1, c2, c3;
+
+		p_point = LibMath::Vector2(	LibMath::clamp(p_point.m_x, p_min.m_x, p_max.m_x),	//clamp the point's x value
+									LibMath::clamp(p_point.m_y, p_min.m_y, p_max.m_y));	//clamp the point's y value
+
+		LibMath::Vector2 delta = p_max - p_min;
+
+		if (delta.m_x == 0 || delta.m_y == 0)
+			throw "lmoa"; // TODO : Exception Class for Color blerp()
+
+		float t = (p_point.m_x - p_min.m_x) / delta.m_x;
+		c1 = lerp(p_colors[0], p_colors[1], t);		// Q11 + t*Q21
+		c2 = lerp(p_colors[2], p_colors[3], t);		// Q12 + t*Q22
+
+		t = (p_point.m_y - p_min.m_y) / delta.m_y;			
+		c3 = lerp(c1, c2, t);						// R12 + t*R22
+
+		return c3;
+	}
+	Color Color::bLerp(const Color p_colors[4], LibMath::Vector2 p_point) 
+	{
+		return Color::bLerp(p_colors, p_point, LibMath::Vector2(0), LibMath::Vector2(1));
 	}
 }
