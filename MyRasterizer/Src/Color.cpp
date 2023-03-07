@@ -67,11 +67,16 @@ namespace My
 	Color Color::operator/(const float p_scalar) const
 	{
 		return {
-			static_cast<uint8_t>(static_cast<float>(m_r) / p_scalar),
-			static_cast<uint8_t>(static_cast<float>(m_g) / p_scalar),
-			static_cast<uint8_t>(static_cast<float>(m_b) / p_scalar),
-			static_cast<uint8_t>(static_cast<float>(m_a) / p_scalar)
+			static_cast<uint8_t>(LibMath::clamp(static_cast<float>(m_r) / p_scalar, 0, 255)),
+			static_cast<uint8_t>(LibMath::clamp(static_cast<float>(m_g) / p_scalar, 0, 255)),
+			static_cast<uint8_t>(LibMath::clamp(static_cast<float>(m_b) / p_scalar, 0, 255)),
+			static_cast<uint8_t>(LibMath::clamp(static_cast<float>(m_a) / p_scalar, 0, 255))
 		};
+	}
+
+	Color& Color::operator+=(const Color& p_other)
+	{
+		return *this = *this + p_other;
 	}
 
 	Color Color::lerp(const Color& a, const Color& b, const float t)

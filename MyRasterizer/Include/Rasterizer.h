@@ -51,31 +51,30 @@ namespace My
 		 * \brief Draws the received entity on the target texture
 		 * \param p_entity The entity to draw
 		 * \param p_target The texture on which the entity should be drawn
+		 * \param p_lights The lights to apply to the entity
+		 * \param p_viewPos The position from which the entity is seen
 		 */
-		void				drawEntity(const Entity& p_entity, Texture& p_target);
-
-		/**
-		 * \brief Draws the received entity on the target texture
-		 * \param p_entity The entity to draw
-		 * \param p_target The texture on which the entity should be drawn
-		 * \param 
-		 */
-		void drawEntity(const Entity& p_entity, Texture& p_target, const Light& p_light);
+		void drawEntity(const Entity& p_entity, Texture& p_target,
+			const std::vector<Light>& p_lights, const LibMath::Vector3& p_viewPos);
 
 		/**
 		 * \brief Draws the entity's normals on the target texture
 		 * \param p_entity The entity to draw
 		 * \param p_target The texture on which the entity should be drawn
+		 * \param p_viewPos The position from which the entity is seen
 		 */
-		void drawNormals(const Entity& p_entity, Texture& p_target, const Light& p_light);
+		void drawNormals(const Entity& p_entity, Texture& p_target,
+			const LibMath::Vector3& p_viewPos);
 
 		/**
 		 * \brief Draws the received triangle on the target texture
 		 * \param p_vertices The triangle to draw
 		 * \param p_target The texture on which the triangle should be drawn
-		 * \param p_light The light used to shade the triangle
+		 * \param p_lights The light used to shade the triangle
+		 * \param p_viewPos The position from which the triangle is seen
 		 */
-		void				drawTriangle(const Vertex p_vertices[3], Texture& p_target, const Light& p_light);
+		void drawTriangle(const Vertex p_vertices[3], Texture& p_target,
+			const std::vector<Light>& p_lights, const LibMath::Vector3& p_viewPos);
 
 	private:
 		std::vector<float>	m_zBuffer;
