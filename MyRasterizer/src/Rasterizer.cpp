@@ -236,19 +236,23 @@ namespace My
 				LibMath::Vector2 q(static_cast<float>(x) - points[0].m_x,
 					static_cast<float>(y) - points[0].m_y);
 
-				const float s = q.cross(vs2) / vs1.cross(vs2);
-				const float t = vs1.cross(q) / vs1.cross(vs2);
+				const float t = q.cross(vs2) / vs1.cross(vs2);
+				const float w = vs1.cross(q) / vs1.cross(vs2);
+				const float s = 1 - t - w;
 
-				if (s >= 0 && t >= 0 && s + t <= 1.0f)
+				if (s >= 0 && t >= 0 && s + t <= 1)
 				{
 					const size_t bufferIndex = static_cast<size_t>(y) * p_target.getWidth() + x;
-					float pixelZ = LibMath::lerp(p_vertices[0].m_position.m_z, p_vertices[1].m_position.m_z, s);
-					pixelZ = LibMath::lerp(pixelZ, p_vertices[2].m_position.m_z, t);
 
-					if (pixelZ < m_zBuffer[bufferIndex])
+					const LibMath::Vector3 pos = p_vertices[0].m_position * s
+						+ p_vertices[1].m_position * t
+						+ p_vertices[2].m_position * w;
+
+					if (pos.m_z < m_zBuffer[bufferIndex])
 					{
-						Color pixelColor = Color::lerp(p_vertices[0].m_color, p_vertices[1].m_color, s);
-						pixelColor = Color::lerp(pixelColor, p_vertices[2].m_color, t);
+						const Color pixelColor = p_vertices[0].m_color * s
+							+ p_vertices[1].m_color * t
+							+ p_vertices[2].m_color * w;
 
 						if (pixelColor.m_a != 255.0f) //if transparent lerp from current color to new color
 						{
@@ -262,6 +266,7 @@ namespace My
 							m_zBuffer[bufferIndex] = pixelZ;
 							
 						p_target.setPixelColor(x, y, pixelColor);
+						m_zBuffer[bufferIndex] = pixelZ;
 					}
 				}
 			}
