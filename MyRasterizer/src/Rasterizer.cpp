@@ -25,11 +25,22 @@ namespace My
 		m_zBuffer.clear();
 		m_zBuffer.resize(textureSize, INFINITY);
 
-		for (const auto& entity : p_scene.getEntities())
+		auto entities = p_scene.getEntities();
+		std::vector<const Entity*> transparentEntities;
+
+		for (const auto& entity : entities)
 		{
-			drawEntity(entity, p_target, p_scene.getLights()[0]);
+			if (entity.getTransparency() == 1)
+				drawEntity(entity, p_target, p_scene.getLights()[0]);
+			else //if transparent 
+				transparentEntities.push_back(&entity);//add to vector to draw afterwards
+
 			//drawNormals(entity, p_target, p_scene.getLights()[0]);
 		}
+
+		for (const auto& entityPtr : transparentEntities)
+			drawEntity(*entityPtr, p_target, p_scene.getLights()[0]);	
+
 	}
 
 	void Rasterizer::drawEntity(const Entity& p_entity, Texture& p_target)
@@ -91,6 +102,7 @@ namespace My
 				}
 
 				v.m_color = p_light.CalculateLightingPhong(v, LibMath::Vector3::zero());
+				v.m_color.m_a = static_cast<uint8_t>(static_cast<float>(v.m_color.m_a) * p_entity.getTransparency());
 			}
 
 			for (size_t i = 0; i + 2 < indices.size(); i += 3)
@@ -228,7 +240,6 @@ namespace My
 				const float t = vs1.cross(q) / vs1.cross(vs2);
 
 				if (s >= 0 && t >= 0 && s + t <= 1.0f)
-					//(s <= 0.01f || t <= 0.01f || s + t >= 0.99f))
 				{
 					const size_t bufferIndex = static_cast<size_t>(y) * p_target.getWidth() + x;
 					float pixelZ = LibMath::lerp(p_vertices[0].m_position.m_z, p_vertices[1].m_position.m_z, s);
