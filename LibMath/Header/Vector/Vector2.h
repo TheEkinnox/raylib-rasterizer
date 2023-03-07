@@ -77,6 +77,7 @@ namespace LibMath
 		std::string		stringLong() const;								// return a verbose string representation of this vector
 
 		void			translate(Vector2 const&);						// offset this vector by a given distance
+		bool			inBounds(Vector2 const&, Vector2 const&)const;
 
 		float m_x = 0;
 		float m_y = 0;
