@@ -38,7 +38,7 @@ int main()
 
 	My::Texture texture(SCREEN_WIDTH, SCREEN_HEIGHT);
 
-	const Mat4 projMat = Mat4::perspectiveProjection(145_deg, ASPECT, 0.1f, 200.f);
+	const Mat4 projMat = Mat4::perspectiveProjection(145_deg, ASPECT, FLT_EPSILON, 200.f);
 
 	My::Rasterizer rasterizer;
 	rasterizer.renderScene(scene, texture, projMat);
