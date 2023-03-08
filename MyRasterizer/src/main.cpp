@@ -27,19 +27,48 @@ int main()
 	
 	
 	My::Mesh* cube = My::Mesh::createCube();
-	const char* path = GetWorkingDirectory();
 	My::Texture textureWrapper("../img/container.png");
 	cube->setTexture(&textureWrapper);
-	LibMath::Matrix4 transform = LibMath::Matrix4::translation(0, 0, -3) * LibMath::Matrix4::scaling(2,2,2);
+
+	scene.addMesh("sphereW", *My::Mesh::createSphere(8, 8, My::Color::white));
+	scene.addMesh("sphereR", *My::Mesh::createSphere(32, 32, My::Color::red));
+	scene.addMesh("sphereG", *My::Mesh::createSphere(32, 32, My::Color::green));
+	scene.addMesh("sphereB", *My::Mesh::createSphere(32, 32, My::Color::blue));
+
+	LibMath::Matrix4 transform = LibMath::Matrix4::translation(0, 0, -3) * LibMath::Matrix4::scaling(2, 2, 2);
 	scene.addEntity(My::Entity(*cube, transform));
-	scene.getEntity(0).setRotationEulerAngles(0_deg, 45_rad, 0_rad);
+
+	transform = LibMath::Matrix4::translation(0, 1, -2);
+	scene.addEntity(My::Entity(*scene.getMesh("sphereR"), transform));
+
+	transform = LibMath::Matrix4::translation(-1, -1, -2);
+	scene.addEntity(My::Entity(*scene.getMesh("sphereG"), transform));
+
+	transform = LibMath::Matrix4::translation(1, -1, -2);
+	scene.addEntity(My::Entity(*scene.getMesh("sphereB"), transform));
 
 	//light
-	scene.addLight(My::Light(LibMath::Vector3(0, 0, 10), 0.2f, 0.4f, 0.4f));
+	const LibMath::Matrix4 lightScale = LibMath::Matrix4::scaling(.1f, .1f, .1f);
+
+	LibMath::Vector3 lightPos = LibMath::Vector3(0, 2.25f, 1);
+	transform = LibMath::Matrix4::translation(lightPos.m_x, lightPos.m_y, lightPos.m_z) * lightScale;
+	scene.addEntity(My::Entity(*scene.getMesh("sphereW"), transform));
+	scene.addLight(My::Light(lightPos, 0.1f, 0.5f, 0.4f, 8));
+
+	lightPos = LibMath::Vector3(-2.25f, -2.25f, 1);
+	transform = LibMath::Matrix4::translation(lightPos.m_x, lightPos.m_y, lightPos.m_z) * lightScale;
+	scene.addEntity(My::Entity(*scene.getMesh("sphereW"), transform));
+	scene.addLight(My::Light(lightPos, 0.1f, 0.5f, 0.4f, 8));
+
+	lightPos = LibMath::Vector3(2.25f, -2.25f, 1);
+	transform = LibMath::Matrix4::translation(lightPos.m_x, lightPos.m_y, lightPos.m_z) * lightScale;
+	scene.addEntity(My::Entity(*scene.getMesh("sphereW"), transform));
+	scene.addLight(My::Light(lightPos, 0.1f, 0.5f, 0.4f, 8));
 
 	My::Texture texture(SCREEN_WIDTH, SCREEN_HEIGHT);
 
-	const Mat4 projMat = Mat4::perspectiveProjection(145_deg, ASPECT, 0.1f, 200.f);
+	//const Mat4 projMat = Mat4::orthographicProjection(-6, 6, -6, 6, 0.1f, 200.f);
+	const Mat4 projMat = Mat4::perspectiveProjection(90_deg, ASPECT, 0.1f, 200.f);
 
 	My::Rasterizer rasterizer;
 	rasterizer.renderScene(scene, texture, projMat);

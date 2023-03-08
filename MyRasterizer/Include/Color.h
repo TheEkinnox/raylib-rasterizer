@@ -70,6 +70,8 @@ namespace My
 		/// <param name="p_scalar">The value by which each element should be divided</param>
 		Color operator/(float p_scalar) const;
 
+		Color& operator+=(const Color& p_other);
+
 		uint8_t m_r;
 		uint8_t m_g;
 		uint8_t m_b;

@@ -75,13 +75,13 @@ namespace My
 
 		/**
 		 * \brief Gives read access to the vertex buffer of the mesh
-		 * \return The vertex buffer of the mesh
+		 * \return The mesh's vertex buffer
 		 */
 		std::vector<Vertex>	getVertices() const;
 
 		/**ss
 		 * \brief Gives read access to the index buffer of the mesh
-		 * \return The index buffer of the mesh
+		 * \return The mesh's index buffer
 		 */
 		std::vector<size_t>	getIndices() const;
 

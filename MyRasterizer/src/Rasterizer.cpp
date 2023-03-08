@@ -8,7 +8,6 @@
 #include "Light.h"
 #include "Vector/Vector2.h"
 #include "Vector/Vector4.h"
-#include <Interpolation.h>
 
 namespace My
 {
@@ -28,13 +27,14 @@ namespace My
 
 		for (const auto& entity : p_scene.getEntities())
 		{
-			drawEntity(entity, p_target, p_projectionMatrix, p_scene.getLights()[0]);
-			//drawNormals(entity, p_target, p_scene.getLights()[0]);
+			drawEntity(entity, p_target, p_projectionMatrix, p_scene.getLights(), LibMath::Vector3::zero());
+			//drawNormals(entity, p_target, p_scene.getLights(), LibMath::Vector3::zero());
 		}
 	}
 
 	void Rasterizer::drawEntity(const Entity& p_entity, Texture& p_target,
-		const Mat4& p_projectionMatrix, const Light& p_light)
+		const Mat4& p_projectionMatrix, const std::vector<Light>& p_lights,
+		const LibMath::Vector3& p_viewPos)
 	{
 		if (p_entity.getMesh() != nullptr)
 		{
@@ -44,7 +44,6 @@ namespace My
 
 			std::map<size_t, Color> vertexLightColor;
 
-			//calculate light
 			for (auto& v : vertices)
 			{
 				const Vec3 pos = v.m_position;
@@ -58,13 +57,6 @@ namespace My
 				vec4 = LibMath::Vector4{ nor.m_x, nor.m_y, nor.m_z, 1.f };
 				vec4 = p_entity.getRotation() * vec4;
 				nor = { vec4.m_x, vec4.m_y, vec4.m_z };
-
-				// Apply lighting to the vertex color
-				v.m_color = p_light.calculateLightingPhong(v, LibMath::Vector3::zero());
-
-				// Convert vertex coordinates from world to screen
-				// THIS MUST BE DONE AFTER LIGHTING - LIGHTS USE WORLD POSITIONS
-				v.m_position = worldToPixel(pos, p_target, mvpMatrix);
 			}
 
 			for (size_t i = 0; i + 2 < indices.size(); i += 3)
@@ -76,66 +68,77 @@ namespace My
 					vertices[indices[i + 2]]
 				};
 
-				drawTriangle(triangle, p_target, p_entity.getMesh()->getTexture());
+				drawTriangle(triangle, p_target, p_lights, p_viewPos, mvpMatrix,
+					p_entity.getMesh()->getTexture());
 			}
 		}
 	}
 
-	void Rasterizer::drawNormals(const Entity& p_entity, Texture& p_target, const Light& p_light)
-	{
-		if (p_entity.getMesh() != nullptr)
-		{
-			const auto vertices = p_entity.getMesh()->getVertices();
-			const auto indices = p_entity.getMesh()->getIndices();
+	//void Rasterizer::drawNormals(const Entity& p_entity, Texture& p_target,
+	//	const LibMath::Vector3& p_viewPos)
+	//{
+	//	if (p_entity.getMesh() != nullptr)
+	//	{
+	//		const auto vertices = p_entity.getMesh()->getVertices();
+	//		const auto indices = p_entity.getMesh()->getIndices();
 
-			for (auto v : vertices)
-			{
-				{
-					auto& pos = v.m_position; //update pos
-					auto vec4 = LibMath::Vector4{ pos.m_x, pos.m_y, pos.m_z, 1.f };
-					vec4 = p_entity.getTransform() * vec4;
-					pos = { vec4.m_x, vec4.m_y, vec4.m_z };
-				}
+	//		for (auto v : vertices)
+	//		{
+	//			{
+	//				auto& pos = v.m_position; //update pos
+	//				auto vec4 = LibMath::Vector4{ pos.m_x, pos.m_y, pos.m_z, 1.f };
+	//				vec4 = p_entity.getTransform() * vec4;
+	//				pos = { vec4.m_x, vec4.m_y, vec4.m_z };
+	//			}
 
-				{
-					auto& nor = v.m_normal; //update normal
-					auto vec4 = LibMath::Vector4{ nor.m_x, nor.m_y, nor.m_z, 1.f };
-					vec4 = p_entity.getRotation() * vec4;
-					nor = { vec4.m_x, vec4.m_y, vec4.m_z };
-				}
+	//			{
+	//				auto& nor = v.m_normal; //update normal
+	//				auto vec4 = LibMath::Vector4{ nor.m_x, nor.m_y, nor.m_z, 1.f };
+	//				vec4 = p_entity.getRotation() * vec4;
+	//				nor = { vec4.m_x, vec4.m_y, vec4.m_z };
+	//			}
 
-				const Color color = p_light.calculateLightingPhong(v, LibMath::Vector3::zero());
+	//			const Color color = Color::white;
 
-				const Vertex triangle1[3]
-				{
-					Vertex{v.m_position + LibMath::Vector3(0.02f), LibMath::Vector3::zero(), color},
-					Vertex{v.m_position + v.m_normal,LibMath::Vector3::zero(),color},
-					Vertex{v.m_position,LibMath::Vector3::zero(),color}
-				};
+	//			const Vertex triangle1[3]
+	//			{
+	//				Vertex{v.m_position + LibMath::Vector3(0.02f), LibMath::Vector3::zero(), color},
+	//				Vertex{v.m_position + v.m_normal,LibMath::Vector3::zero(),color},
+	//				Vertex{v.m_position,LibMath::Vector3::zero(),color}
+	//			};
 
-				drawTriangle(triangle1, p_target);
+	//			drawTriangle(triangle1, p_target, {}, p_viewPos);
 
-				const Vertex triangle2[3]
-				{
-					Vertex{v.m_position + LibMath::Vector3(0.02f),LibMath::Vector3::zero(), color},
-					Vertex{v.m_position + v.m_normal,LibMath::Vector3::zero(),color},
-					Vertex{v.m_position + v.m_normal + LibMath::Vector3(0.02f),LibMath::Vector3::zero(),color }
-				};
+	//			const Vertex triangle2[3]
+	//			{
+	//				Vertex{v.m_position + LibMath::Vector3(0.02f),LibMath::Vector3::zero(), color},
+	//				Vertex{v.m_position + v.m_normal,LibMath::Vector3::zero(),color},
+	//				Vertex{v.m_position + v.m_normal + LibMath::Vector3(0.02f),LibMath::Vector3::zero(),color }
+	//			};
 
-				drawTriangle(triangle2, p_target);
-			}
-		}
-	}
+	//			drawTriangle(triangle2, p_target, {}, p_viewPos);
+	//		}
+	//	}
+	//}
 
-	void Rasterizer::drawTriangle(const Vertex p_vertices[3], Texture& p_target, const Texture* p_texture)
+	void Rasterizer::drawTriangle(const Vertex p_vertices[3], Texture& p_target,
+		const std::vector<Light>& p_lights, const LibMath::Vector3& p_viewPos,
+		const Mat4& p_mvpMatrix, const Texture* p_texture)
 	{
 		// Create an array of vector4 for the positions
-		const Vec3 points[3]
+		Vec3 points[3]
 		{
 			{ p_vertices[0].m_position.m_x, p_vertices[0].m_position.m_y, p_vertices[0].m_position.m_z },
 			{ p_vertices[1].m_position.m_x, p_vertices[1].m_position.m_y, p_vertices[1].m_position.m_z },
 			{ p_vertices[2].m_position.m_x, p_vertices[2].m_position.m_y, p_vertices[2].m_position.m_z }
 		};
+
+		for (auto& point : points)
+		{
+			// Convert vertex coordinates from world to screen
+			// THIS MUST BE DONE AFTER LIGHTING - LIGHTS USE WORLD POSITIONS
+			point = worldToPixel(point, p_target, p_mvpMatrix);
+		}
 
 		const float floatWidth = static_cast<float>(p_target.getWidth());
 		const float floatHeight = static_cast<float>(p_target.getHeight());
@@ -175,7 +178,11 @@ namespace My
 				{
 					const size_t bufferIndex = static_cast<size_t>(y) * p_target.getWidth() + x;
 
-					const LibMath::Vector3 pos = p_vertices[0].m_position * s
+					const LibMath::Vector3 pos = points[0] * s
+						+ points[1] * t
+						+ points[2] * w;
+
+					const LibMath::Vector3 vertPos = p_vertices[0].m_position * s
 						+ p_vertices[1].m_position * t
 						+ p_vertices[2].m_position * w;
 
@@ -196,7 +203,22 @@ namespace My
 							pixelColor *= p_texture->getPixelColor((uint32_t)LibMath::round(textureX), (uint32_t)LibMath::round(textureY));
 						}
 
-						p_target.setPixelColor(x, y, pixelColor);
+						if (!p_lights.empty())
+						{
+							LibMath::Vector3 normal = p_vertices[0].m_normal * s
+								+ p_vertices[1].m_normal * t
+								+ p_vertices[2].m_normal * w;
+
+							normal.normalize();
+
+							Color litColor = Color::black;
+
+							for (const auto& light : p_lights)
+								litColor += light.calculateLightingBlinnPhong(vertPos, pixelColor, normal, p_viewPos);
+
+							p_target.setPixelColor(x, y, litColor);
+						}
+
 						m_zBuffer[bufferIndex] = pos.m_z;
 					}
 				}
