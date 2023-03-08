@@ -13,25 +13,25 @@ My::Light::Light(Vec3 p_position, float p_ambientComponent, float p_diffuseCompo
 	m_intensity = Vec3(1); //how much rgb light it emits [0,1]
 }
 
-My::Color My::Light::CalculateLightingPhong(	const Vertex& p_vertex, const Vec3& p_observer,
-												size_t p_shinyness)const
+My::Color My::Light::calculateLightingPhong(const Vertex& p_vertex, const Vec3& p_observer,
+	const size_t p_shininess)const
 {
 	// https://fr.wikipedia.org/wiki/Ombrage_de_Phong
 
-	const float lightAngle = LibMath::clamp(	p_vertex.m_normal.dot(this->m_position - p_vertex.m_position), 
+	const float lightAngle = LibMath::clamp(p_vertex.m_normal.dot(this->m_position - p_vertex.m_position),
 											0.0f, 1.0f);
 	Vec3 halfVector = p_observer + this->m_position - 2 * p_vertex.m_position;
 	halfVector.normalize();
 	float nDotH = LibMath::clamp(p_vertex.m_normal.dot(halfVector), 0.0, 1.0); 
 
-	// Intensity ambiante
+	// Intensity ambient
 	Vec3 ia = p_vertex.m_color.rgb() * m_ambientComponent;
 
 	// Intensity diffuse
 	Vec3 id = p_vertex.m_color.rgb() * m_diffuseComponent * nDotH; // TODO : remove * nDotH
 
 	// Intensity specular
-	Vec3 is = Color::white.rgb() * LibMath::pow(nDotH, static_cast<int>(p_shinyness)) * m_specularComponent;
+	Vec3 is = Color::white.rgb() * LibMath::pow(nDotH, static_cast<int>(p_shininess)) * m_specularComponent;
 
 	return Color(	ia + (id + is) * lightAngle * m_intensity,
 					255);

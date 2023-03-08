@@ -16,25 +16,25 @@ namespace My
 	public: 
 		
 		/// <summary>
-		/// Light source to illumanate entites at p_position. 
+		/// Light source to illuminate entities at p_position.
 		/// Components are percents that must add to 1
 		/// </summary>
 		/// <param name="p_position"> pos in 3D space</param>
-		/// <param name="p_ambientComponent">constant lighting on entites</param>
-		/// <param name="p_diffuseComponent">spotlight lighting on entites</param>
-		/// <param name="p_specularComponent">white spec on entites</param>
+		/// <param name="p_ambientComponent">constant lighting on entities</param>
+		/// <param name="p_diffuseComponent">spotlight lighting on entities</param>
+		/// <param name="p_specularComponent">white spec on entities</param>
 		Light(Vec3 p_position, float p_ambientComponent, float p_diffuseComponent, float p_specularComponent);
 		~Light() = default;
 
 
 		/// <summary>
-		/// Calucale the limunosity/color of a vertex based on the Phong method
+		/// Calculate the luminosity/color of a vertex based on the Phong method
 		/// </summary>
-		/// <param name="p_vertex">: target vertex</param>
-		/// <param name="p_observer">: camera position</param>
-		/// <param name="p_shinyness">: material shinyness constant </param>
+		/// <param name="p_vertex"> target vertex</param>
+		/// <param name="p_observer"> camera position</param>
+		/// <param name="p_shininess"> material shininess constant </param>
 		/// <returns></returns>
-		Color CalculateLightingPhong(const Vertex& p_vertex, const Vec3& p_observer, size_t p_shinyness = 10)const;
+		Color calculateLightingPhong(const Vertex& p_vertex, const Vec3& p_observer, size_t p_shininess = 10)const;
 
 		//Color static ApplyLightToColor(const Color& p_color, float lightValue);
 

@@ -10,9 +10,13 @@
 #include "Angle.h"
 
 constexpr auto SCREEN_WIDTH = 800;
-constexpr auto SCREEN_HEIGHT = 800;
+constexpr auto SCREEN_HEIGHT = 600;
+constexpr auto ASPECT = static_cast<float>(SCREEN_WIDTH) /
+	static_cast<float>(SCREEN_HEIGHT);
 
 using namespace LibMath::Literal;
+
+using Mat4 = LibMath::Matrix4;
 
 int main()
 {
@@ -26,20 +30,23 @@ int main()
 	const char* path = GetWorkingDirectory();
 	My::Texture textureWrapper("../img/container.png");
 	cube->setTexture(&textureWrapper);
-	LibMath::Matrix4 transform = LibMath::Matrix4::translation(0, 0, 2) * LibMath::Matrix4::scaling(2,2,2);
+	LibMath::Matrix4 transform = LibMath::Matrix4::translation(0, 0, -3) * LibMath::Matrix4::scaling(2,2,2);
 	scene.addEntity(My::Entity(*cube, transform));
-	scene.getEntity(0).setRotationEulerAngles(45_deg, 0_rad, 0_rad);
+	scene.getEntity(0).setRotationEulerAngles(0_deg, 45_rad, 0_rad);
 
 	//light
-	scene.addLight(My::Light(LibMath::Vector3(0, 0, -10), 0.2f, 0.4f, 0.4f));
+	scene.addLight(My::Light(LibMath::Vector3(0, 0, 10), 0.2f, 0.4f, 0.4f));
 
 	My::Texture texture(SCREEN_WIDTH, SCREEN_HEIGHT);
 
+	const Mat4 projMat = Mat4::perspectiveProjection(145_deg, ASPECT, 0.1f, 200.f);
+
 	My::Rasterizer rasterizer;
-	rasterizer.renderScene(scene, texture);
+	rasterizer.renderScene(scene, texture, projMat);
 
 	// Create the texture
-	const RenderTexture2D target = LoadRenderTexture(static_cast<int>(texture.getWidth()), static_cast<int>(texture.getHeight()));
+	const RenderTexture2D target = LoadRenderTexture(static_cast<int>(texture.getWidth()),
+	                                                 static_cast<int>(texture.getHeight()));
 
 	// Main game loop
 	while (!WindowShouldClose())
