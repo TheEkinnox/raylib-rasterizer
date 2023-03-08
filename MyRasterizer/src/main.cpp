@@ -28,7 +28,7 @@ int main()
 	cube->setTexture(&textureWrapper);
 	LibMath::Matrix4 transform = LibMath::Matrix4::translation(0, 0, 2) * LibMath::Matrix4::scaling(2,2,2);
 	scene.addEntity(My::Entity(*cube, transform));
-	scene.getEntity(0).setRotationEulerAngles(45_deg, 0_rad, 0_rad);
+	scene.getEntity(0).rotateEulerAngles(-30_deg, 45_rad, 0_rad);
 
 	//light
 	scene.addLight(My::Light(LibMath::Vector3(0, 0, -10), 0.2f, 0.4f, 0.4f));
