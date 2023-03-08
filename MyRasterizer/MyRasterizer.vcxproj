@@ -30,11 +30,11 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Src\Light.cpp" />
-    <ClCompile Include="src\Color.cpp" />
+    <ClCompile Include="Src\Color.cpp" />
     <ClCompile Include="Src\Mesh.cpp" />
     <ClCompile Include="Src\Entity.cpp" />
     <ClCompile Include="Src\main.cpp" />
-    <ClCompile Include="src\Rasterizer.cpp" />
+    <ClCompile Include="Src\Rasterizer.cpp" />
     <ClCompile Include="Src\Scene.cpp" />
     <ClCompile Include="Src\Texture.cpp" />
   </ItemGroup>
