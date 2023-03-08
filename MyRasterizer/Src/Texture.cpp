@@ -91,12 +91,12 @@ My::Color My::Texture::getPixelColorBlerp(	float p_x, float p_y,
 	max.m_x = max.m_x >= m_width  ? static_cast<float>(m_width) - 1.0f : max.m_x;
 	max.m_y = max.m_y >= m_height ? static_cast<float>(m_height) - 1.0f : max.m_y;
 
-	Color colorsAround[4]
+	const Color* colorsAround[4]
 	{
-		m_pixels[static_cast<size_t>(min.m_y * m_width + min.m_x)],		//top left
-		m_pixels[static_cast<size_t>(min.m_y * m_width + max.m_x)],		//top right
-		m_pixels[static_cast<size_t>(max.m_y * m_width + min.m_x)],		//bot left
-		m_pixels[static_cast<size_t>(max.m_y * m_width + max.m_x)]		//bot right
+		&m_pixels[static_cast<size_t>(min.m_y * m_width + min.m_x)],	//top left
+		&m_pixels[static_cast<size_t>(min.m_y * m_width + max.m_x)],	//top right
+		&m_pixels[static_cast<size_t>(max.m_y * m_width + min.m_x)],	//bot left
+		&m_pixels[static_cast<size_t>(max.m_y * m_width + max.m_x)]		//bot right
 	};
 
 	return Color::bLerp(colorsAround, LibMath::Vector2(p_x, p_y), min, max);

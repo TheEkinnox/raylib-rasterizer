@@ -96,10 +96,10 @@ namespace My
 		/// <summary>
 		/// bilinear interpolation
 		/// </summary>
-		static Color bLerp(	const Color p_colors[4], LibMath::Vector2 p_point,
+		static Color bLerp(	const Color* p_colors[4], LibMath::Vector2 p_point,
 							const LibMath::Vector2& p_min, const LibMath::Vector2& p_max);
 
-		static Color bLerp(	const Color p_colors[4], LibMath::Vector2 p_point);
+		static Color bLerp(	const Color* p_colors[4], LibMath::Vector2 p_point);
 	};
 }
 
