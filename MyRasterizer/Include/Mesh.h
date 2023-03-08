@@ -1,6 +1,7 @@
 #pragma once
 #include <vector>
 #include "Vertex.h"
+#include "Texture.h"
 
 namespace My
 {
@@ -38,8 +39,9 @@ namespace My
 		 * \brief Creates a mesh with the given set of vertices and indices
 		 * \param p_vertices The vertex buffer of the mesh
 		 * \param p_indices The index buffer of the mesh
+		 * \param p_texture The texture of the mesh (nullptr by default)
 		 */
-		Mesh(const std::vector<Vertex>& p_vertices, const std::vector<size_t>& p_indices);
+		Mesh(const std::vector<Vertex>& p_vertices, const std::vector<size_t>& p_indices, const Texture* p_texture = nullptr);
 
 		/**
 		 * \brief Creates a copy of the given mesh
@@ -73,13 +75,13 @@ namespace My
 
 		/**
 		 * \brief Gives read access to the vertex buffer of the mesh
-		 * \return The vertex buffer of the mesh
+		 * \return The mesh's vertex buffer
 		 */
 		std::vector<Vertex>	getVertices() const;
 
 		/**ss
 		 * \brief Gives read access to the index buffer of the mesh
-		 * \return The index buffer of the mesh
+		 * \return The mesh's index buffer
 		 */
 		std::vector<size_t>	getIndices() const;
 
@@ -105,9 +107,22 @@ namespace My
 		static Mesh* createSphere(uint32_t p_latitudeCount, uint32_t p_longitudeCount,
 			const Color& p_color = Color::white);
 
+		/*
+		* *\brief We use it to give a texture to our Mesh
+		 * \param textture is the name of the texture we want to give him
+		 * */
+		const Texture* getTexture() const;
+
+		/*
+		* *\brief We use it to give a texture to our Mesh
+		 * \param textture is the name of the texture we want to give him
+		 * */
+		void setTexture(My::Texture* texture);
+
 	private:
 		std::vector<Vertex> m_vertices;
 		std::vector<size_t> m_indices;
+		const My::Texture* m_texture;
 	};
 
 }

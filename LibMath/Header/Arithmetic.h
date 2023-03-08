@@ -19,6 +19,13 @@ namespace LibMath
 	float	ceil(float value);
 
 	/**
+	 * \brief Returns the rounded value
+	 * \param value The value to round
+	 * \return The received value rounded
+	*/
+	float round(const float value);
+
+	/**
 	 * \brief Returns the received value limited to the given range
 	 * \param value The value to clamp
 	 * \param a The first value of the range
@@ -61,6 +68,12 @@ namespace LibMath
 	 */
 	float	min(float a, float b);
 
+	template<typename T>
+	T		min(T a, T b)
+	{
+		return a < b ? a : b;
+	}
+
 	/**
 	 * \brief Returns the largest of two given values
 	 * \param a The first value
@@ -68,6 +81,12 @@ namespace LibMath
 	 * \return a if a > b. b otherwise
 	 */
 	float	max(float a, float b);
+
+	template<typename T>
+	T		max(T a, T b)
+	{
+		return a > b ? a : b;
+	}
 
 	/**
 	 * \brief Returns the absolute value of the given number

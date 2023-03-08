@@ -121,7 +121,7 @@ namespace My
 		float getScaleZ() const;
 
 		/// <summary>
-		/// Get the Entity's rotation arround each axis in radians in a Vector3
+		/// Get the Entity's rotation around each axis in radians in a Vector3
 		/// </summary>
 		/// <returns></returns>
 		Vec3 getRotationEulerAngles()const;

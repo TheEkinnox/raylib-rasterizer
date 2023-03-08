@@ -9,5 +9,7 @@ namespace My
 		LibMath::Vector3	m_position;
 		LibMath::Vector3	m_normal;
 		Color				m_color;
+		float				m_u;
+		float				m_v;
 	};
 }

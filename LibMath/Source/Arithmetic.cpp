@@ -14,6 +14,7 @@ namespace LibMath
 		return intPart;
 	}
 
+
 	float ceil(const float value)
 	{
 		const auto intPart = static_cast<float>(static_cast<int>(value));
@@ -22,6 +23,17 @@ namespace LibMath
 			return intPart + 1;
 
 		return intPart;
+	}
+
+	float round(const float value)
+	{
+		const auto intPart = static_cast<float>(static_cast<int>(value));
+		const float decimalPart = value - intPart;
+
+		if (decimalPart < .5f)
+			return intPart;
+
+		return intPart + 1;
 	}
 
 	float clamp(const float value, const float a, const float b)

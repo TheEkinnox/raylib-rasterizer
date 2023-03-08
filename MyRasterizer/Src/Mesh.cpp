@@ -1,5 +1,6 @@
 #include "Trigonometry.h"
 #include "Mesh.h"
+#include "Texture.h"
 #include "Vector/Vector3.h"
 #include "Arithmetic.h"
 #include <map>
@@ -8,7 +9,8 @@
 
 using Vec3 = LibMath::Vector3;
 
-My::Mesh::Mesh(const std::vector<Vertex>& p_vertices, const std::vector<size_t>& p_indices)
+My::Mesh::Mesh(const std::vector<Vertex>& p_vertices,
+	const std::vector<size_t>& p_indices, const Texture* p_texture)
 {
 	// Make sure the index buffer is a set of triangles
 	if (p_indices.size() % 3 != 0)
@@ -22,8 +24,7 @@ My::Mesh::Mesh(const std::vector<Vertex>& p_vertices, const std::vector<size_t>&
 
 	this->m_vertices = p_vertices;
 	this->m_indices = p_indices;
-
-	//this->CalculateNormals();
+	this->m_texture = p_texture;
 }
 
 std::vector<My::Vertex> My::Mesh::getVertices() const
@@ -41,14 +42,14 @@ My::Mesh* My::Mesh::createCube(const Color& p_color)
 	float nLen = 0.57735027f;	// 1 = sqrt(3 * x2) => sqrt(1/3) = x => 0.57735027f = x
 	const std::vector<Vertex> vertices
 	{
-		{ { -.5f, .5f, .5f }, { -nLen, nLen, nLen }, p_color  },		// Front-top-left
-		{ { .5f, .5f, .5f }, { nLen, nLen, nLen }, p_color  },		// Front-top-right
-		{ { -.5f, -.5f, .5f }, { -nLen, -nLen, nLen }, p_color  },	// Front-bottom-left
-		{ { .5f, -.5f, .5f }, { nLen, -nLen, nLen }, p_color  },		// Front-bottom-right
-		{ { -.5f, .5f, -.5f }, { -nLen, nLen, -nLen }, p_color  },	// Back-top-left
-		{ { .5f, .5f, -.5f }, { nLen, nLen, -nLen }, p_color  },		// Back-top-right
-		{ { -.5f, -.5f, -.5f }, { -nLen, -nLen, -nLen }, p_color  },	// Back-bottom-left
-		{ { .5f, -.5f, -.5f }, { nLen, -nLen, -nLen }, p_color  }	// Back-bottom-right
+		{ { -.5f, .5f, .5f }, { -nLen, nLen, nLen }, p_color, 0, 0 },		// Front-top-left
+		{ { .5f, .5f, .5f }, { nLen, nLen, nLen }, p_color, 1, 0 },		// Front-top-right
+		{ { -.5f, -.5f, .5f }, { -nLen, -nLen, nLen }, p_color, 0, 1 },	// Front-bottom-left
+		{ { .5f, -.5f, .5f }, { nLen, -nLen, nLen }, p_color, 1, 1 },		// Front-bottom-right
+		{ { -.5f, .5f, -.5f }, { -nLen, nLen, -nLen }, p_color, 1, 0 },	// Back-top-left
+		{ { .5f, .5f, -.5f }, { nLen, nLen, -nLen }, p_color, 0, 0 },		// Back-top-right
+		{ { -.5f, -.5f, -.5f }, { -nLen, -nLen, -nLen }, p_color, 1, 1 },	// Back-bottom-left
+		{ { .5f, -.5f, -.5f }, { nLen, -nLen, -nLen }, p_color, 0, 1 }	// Back-bottom-right
 	};
 
 	const std::vector<size_t> indices
@@ -265,3 +266,14 @@ void My::Mesh::CalculateNormals()
 		pair.first->m_normal.normalize();
 	}
 }
+
+const My::Texture* My::Mesh::getTexture() const
+{
+	return m_texture;
+}
+
+void My::Mesh::setTexture(My::Texture* texture)
+{
+	m_texture = texture;
+}
+
