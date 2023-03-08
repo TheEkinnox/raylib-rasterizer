@@ -5,20 +5,36 @@
 
 namespace My
 {
-	const Color Color::black	= { 0, 0, 0, 255 };
-	const Color Color::white	= { 255, 255, 255, 255 };
-	const Color Color::red		= { 255, 0, 0, 255 };
-	const Color Color::green	= { 0, 255, 0, 255 };
-	const Color Color::blue		= { 0, 0, 255, 255 };
+	const Color Color::black	= { 0, 0, 0, UINT8_MAX };
+	const Color Color::white	= { UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX };
+	const Color Color::red		= { UINT8_MAX, 0, 0, UINT8_MAX };
+	const Color Color::green	= { 0, UINT8_MAX, 0, UINT8_MAX };
+	const Color Color::blue		= { 0, 0, UINT8_MAX, UINT8_MAX };
 
 	Color& Color::aditionClamp(const LibMath::Vector3& p_rgb)
 	{
 		this->m_r = static_cast<uint8_t>(LibMath::clamp(static_cast<float>(this->m_r) + p_rgb.m_x,
-														0.0f, 255.0f));
+														0.0f, UINT8_MAX));
 		this->m_g = static_cast<uint8_t>(LibMath::clamp(static_cast<float>(this->m_g) + p_rgb.m_y,
-														0.0f, 255.0f));		
+														0.0f, UINT8_MAX));		
 		this->m_b = static_cast<uint8_t>(LibMath::clamp(static_cast<float>(this->m_b) + p_rgb.m_z,
-														0.0f, 255.0f));
+														0.0f, UINT8_MAX));
+
+		return *this;
+	}
+
+	Color& Color::blend(const Color& p_dest)
+	{
+		float srcAlphaPercent = static_cast<float>(this->m_a) / UINT8_MAX;
+		float destAlphaPercent = static_cast<float>(p_dest.m_a) / UINT8_MAX * (1 - srcAlphaPercent);
+
+		this->m_r = static_cast<uint8_t>(	static_cast<float>(this->m_r) * srcAlphaPercent + 
+											static_cast<float>(p_dest.m_r) * destAlphaPercent);
+		this->m_g = static_cast<uint8_t>(	static_cast<float>(this->m_g) * srcAlphaPercent + 
+											static_cast<float>(p_dest.m_g) * destAlphaPercent);
+		this->m_b = static_cast<uint8_t>(	static_cast<float>(this->m_b) * srcAlphaPercent + 
+											static_cast<float>(p_dest.m_b) * destAlphaPercent);
+		this->m_a = UINT8_MAX;
 
 		return *this;
 	}
@@ -41,10 +57,10 @@ namespace My
 	Color Color::operator*(const Color& p_other) const
 	{
 		return {
-			static_cast<uint8_t>(static_cast<short>(m_r) * p_other.m_r / 255),
-			static_cast<uint8_t>(static_cast<short>(m_g) * p_other.m_g / 255),
-			static_cast<uint8_t>(static_cast<short>(m_b) * p_other.m_b / 255),
-			static_cast<uint8_t>(static_cast<short>(m_a) * p_other.m_a / 255)
+			static_cast<uint8_t>(static_cast<short>(m_r) * p_other.m_r / UINT8_MAX),
+			static_cast<uint8_t>(static_cast<short>(m_g) * p_other.m_g / UINT8_MAX),
+			static_cast<uint8_t>(static_cast<short>(m_b) * p_other.m_b / UINT8_MAX),
+			static_cast<uint8_t>(static_cast<short>(m_a) * p_other.m_a / UINT8_MAX)
 		};
 	}
 

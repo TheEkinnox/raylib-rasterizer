@@ -22,6 +22,12 @@ My::Mesh::Mesh(const std::vector<Vertex>& p_vertices, const std::vector<size_t>&
 
 	this->m_vertices = p_vertices;
 	this->m_indices = p_indices;
+
+	for (auto& vertex : m_vertices)
+	{
+		if (vertex.m_color.m_a != UINT8_MAX)
+			updateColor(vertex.m_color);
+	}
 }
 
 std::vector<My::Vertex> My::Mesh::getVertices() const
@@ -34,8 +40,10 @@ std::vector<size_t> My::Mesh::getIndices() const
 	return m_indices;
 }
 
-My::Mesh* My::Mesh::createCube(const Color& p_color)
+My::Mesh* My::Mesh::createCube(Color p_color)
 {
+	updateColor(p_color);
+
 	const std::vector<Vertex> vertices
 	{
 		//up
@@ -71,6 +79,7 @@ My::Mesh* My::Mesh::createCube(const Color& p_color)
 	};
 
 	std::vector<size_t> indices(36); // 6 faces * 2 triangles * 3 points
+	//std::vector<size_t> indices; // 6 faces * 2 triangles * 3 points
 
 	for (size_t i = 0; i < vertices.size(); i += 4) //4 vertex is one face
 	{
@@ -84,51 +93,14 @@ My::Mesh* My::Mesh::createCube(const Color& p_color)
 		indices.push_back(i + 3);
 	}
 
-	/*
-	{
-		// Front
-		1, 0, 2,
-		2, 3, 1,
-
-		// Bottom
-		3, 2, 7,
-		7, 2, 6,
-
-		// Left
-		6, 2, 0,
-		6, 0, 4,
-
-		// Back
-		6, 4, 5,
-		5, 7, 6,
-
-		// Right
-		7, 5, 3,
-		3, 5, 1,
-
-		// Top
-		1, 5, 4,
-		4, 0, 1
-	};
-	*/
-	//normal test
-	// auto m1 = new Mesh(vertices, indices);
-	// auto m2 = new Mesh(*m1);
-
-	// m2->CalculateNormals();
-
-	// for (auto& v : m1->m_vertices)
-	// 	std::cout << v.m_normal << std::endl;
-	// std::cout << "my normals" << std::endl;
-	// for (auto& v : m2->m_vertices)
-	// 	std::cout << v.m_normal << std::endl;
-
 	return new Mesh(vertices, indices);
 }
 
-My::Mesh* My::Mesh::createSphere(const uint32_t p_latitudeCount, const uint32_t p_longitudeCount,
-	const Color& p_color)
+My::Mesh* My::Mesh::createSphere(	const uint32_t p_latitudeCount, const uint32_t p_longitudeCount,
+									Color p_color)
 {
+	updateColor(p_color);
+
 	const float deltaPhi = LibMath::g_pi / static_cast<float>(p_latitudeCount);
 	const float deltaTheta = LibMath::g_pi * 2.f / static_cast<float>(p_longitudeCount);
 
@@ -216,7 +188,7 @@ My::Mesh* My::Mesh::createSphere(const uint32_t p_latitudeCount, const uint32_t 
 	/*auto m1 = new Mesh(vertices, indices);
 	auto m2 = new Mesh(*m1);
 
-	m2->CalculateNormals();
+	m2->calculateNormals();
 
 	for (auto& v : m1->m_vertices)
 		std::cout << v.m_normal << std::endl;
@@ -238,7 +210,12 @@ My::Mesh* My::Mesh::createSphere(const uint32_t p_latitudeCount, const uint32_t 
 	return new Mesh(vertices, indices);
 }
 
-void My::Mesh::CalculateNormals()
+void My::Mesh::updateColor(Color& p_color)
+{
+	p_color = p_color.m_a != UINT8_MAX ? p_color.blend(Color::black) : p_color;
+}
+
+void My::Mesh::calculateNormals()
 {
 	Vec3* A, *B, *C;
 	Vec3 BC, BA, normal;

@@ -36,6 +36,7 @@ namespace My
 	public:
 		/**
 		 * \brief Creates a mesh with the given set of vertices and indices
+		 * \brief Vertex color converted to opaque Color if transparent
 		 * \param p_vertices The vertex buffer of the mesh
 		 * \param p_indices The index buffer of the mesh
 		 */
@@ -86,14 +87,14 @@ namespace My
 		/**
 		* \brief Calculates the normal of each Vertex
 		*/
-		void CalculateNormals();
+		void calculateNormals();
 
 		/**
 		 * \brief Creates a cube of side 1
 		 * \param p_color The color of the cube (white by default)
 		 * \return A pointer to the created cube mesh
 		 */
-		static Mesh* createCube(const Color& p_color = Color::white);
+		static Mesh* createCube(Color p_color = Color::white);
 
 		/**
 		 * \brief Creates a sphere of radius 1 with the given number of subdivisions
@@ -102,12 +103,14 @@ namespace My
 		 * \param p_color The color of the sphere (white by default)
 		 * \return A pointer to the created sphere mesh
 		 */
-		static Mesh* createSphere(uint32_t p_latitudeCount, uint32_t p_longitudeCount,
-			const Color& p_color = Color::white);
+		static Mesh* createSphere(	uint32_t p_latitudeCount, uint32_t p_longitudeCount,
+									Color p_color = Color::white);
 
 	private:
 		std::vector<Vertex> m_vertices;
 		std::vector<size_t> m_indices;
+
+		static void updateColor(Color& p_color);
 	};
 
 }

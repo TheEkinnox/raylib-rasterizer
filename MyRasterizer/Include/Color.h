@@ -37,6 +37,12 @@ namespace My
 		Color& aditionClamp(const LibMath::Vector3& p_rgb);
 
 		/// <summary>
+		/// Blend from this as a source to the destination
+		/// </summary>
+		/// <returns></returns>
+		Color& blend(const Color& p_dest);
+
+		/// <summary>
 		/// Get the Red, Green and Blue values in a Vector3
 		/// </summary>
 		LibMath::Vector3 rgb()const;

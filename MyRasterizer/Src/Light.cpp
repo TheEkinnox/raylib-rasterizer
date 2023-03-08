@@ -10,7 +10,7 @@ My::Light::Light(Vec3 p_position, float p_ambientComponent, float p_diffuseCompo
 	m_diffuseComponent = LibMath::clamp(p_diffuseComponent, 0, 1);
 	m_specularComponent = LibMath::clamp(p_specularComponent, 0, 1);
 
-	m_intensity = Vec3(1); //how much rgb light it emits [0,1]
+	m_intensity = Vec3(2); //how much rgb light it emits [0,1]
 }
 
 My::Color My::Light::CalculateLightingPhong(	const Vertex& p_vertex, const Vec3& p_observer,
