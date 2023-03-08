@@ -1,6 +1,7 @@
 #pragma once
 #include <cstdint>
 #include "Vector/Vector3.h"
+#include "Vector/Vector2.h"
 
 namespace My
 {
@@ -91,6 +92,14 @@ namespace My
 		static Color	lerp(const Color& a, const Color& b, float t);
 
 		Color& operator*=(const Color& color);
+
+		/// <summary>
+		/// bilinear interpolation
+		/// </summary>
+		static Color bLerp(	const Color p_colors[4], LibMath::Vector2 p_point,
+							const LibMath::Vector2& p_min, const LibMath::Vector2& p_max);
+
+		static Color bLerp(	const Color p_colors[4], LibMath::Vector2 p_point);
 	};
 }
 
