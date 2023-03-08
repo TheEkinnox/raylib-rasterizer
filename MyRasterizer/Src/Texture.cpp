@@ -77,6 +77,9 @@ My::Color My::Texture::getPixelColor(const uint32_t p_x, const uint32_t p_y) con
 My::Color My::Texture::getPixelColorBlerp(	float p_x, float p_y,
 											LibMath::Vector2 p_deltaTriangleBounds) const
 {
+	if (p_deltaTriangleBounds.m_x == 0 || p_deltaTriangleBounds.m_y == 0) // TODO : texture blerp delta (0,0) deal with them with lerp 
+		return m_pixels[static_cast<size_t>(LibMath::round(p_y) * m_width + LibMath::round(p_x))];
+
 	LibMath::Vector2 deltaRatio = LibMath::Vector2(	static_cast<float>(m_height), 
 													static_cast<float>(m_width)) / p_deltaTriangleBounds;
 
@@ -87,9 +90,6 @@ My::Color My::Texture::getPixelColorBlerp(	float p_x, float p_y,
 	min.m_y = min.m_y < 0 ? 0 : min.m_x;
 	max.m_x = max.m_x >= m_width  ? static_cast<float>(m_width) - 1.0f : max.m_x;
 	max.m_y = max.m_y >= m_height ? static_cast<float>(m_height) - 1.0f : max.m_y;
-
-	if ((max.m_y * m_width + max.m_x) == m_width * m_height)
-		int i = 0;
 
 	Color colorsAround[4]
 	{
