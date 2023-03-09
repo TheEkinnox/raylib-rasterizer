@@ -37,6 +37,7 @@ int main()
 
 	LibMath::Matrix4 transform = LibMath::Matrix4::translation(0, 0, -3) * LibMath::Matrix4::scaling(2, 2, 2);
 	scene.addEntity(My::Entity(*cube, transform));
+	scene.getEntity(0).rotateEulerAngles(-30_deg, 45_rad, 0_rad);
 
 	transform = LibMath::Matrix4::translation(0, 1, -2);
 	scene.addEntity(My::Entity(*scene.getMesh("sphereR"), transform));

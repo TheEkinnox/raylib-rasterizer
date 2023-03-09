@@ -163,6 +163,18 @@ namespace My
 		const LibMath::Vector2 vs2(points[2].m_x - points[0].m_x,
 			points[2].m_y - points[0].m_y);
 
+		// Delta Triangle size * delta UV's
+		float deltaU =	LibMath::max(LibMath::max(p_vertices[0].m_u, p_vertices[1].m_u), p_vertices[2].m_u) -
+						LibMath::min(LibMath::min(p_vertices[0].m_u, p_vertices[1].m_u), p_vertices[2].m_u);
+		float deltaV =	LibMath::max(LibMath::max(p_vertices[0].m_v, p_vertices[1].m_v), p_vertices[2].m_v) -
+						LibMath::min(LibMath::min(p_vertices[0].m_v, p_vertices[1].m_v), p_vertices[2].m_v);
+
+		if (deltaU == 0 || deltaV == 0)
+			int i = 0;
+
+		const LibMath::Vector2 deltaTriangleBounds = LibMath::Vector2(	static_cast<float>(maxX - minX) * deltaU,
+																		static_cast<float>(maxY - minY) * deltaV);
+
 		for (int x = minX; x <= maxX; x++)
 		{
 			for (int y = minY; y <= maxY; y++)
@@ -200,7 +212,8 @@ namespace My
 							float textureX = (u - LibMath::floor(u)) * p_texture->getWidth();
 							float textureY = (v - LibMath::floor(v)) * p_texture->getHeight();
 
-							pixelColor *= p_texture->getPixelColor((uint32_t)LibMath::round(textureX), (uint32_t)LibMath::round(textureY));
+							//pixelColor *= p_texture->getPixelColor((uint32_t)LibMath::round(textureX), (uint32_t)LibMath::round(textureY));
+							pixelColor *= p_texture->getPixelColorBlerp(textureX, textureY, deltaTriangleBounds); //blerp for fuzzy image
 						}
 
 						if (!p_lights.empty())
