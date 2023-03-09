@@ -118,7 +118,13 @@ namespace My
 		if (delta.m_x != 0.f)
 			t = (p_point.m_x - p_min.m_x) / delta.m_x;
 		else
-			t = 0;
+			t = 1;
+
+		for (size_t i = 0; i < 4; i++)
+		{
+			if (p_colors[i] == nullptr)
+				int i = 0;
+		}
 
 		c1 = lerp(*p_colors[0], *p_colors[1], t);		// Q11 + t*Q21
 		c2 = lerp(*p_colors[2], *p_colors[3], t);		// Q12 + t*Q22
@@ -126,10 +132,10 @@ namespace My
 		if (delta.m_y != 0.f)
 			t = (p_point.m_y - p_min.m_y) / delta.m_y;
 		else
-			t = 0;
+			t = 1;
 
 		c3 = lerp(c1, c2, t);						// R12 + t*R22
-
+		
 		return c3;
 	}
 
