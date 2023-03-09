@@ -80,14 +80,14 @@ My::Color My::Texture::getPixelColorBlerp(	float p_x, float p_y,
 	if (p_deltaTriangleBounds.m_x == 0 || p_deltaTriangleBounds.m_y == 0) // TODO : texture blerp delta (0,0) deal with them with lerp 
 		return m_pixels[static_cast<size_t>(LibMath::round(p_y) * m_width + LibMath::round(p_x))];
 
-	LibMath::Vector2 deltaRatio = LibMath::Vector2(	static_cast<float>(m_height), 
-													static_cast<float>(m_width)) / p_deltaTriangleBounds;
+	LibMath::Vector2 deltaRatio = LibMath::Vector2(	static_cast<float>(m_width),
+													static_cast<float>(m_height)) / p_deltaTriangleBounds;
 
 	LibMath::Vector2 min(LibMath::round(p_x - deltaRatio.m_x / 2),	LibMath::round(p_y - deltaRatio.m_y / 2));
 	LibMath::Vector2 max(LibMath::round(p_x + deltaRatio.m_x / 2),	LibMath::round(p_y + deltaRatio.m_y / 2));
 
 	min.m_x = min.m_x < 0 ? 0 : min.m_x;
-	min.m_y = min.m_y < 0 ? 0 : min.m_x;
+	min.m_y = min.m_y < 0 ? 0 : min.m_y;
 	max.m_x = max.m_x >= m_width  ? static_cast<float>(m_width) - 1.0f : max.m_x;
 	max.m_y = max.m_y >= m_height ? static_cast<float>(m_height) - 1.0f : max.m_y;
 
