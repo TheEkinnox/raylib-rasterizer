@@ -71,7 +71,7 @@ int main()
 	//const Mat4 projMat = Mat4::orthographicProjection(-6, 6, -6, 6, 0.1f, 200.f);
 	const Mat4 projMat = Mat4::perspectiveProjection(90_deg, ASPECT, 0.1f, 200.f);
 
-	My::Rasterizer rasterizer;
+	My::Rasterizer rasterizer(2.0f);
 	rasterizer.renderScene(scene, texture, projMat);
 
 	// Create the texture

@@ -11,24 +11,59 @@
 
 namespace My
 {
+	Rasterizer::Rasterizer(float p_msaaValue)
+	{
+		m_msaaValue = LibMath::abs(p_msaaValue);
+		m_msaaTexture = nullptr;
+	}
+
 	void Rasterizer::renderScene(const Scene& p_scene, Texture& p_target,
 		const Mat4& p_projectionMatrix)
 	{
-		// Set every pixel to black
-		for (uint32_t x = 0; x < p_target.getWidth(); x++)
-			for (uint32_t y = 0; y < p_target.getHeight(); y++)
-				p_target.setPixelColor(x, y, Color::black);
+		if (m_msaaValue == 1 && m_msaaTexture.get() != &p_target)
+			m_msaaTexture.reset(&p_target);
+		else
+		{
+			uint32_t msaaWidth = static_cast<uint32_t>(m_msaaValue * p_target.getWidth());
+			uint32_t msaaheight = static_cast<uint32_t>(m_msaaValue * p_target.getHeight());
 
-		const size_t textureSize = static_cast<size_t>(p_target.getWidth())
-			* p_target.getHeight();
+			if (m_msaaTexture == nullptr ||
+				!(m_msaaTexture->getWidth() == msaaWidth &&
+				m_msaaTexture->getHeight() == msaaheight)) //not same size
+			{
+				m_msaaTexture = std::make_shared<Texture>(Texture(msaaWidth, msaaheight));
+			}
+		}
+
+		// Set every pixel to black
+		for (uint32_t x = 0; x < m_msaaTexture->getWidth(); x++)
+			for (uint32_t y = 0; y < m_msaaTexture->getHeight(); y++)
+				m_msaaTexture->setPixelColor(x, y, Color::black);
+
+		const size_t textureSize = static_cast<size_t>(m_msaaTexture->getWidth())
+			* m_msaaTexture->getHeight();
 
 		m_zBuffer.clear();
 		m_zBuffer.resize(textureSize, INFINITY);
 
 		for (const auto& entity : p_scene.getEntities())
 		{
-			drawEntity(entity, p_target, p_projectionMatrix, p_scene.getLights(), LibMath::Vector3::zero());
+			drawEntity(entity, *m_msaaTexture, p_projectionMatrix, p_scene.getLights(), LibMath::Vector3::zero());
 			//drawNormals(entity, p_target, p_scene.getLights(), LibMath::Vector3::zero());
+		}
+		
+		LibMath::Vector2 deltaSize(	static_cast<float>(p_target.getWidth()), 
+									static_cast<float>(p_target.getHeight()));
+
+		if (m_msaaTexture.get() == &p_target) //if already drawn on p_texture
+			return;
+
+		for (uint32_t i = 0; i < p_target.getWidth(); i++) //draw form msaa to p_texture
+		{
+			for (uint32_t j = 0; j < p_target.getHeight(); j++)
+				p_target.setPixelColor(i, j, 
+					m_msaaTexture->getPixelColorBlerp(	this->m_msaaValue * static_cast<float>(i) + this->m_msaaValue / 2.f,
+														this->m_msaaValue * static_cast<float>(j) + this->m_msaaValue / 2.f, deltaSize));
 		}
 	}
 

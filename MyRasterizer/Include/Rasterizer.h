@@ -20,7 +20,11 @@ namespace My
 		using Mat4 = LibMath::Matrix4;
 
 	public:
-		Rasterizer() = default;
+
+		Rasterizer() : Rasterizer(1.0f)
+		{}
+
+		Rasterizer(float p_msaaValue);
 
 		/**
 		 * \brief Creates a move copy of the given rasterizer
@@ -107,5 +111,7 @@ namespace My
 
 	private:
 		std::vector<float>	m_zBuffer;
+		float m_msaaValue;
+		std::shared_ptr<Texture> m_msaaTexture;
 	};
 }
