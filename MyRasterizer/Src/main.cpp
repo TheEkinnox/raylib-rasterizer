@@ -67,9 +67,8 @@ int main()
 	scene.addLight(My::Light(lightPos, 0.1f, 0.5f, 0.4f, 8));
 
 	My::Texture texture(SCREEN_WIDTH, SCREEN_HEIGHT);
-
-	//const Mat4 projMat = Mat4::orthographicProjection(-6, 6, -6, 6, 0.1f, 200.f);
-	const Mat4 projMat = Mat4::perspectiveProjection(90_deg, ASPECT, 0.1f, 200.f);
+	
+	const Mat4 projMat = Mat4::perspectiveProjection(90_deg, ASPECT, FLT_EPSILON, 200.f);
 
 	My::Rasterizer rasterizer;
 	rasterizer.renderScene(scene, texture, projMat);
