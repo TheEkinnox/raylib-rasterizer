@@ -35,7 +35,7 @@ namespace My
 		~Scene();
 
 		Scene&				operator=(const Scene& p_other) = default;
-		Scene&				operator=(Scene&& p_other) = default;
+		Scene&				operator=(Scene&& p_other) noexcept;
 
 		const Mesh*			addMesh(const std::string& p_name, Mesh& p_mesh);
 		const Mesh*			getMesh(const std::string& p_name);
@@ -44,6 +44,8 @@ namespace My
 		void				addLight(const Light& p_light);
 
 		std::vector<Entity>	getEntities() const;
+		std::vector<Entity>&	getEntities();
+
 		Entity&				getEntity(size_t index);
 		std::vector<Light>	getLights() const;
 
