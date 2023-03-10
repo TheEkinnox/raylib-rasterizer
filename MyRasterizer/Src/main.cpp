@@ -10,9 +10,13 @@
 #include "Angle.h"
 
 constexpr auto SCREEN_WIDTH = 800;
-constexpr auto SCREEN_HEIGHT = 800;
+constexpr auto SCREEN_HEIGHT = 600;
+constexpr auto ASPECT = static_cast<float>(SCREEN_WIDTH) /
+static_cast<float>(SCREEN_HEIGHT);
 
 using namespace LibMath::Literal;
+
+using Mat4 = LibMath::Matrix4;
 
 int main()
 {
@@ -20,31 +24,76 @@ int main()
 	InitWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "Rasterize me baby");
 
 	My::Scene scene;
-	
-	
+
+
 	My::Mesh* cube = My::Mesh::createCube();
-	const char* path = GetWorkingDirectory();
-	My::Texture textureWrapper("../img/container.png");
-	cube->setTexture(&textureWrapper);
-	LibMath::Matrix4 transform = LibMath::Matrix4::translation(0, 0, 2) * LibMath::Matrix4::scaling(2,2,2);
-	scene.addEntity(My::Entity(*cube, transform));
-	scene.getEntity(0).rotateEulerAngles(-30_deg, 45_rad, 0_rad);
+	const My::Texture containerTexture("../img/container.png");
+	cube->setTexture(&containerTexture);
+	scene.addMesh("cube", *cube);
+
+	scene.addMesh("sphereW", *My::Mesh::createSphere(8, 8, My::Color::white));
+	scene.addMesh("sphereR", *My::Mesh::createSphere(16, 16, My::Color::red));
+	scene.addMesh("sphereG", *My::Mesh::createSphere(16, 16, My::Color::green));
+	scene.addMesh("sphereB", *My::Mesh::createSphere(16, 16, My::Color::blue));
+
+	LibMath::Matrix4 transform = LibMath::Matrix4::translation(0, 0, -2) * LibMath::Matrix4::scaling(1.25f, 1.25f, 1.25f);
+	scene.addEntity(My::Entity(*scene.getMesh("cube"), 0.25f, transform));
+
+	transform = LibMath::Matrix4::translation(0, 1.f, -3);
+	scene.addEntity(My::Entity(*scene.getMesh("sphereR"), transform));
+
+	transform = LibMath::Matrix4::translation(-1.f, -1.f, -3);
+	scene.addEntity(My::Entity(*scene.getMesh("sphereG"), transform));
+
+	transform = LibMath::Matrix4::translation(1.f, -1.f, -3);
+	scene.addEntity(My::Entity(*scene.getMesh("sphereB"), transform));
 
 	//light
-	scene.addLight(My::Light(LibMath::Vector3(0, 0, -10), 0.2f, 0.4f, 0.4f));
+	const LibMath::Matrix4 lightScale = LibMath::Matrix4::scaling(.1f, .1f, .1f);
+
+	LibMath::Vector3 lightPos = LibMath::Vector3(0, 2.f, -1);
+	transform = LibMath::Matrix4::translation(lightPos.m_x, lightPos.m_y, lightPos.m_z) * lightScale;
+	scene.addEntity(My::Entity(*scene.getMesh("sphereW"), transform));
+	scene.addLight(My::Light(lightPos, 0.1f, 0.5f, 0.4f, 8));
+
+	lightPos = LibMath::Vector3(-2.f, -2.f, -1);
+	transform = LibMath::Matrix4::translation(lightPos.m_x, lightPos.m_y, lightPos.m_z) * lightScale;
+	scene.addEntity(My::Entity(*scene.getMesh("sphereW"), transform));
+	scene.addLight(My::Light(lightPos, 0.1f, 0.5f, 0.4f, 8));
+
+	lightPos = LibMath::Vector3(2.f, -2.f, -1);
+	transform = LibMath::Matrix4::translation(lightPos.m_x, lightPos.m_y, lightPos.m_z) * lightScale;
+	scene.addEntity(My::Entity(*scene.getMesh("sphereW"), transform));
+	scene.addLight(My::Light(lightPos, 0.1f, 0.5f, 0.4f, 8));
 
 	My::Texture texture(SCREEN_WIDTH, SCREEN_HEIGHT);
+	
+	const Mat4 projMat = Mat4::perspectiveProjection(90_deg, ASPECT, .1f, 200.f);
 
 	My::Rasterizer rasterizer;
-	rasterizer.renderScene(scene, texture);
+	rasterizer.renderScene(scene, texture, projMat);
 
 	// Create the texture
-	const RenderTexture2D target = LoadRenderTexture(static_cast<int>(texture.getWidth()), static_cast<int>(texture.getHeight()));
+	const RenderTexture2D target = LoadRenderTexture(static_cast<int>(texture.getWidth()),
+		static_cast<int>(texture.getHeight()));
 
 	// Main game loop
 	while (!WindowShouldClose())
 	{
 		// Update
+		if (IsKeyPressed(KEY_F1))
+		{
+			rasterizer.toggleWireFrameMode();
+			rasterizer.renderScene(scene, texture, projMat);
+		}
+
+		if (IsKeyDown(KEY_R))
+		{
+			for (auto& entity : scene.getEntities())
+				entity.rotateEulerAngles(1_deg, 1_deg, 0_rad);
+
+			rasterizer.renderScene(scene, texture, projMat);
+		}
 
 		// Draw
 		BeginDrawing();
@@ -61,7 +110,7 @@ int main()
 			for (int y = 0; y < static_cast<int>(texture.getHeight()); y++)
 			{
 				const My::Color myColor(texture.getPixelColor(x, y));
-				const Color rlColor{myColor.m_r, myColor.m_g, myColor.m_b, myColor.m_a};
+				const Color rlColor{ myColor.m_r, myColor.m_g, myColor.m_b, myColor.m_a };
 
 				DrawPixel(x, y, rlColor);
 			}
@@ -72,14 +121,14 @@ int main()
 
 		// Draw the render texture to the screen
 		DrawTexturePro(target.texture, {
-			               0, 0, static_cast<float>(target.texture.width),
-			               -static_cast<float>(target.texture.height)
-		               },
-		               {
-			               0, 0, static_cast<float>(GetScreenWidth()),
-			               static_cast<float>(GetScreenHeight())
-		               },
-		               {0, 0}, 0, WHITE);
+						   0, 0, static_cast<float>(target.texture.width),
+						   -static_cast<float>(target.texture.height)
+			},
+					   {
+						   0, 0, static_cast<float>(GetScreenWidth()),
+						   static_cast<float>(GetScreenHeight())
+					   },
+			{ 0, 0 }, 0, WHITE);
 
 		// End drawing
 		EndDrawing();

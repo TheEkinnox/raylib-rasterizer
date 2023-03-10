@@ -44,6 +44,8 @@ namespace My
 		void				addLight(const Light& p_light);
 
 		std::vector<Entity>	getEntities() const;
+		std::vector<Entity>&	getEntities();
+
 		Entity&				getEntity(size_t index);
 		std::vector<Light>	getLights() const;
 

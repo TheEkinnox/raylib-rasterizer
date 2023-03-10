@@ -259,6 +259,12 @@ namespace LibMath
 		*this += vect;
 	}
 
+	bool Vector2::inBounds(Vector2 const& p_min, Vector2 const& p_max)const
+	{
+		return	this->m_x >= p_min.m_x && this->m_x <= p_max.m_x &&
+				this->m_y >= p_min.m_y && this->m_y <= p_max.m_y;
+	}
+
 	bool operator==(Vector2 const& lhs, Vector2 const& rhs)
 	{
 		return floatEquals(lhs.m_x, rhs.m_x)

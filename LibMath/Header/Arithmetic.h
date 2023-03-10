@@ -68,6 +68,12 @@ namespace LibMath
 	 */
 	float	min(float a, float b);
 
+	template<typename T>
+	T		min(T a, T b)
+	{
+		return a < b ? a : b;
+	}
+
 	/**
 	 * \brief Returns the largest of two given values
 	 * \param a The first value
@@ -75,6 +81,12 @@ namespace LibMath
 	 * \return a if a > b. b otherwise
 	 */
 	float	max(float a, float b);
+
+	template<typename T>
+	T		max(T a, T b)
+	{
+		return a > b ? a : b;
+	}
 
 	/**
 	 * \brief Returns the absolute value of the given number
