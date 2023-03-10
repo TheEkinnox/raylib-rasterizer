@@ -11,7 +11,7 @@ namespace My
 	class Texture;
 	class Scene;
 
-	typedef std::function<void(const Vertex p_vertices[3], Texture& p_target, std::vector<float>& p_zBuffer)> drawFunc;
+	typedef std::function<void(const Vertex p_vertices[3], Texture& p_target, std::vector<float>& p_zBuffer)> DrawFunc;
 
 	class Rasterizer
 	{
@@ -61,14 +61,16 @@ namespace My
 		 * \brief Draws the received entity on the target texture
 		 * \param p_entity The entity to draw
 		 * \param p_target The texture on which the entity should be drawn
-		 * \param 
+		 * \param p_light The light source illuminating the drawn entity
+		 * \param p_draw The triangle drawing function to use
 		 */
-		void drawEntity(const Entity& p_entity, Texture& p_target, const Light& p_light, drawFunc p_draw);
+		void drawEntity(const Entity& p_entity, Texture& p_target, const Light& p_light, DrawFunc p_draw);
 
 		/**
 		 * \brief Draws the entity's normals on the target texture
 		 * \param p_entity The entity to draw
 		 * \param p_target The texture on which the entity should be drawn
+		 * \param p_light The light source illuminating the drawn entity
 		 */
 		void drawNormals(const Entity& p_entity, Texture& p_target, const Light& p_light);
 
@@ -76,8 +78,16 @@ namespace My
 		 * \brief Draws the received triangle on the target texture
 		 * \param p_vertices The triangle to draw
 		 * \param p_target The texture on which the triangle should be drawn
+		 * \param p_zBuffer A reference to the rasterizer's zBuffer
 		 */
 		static void drawTriangleFill(		const Vertex p_vertices[3], Texture& p_target, std::vector<float>& p_zBuffer);
+
+		/**
+		 * \brief Draws the received triangle's edges on the target texture
+		 * \param p_vertices The triangle to draw
+		 * \param p_target The texture on which the triangle should be drawn
+		 * \param p_zBuffer A reference to the rasterizer's zBuffer
+		 */
 		static void drawTriangleWireFrame(	const Vertex p_vertices[3], Texture& p_target, std::vector<float>& p_zBuffer);
 
 		void toggleWireFrameMode();
@@ -92,8 +102,8 @@ namespace My
 			E_WIRE_FRAME
 		};
 
-		e_drawMode m_drawMode;
-		drawFunc m_drawTriangle = &Rasterizer::drawTriangleFill;
+		e_drawMode m_drawMode = e_drawMode::E_FILL;
+		DrawFunc m_drawTriangle = &Rasterizer::drawTriangleFill;
 
 		static LibMath::Vector2 pointOnTriangleEdge(	LibMath::Vector2 p_point, const LibMath::Vector2& p_triangleP1,
 														const LibMath::Vector2& p_triangleP2);

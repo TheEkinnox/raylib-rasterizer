@@ -22,12 +22,6 @@ My::Mesh::Mesh(const std::vector<Vertex>& p_vertices, const std::vector<size_t>&
 
 	this->m_vertices = p_vertices;
 	this->m_indices = p_indices;
-
-	for (auto& vertex : m_vertices)
-	{
-		if (vertex.m_color.m_a != UINT8_MAX)
-			updateColor(vertex.m_color);
-	}
 }
 
 std::vector<My::Vertex> My::Mesh::getVertices() const
@@ -42,8 +36,6 @@ std::vector<size_t> My::Mesh::getIndices() const
 
 My::Mesh* My::Mesh::createCube(Color p_color)
 {
-	updateColor(p_color);
-
 	const std::vector<Vertex> vertices
 	{
 		//up
@@ -99,8 +91,6 @@ My::Mesh* My::Mesh::createCube(Color p_color)
 My::Mesh* My::Mesh::createSphere(	const uint32_t p_latitudeCount, const uint32_t p_longitudeCount,
 									Color p_color)
 {
-	updateColor(p_color);
-
 	const float deltaPhi = LibMath::g_pi / static_cast<float>(p_latitudeCount);
 	const float deltaTheta = LibMath::g_pi * 2.f / static_cast<float>(p_longitudeCount);
 
@@ -208,11 +198,6 @@ My::Mesh* My::Mesh::createSphere(	const uint32_t p_latitudeCount, const uint32_t
 	}*/
 
 	return new Mesh(vertices, indices);
-}
-
-void My::Mesh::updateColor(Color& p_color)
-{
-	p_color = p_color.m_a != UINT8_MAX ? p_color.blend(Color::black) : p_color;
 }
 
 void My::Mesh::calculateNormals()

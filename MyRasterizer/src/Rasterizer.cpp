@@ -8,7 +8,6 @@
 #include "Light.h"
 #include "Vector/Vector2.h"
 #include "Vector/Vector4.h"
-#include <Interpolation.h>
 #include <functional>
 
 namespace My
@@ -26,15 +25,16 @@ namespace My
 		m_zBuffer.clear();
 		m_zBuffer.resize(textureSize, INFINITY);
 
-		auto entities = p_scene.getEntities();
+		const auto entities = p_scene.getEntities();
 		std::vector<const Entity*> transparentEntities;
 
 		for (const auto& entity : entities)
 		{
-			if (entity.getTransparency() == 1)
+			// Draw the opaque entities and defer the transparent ones' rendering
+			if (entity.isOpaque())
 				drawEntity(entity, p_target, p_scene.getLights()[0], m_drawTriangle);
-			else //if transparent 
-				transparentEntities.push_back(&entity);//add to vector to draw afterwards
+			else
+				transparentEntities.push_back(&entity);
 			
 			//drawNormals(entity, p_target, p_scene.getLights()[0]);
 		}
@@ -74,20 +74,18 @@ namespace My
 		}
 	}
 
-	void Rasterizer::drawEntity(const Entity& p_entity, Texture& p_target, const Light& p_light, drawFunc p_draw)
+	void Rasterizer::drawEntity(const Entity& p_entity, Texture& p_target, const Light& p_light, const DrawFunc p_draw)
 	{
 		if (p_entity.getMesh() != nullptr)
 		{
 			auto vertices = p_entity.getMesh()->getVertices();
-			auto indices = p_entity.getMesh()->getIndices();
+			const auto indices = p_entity.getMesh()->getIndices();
 
 			std::map<size_t, Color> vertexLightColor;
 
 			//calculate light
-			for (size_t i = 0; i < vertices.size(); i++)
+			for (auto& v : vertices)
 			{
-				Vertex& v = vertices[i];
-
 				{
 					auto& pos = v.m_position; //update pos
 					auto vec4 = LibMath::Vector4{ pos.m_x, pos.m_y, pos.m_z, 1.f };
@@ -102,34 +100,20 @@ namespace My
 					nor = { vec4.m_x, vec4.m_y, vec4.m_z };
 				}
 
-				if (m_drawMode == e_drawMode::E_FILL)
-				{
-					v.m_color = p_light.CalculateLightingPhong(v, LibMath::Vector3::zero());
-				}
 				v.m_color.m_a = static_cast<uint8_t>(static_cast<float>(v.m_color.m_a) * p_entity.getTransparency());
+
+				if (m_drawMode == e_drawMode::E_FILL)
+					v.m_color = p_light.CalculateLightingPhong(v, LibMath::Vector3::zero());
 			}
 
 			for (size_t i = 0; i + 2 < indices.size(); i += 3)
 			{
-				Vertex triangle[3]
+				const Vertex triangle[3]
 				{
 					vertices[indices[i]],
 					vertices[indices[i + 1]],
 					vertices[indices[i + 2]]
 				};
-
-				//triangle[0].m_color = vertexLightColor[indices[i]];
-				//triangle[1].m_color = vertexLightColor[indices[i + 1]];
-				//triangle[2].m_color = vertexLightColor[indices[i + 2]];
-
-				//for (Vertex& vertex : triangle)
-				//{
-				//	auto& pos = vertex.m_position;
-				//	auto vec4 = LibMath::Vector4{ pos.m_x, pos.m_y, pos.m_z, 1.f };
-
-				//	vec4 = p_entity.getTransform() * vec4;
-				//	pos = { vec4.m_x, vec4.m_y, vec4.m_z };
-				//}
 
 				p_draw(triangle, p_target, m_zBuffer);
 			}
@@ -243,9 +227,8 @@ namespace My
 				const float t = q.cross(vs2) / vs1.cross(vs2);
 				const float w = vs1.cross(q) / vs1.cross(vs2);
 				const float s = 1 - t - w;
-				const LibMath::Vector2 pixelPos(static_cast<float>(x), static_cast<float>(y));
 				
-				if (Rasterizer::fillCanDrawPixel(LibMath::Vector3(s,t,w)))
+				if (fillCanDrawPixel(LibMath::Vector3(s,t,w)))
 				{
 					const size_t bufferIndex = static_cast<size_t>(y) * p_target.getWidth() + x;
 
@@ -257,11 +240,12 @@ namespace My
 						+ p_vertices[1].m_color * t
 						+ p_vertices[2].m_color * w;
 
+					// Round up alpha to account for precision loss
 					pixelColor.m_a = pixelColor.m_a >= UINT8_MAX - 2 ? UINT8_MAX : pixelColor.m_a;
 
 					if (pos.m_z < p_zBuffer[bufferIndex])
 					{
-						if (pixelColor.m_a != UINT8_MAX) //if transparent lerp from current color to new color
+						if (pixelColor.m_a != UINT8_MAX)
 							pixelColor.blend(p_target.getPixelColor(x, y));
 						else
 							p_zBuffer[bufferIndex] = pos.m_z;
@@ -342,7 +326,7 @@ namespace My
 				const float s = 1 - t - w;
 				const LibMath::Vector2 pixelPos(static_cast<float>(x), static_cast<float>(y));
 
-				if (Rasterizer::wireFrameCanDrawPixel(pixelPos, trianglePoints, LibMath::Vector3(s, t, w)))
+				if (wireFrameCanDrawPixel(pixelPos, trianglePoints, LibMath::Vector3(s, t, w)))
 				{
 					const size_t bufferIndex = static_cast<size_t>(y) * p_target.getWidth() + x;
 
@@ -352,12 +336,6 @@ namespace My
 
 					if (pos.m_z < p_zBuffer[bufferIndex])
 					{
-						const size_t bufferIndex = static_cast<size_t>(y) * p_target.getWidth() + x;
-
-						const LibMath::Vector3 pos = p_vertices[0].m_position * s
-							+ p_vertices[1].m_position * t
-							+ p_vertices[2].m_position * w;
-
 						Color pixelColor = p_vertices[0].m_color * s
 							+ p_vertices[1].m_color * t
 							+ p_vertices[2].m_color * w;
@@ -380,12 +358,12 @@ namespace My
 		{
 			switch (m_drawMode)
 			{
-			case My::Rasterizer::e_drawMode::E_FILL:
-				m_drawMode = My::Rasterizer::e_drawMode::E_WIRE_FRAME;
+			case e_drawMode::E_FILL:
+				m_drawMode = e_drawMode::E_WIRE_FRAME;
 				m_drawTriangle = &Rasterizer::drawTriangleWireFrame;
 				break;
-			case My::Rasterizer::e_drawMode::E_WIRE_FRAME:
-				m_drawMode = My::Rasterizer::e_drawMode::E_FILL;
+			case e_drawMode::E_WIRE_FRAME:
+				m_drawMode = e_drawMode::E_FILL;
 				m_drawTriangle = &Rasterizer::drawTriangleFill;
 				break;
 			default:
@@ -406,7 +384,7 @@ namespace My
 	bool Rasterizer::wireFrameCanDrawPixel(	const LibMath::Vector2& p_pixelPos, const LibMath::Vector2 p_trianglePoints[3],
 											const LibMath::Vector3& p_stw)
 	{
-		return	Rasterizer::fillCanDrawPixel(p_stw) && //is in triangle 
+		return fillCanDrawPixel(p_stw) && //is in triangle 
 				(pointOnTriangleEdge(p_pixelPos, p_trianglePoints[0], p_trianglePoints[1]). //is on an edge
 				inBounds(p_pixelPos - 1, p_pixelPos + 1) ||
 				pointOnTriangleEdge(p_pixelPos, p_trianglePoints[1], p_trianglePoints[2]).

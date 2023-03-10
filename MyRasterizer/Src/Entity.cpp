@@ -1,8 +1,10 @@
 #include "Entity.h"
 
+#include <algorithm>
 #include <utility>
 
 #include "Arithmetic.h"
+#include "Mesh.h"
 #include "Trigonometry.h"
 
 My::Entity::Entity(const Mesh& p_mesh, Mat4 p_transform) :
@@ -258,6 +260,17 @@ const My::Mesh* My::Entity::getMesh() const
 float My::Entity::getTransparency() const
 {
 	return m_transparency;
+}
+
+bool My::Entity::isOpaque() const
+{
+	if (!LibMath::floatEquals(m_transparency, 1.f))
+		return false;
+
+	const auto vertices = m_mesh->getVertices();
+
+	return !std::all_of(vertices.begin(), vertices.end(),
+		[](const Vertex& vertex) { return vertex.m_color.m_a != UINT8_MAX; });
 }
 
 My::Entity::Mat4 My::Entity::getTransform() const

@@ -109,8 +109,6 @@ namespace My
 	private:
 		std::vector<Vertex> m_vertices;
 		std::vector<size_t> m_indices;
-
-		static void updateColor(Color& p_color);
 	};
 
 }

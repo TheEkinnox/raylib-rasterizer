@@ -90,6 +90,12 @@ namespace My
 		/// <returns>Transparency in percent [0,1]</returns>
 		float getTransparency() const;
 
+		/// <summary>
+		/// Checks whether the entity is fully opaque or not
+		/// </summary>
+		/// <returns>True if the entity is fully opaque. False otherwise</returns>
+		bool isOpaque() const;
+
 		#pragma region Transforms
 		/// <summary>
 		/// Get the Mat4 that Scales, Rotates and Translates the Mesh
