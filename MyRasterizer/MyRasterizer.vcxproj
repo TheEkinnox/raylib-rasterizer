@@ -19,6 +19,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Include\App.h" />
     <ClInclude Include="Include\Camera.h" />
     <ClInclude Include="Include\Color.h" />
     <ClInclude Include="Include\Entity.h" />
@@ -31,6 +32,7 @@
     <ClInclude Include="Include\Light.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Src\App.cpp" />
     <ClCompile Include="Src\Camera.cpp" />
     <ClCompile Include="Src\Light.cpp" />
     <ClCompile Include="Src\Color.cpp" />
