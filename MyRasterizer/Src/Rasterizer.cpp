@@ -11,37 +11,37 @@
 
 namespace My
 {
-	Rasterizer::Rasterizer(float p_msaaValue)
+	Rasterizer::Rasterizer(const uint8_t p_sampleCount)
+		: m_sampleCount(p_sampleCount), m_target(nullptr)
 	{
-		m_msaaValue = LibMath::abs(p_msaaValue);
-		m_msaaTexture = nullptr;
+		if (p_sampleCount == 0)
+			throw std::invalid_argument(
+				"Sample count must be greater than or equal to 1. Received: "
+				+ std::to_string(p_sampleCount));
 	}
 
 	void Rasterizer::renderScene(const Scene& p_scene, Texture& p_target,
-		const Mat4& p_projectionMatrix)
+	                             const Mat4& p_projectionMatrix)
 	{
-		if (m_msaaValue == 1 && m_msaaTexture.get() != &p_target)
-			m_msaaTexture.reset(&p_target);
-		else
-		{
-			uint32_t msaaWidth = static_cast<uint32_t>(m_msaaValue * p_target.getWidth());
-			uint32_t msaaheight = static_cast<uint32_t>(m_msaaValue * p_target.getHeight());
+		Texture target = p_target;
 
-			if (m_msaaTexture == nullptr ||
-				!(m_msaaTexture->getWidth() == msaaWidth &&
-				m_msaaTexture->getHeight() == msaaheight)) //not same size
-			{
-				m_msaaTexture = std::make_shared<Texture>(Texture(msaaWidth, msaaheight));
-			}
+		if (!LibMath::floatEquals(m_sampleCount, 1.f) || m_target == &p_target)
+		{
+			const uint32_t msaaWidth = (p_target.getWidth() + 1) * m_sampleCount;
+			const uint32_t msaaHeight = (p_target.getHeight() + 1) * m_sampleCount;
+
+			target = Texture(msaaWidth, msaaHeight);
 		}
 
-		// Set every pixel to black
-		for (uint32_t x = 0; x < m_msaaTexture->getWidth(); x++)
-			for (uint32_t y = 0; y < m_msaaTexture->getHeight(); y++)
-				m_msaaTexture->setPixelColor(x, y, Color::black);
+		m_target = &target;
 
-		const size_t textureSize = static_cast<size_t>(m_msaaTexture->getWidth())
-			* m_msaaTexture->getHeight();
+		// Set every pixel to black
+		for (uint32_t x = 0; x < m_target->getWidth(); x++)
+			for (uint32_t y = 0; y < m_target->getHeight(); y++)
+				m_target->setPixelColor(x, y, Color::black);
+
+		const size_t textureSize = static_cast<size_t>(m_target->getWidth())
+			* m_target->getHeight();
 
 		m_zBuffer.clear();
 		m_zBuffer.resize(textureSize, INFINITY);
@@ -53,30 +53,41 @@ namespace My
 		{
 			// Draw the opaque entities and defer the transparent ones' rendering
 			if (entity.isOpaque())
-				drawEntity(entity, *m_msaaTexture, p_projectionMatrix, p_scene.getLights(), LibMath::Vector3::zero());
+				drawEntity(entity, *m_target, p_projectionMatrix, p_scene.getLights(), LibMath::Vector3::zero());
 			else
 				transparentEntities.push_back(&entity);
 
-			//drawNormals(entity, p_target, LibMath::Vector3::zero());
+			//drawNormals(entity, *m_target, LibMath::Vector3::zero());
 		}
 
 		for (const auto& entityPtr : transparentEntities)
-			drawEntity(*entityPtr, *m_msaaTexture, p_projectionMatrix, p_scene.getLights(), LibMath::Vector3::zero());
+			drawEntity(*entityPtr, *m_target, p_projectionMatrix, p_scene.getLights(), LibMath::Vector3::zero());
 
 		
-		LibMath::Vector2 deltaSize(	static_cast<float>(p_target.getWidth()), 
+		if (m_target == &p_target)
+		{
+			m_target = nullptr;
+			return;
+		}
+
+		const LibMath::Vector2 deltaSize(	static_cast<float>(p_target.getWidth()),
 									static_cast<float>(p_target.getHeight()));
 
-		if (m_msaaTexture.get() == &p_target) //if already drawn on p_texture
-			return;
+		const float floatSampleCount = m_sampleCount;
 
-		for (uint32_t i = 0; i < p_target.getWidth(); i++) //draw form msaa to p_texture
+		for (uint32_t x = 0; x < p_target.getWidth(); x++) //draw form msaa to p_texture
 		{
-			for (uint32_t j = 0; j < p_target.getHeight(); j++)
-				p_target.setPixelColor(i, j, 
-					m_msaaTexture->getPixelColorBlerp(	this->m_msaaValue * static_cast<float>(i) + this->m_msaaValue / 2.f,
-														this->m_msaaValue * static_cast<float>(j) + this->m_msaaValue / 2.f, deltaSize));
+			for (uint32_t y = 0; y < p_target.getHeight(); y++)
+			{
+				const float msaaX = floatSampleCount * static_cast<float>(x) + floatSampleCount * .5f;
+				const float msaaY = floatSampleCount * static_cast<float>(y) + floatSampleCount * .5f;
+
+				p_target.setPixelColor(x, y,
+					m_target->getPixelColorBlerp(msaaX, msaaY, deltaSize));
+			}
 		}
+
+		m_target = nullptr;
 	}
 
 	void Rasterizer::drawEntity(const Entity& p_entity, Texture& p_target,
@@ -340,13 +351,10 @@ namespace My
 			points[2].m_y - points[0].m_y);
 
 		// Delta Triangle size * delta UV's
-		float deltaU =	LibMath::max(LibMath::max(p_vertices[0].m_u, p_vertices[1].m_u), p_vertices[2].m_u) -
+		const float deltaU =	LibMath::max(LibMath::max(p_vertices[0].m_u, p_vertices[1].m_u), p_vertices[2].m_u) -
 						LibMath::min(LibMath::min(p_vertices[0].m_u, p_vertices[1].m_u), p_vertices[2].m_u);
-		float deltaV =	LibMath::max(LibMath::max(p_vertices[0].m_v, p_vertices[1].m_v), p_vertices[2].m_v) -
+		const float deltaV =	LibMath::max(LibMath::max(p_vertices[0].m_v, p_vertices[1].m_v), p_vertices[2].m_v) -
 						LibMath::min(LibMath::min(p_vertices[0].m_v, p_vertices[1].m_v), p_vertices[2].m_v);
-
-		if (deltaU == 0 || deltaV == 0)
-			int i = 0;
 
 		const LibMath::Vector2 deltaTriangleBounds = LibMath::Vector2(	static_cast<float>(maxX - minX) * deltaU,
 																		static_cast<float>(maxY - minY) * deltaV);

@@ -29,10 +29,10 @@ namespace My
 
 	public:
 
-		Rasterizer() : Rasterizer(1.0f)
+		Rasterizer() : Rasterizer(1)
 		{}
 
-		Rasterizer(float p_msaaValue);
+		explicit Rasterizer(uint8_t p_sampleCount);
 
 		/**
 		 * \brief Creates a move copy of the given rasterizer
@@ -123,9 +123,9 @@ namespace My
 
 
 	private:
-		std::vector<float>			m_zBuffer;
-		float						m_msaaValue;
-		std::shared_ptr<Texture>	m_msaaTexture;
+		std::vector<float>	m_zBuffer;
+		uint8_t				m_sampleCount;
+		Texture*			m_target;
 
 		enum class e_drawMode
 		{
