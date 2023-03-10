@@ -44,6 +44,11 @@ std::vector<My::Entity> My::Scene::getEntities() const
 	return m_entities;
 }
 
+std::vector<My::Entity>& My::Scene::getEntities()
+{
+	return m_entities;
+}
+
 My::Entity& My::Scene::getEntity(size_t index)
 {
 	if (index >= this->m_entities.size())

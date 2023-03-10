@@ -2,6 +2,7 @@
 #include <vector>
 #include "Vertex.h"
 #include "Texture.h"
+#include "Vector/Vector3.h"
 
 namespace My
 {
@@ -34,9 +35,12 @@ namespace My
 
 	class Mesh
 	{
+		using Vec3 = LibMath::Vector3;
+
 	public:
 		/**
 		 * \brief Creates a mesh with the given set of vertices and indices
+		 * \brief Vertex color converted to opaque Color if transparent
 		 * \param p_vertices The vertex buffer of the mesh
 		 * \param p_indices The index buffer of the mesh
 		 * \param p_texture The texture of the mesh (nullptr by default)
@@ -79,16 +83,27 @@ namespace My
 		 */
 		std::vector<Vertex>	getVertices() const;
 
-		/**ss
+		/**
 		 * \brief Gives read access to the index buffer of the mesh
 		 * \return The mesh's index buffer
 		 */
 		std::vector<size_t>	getIndices() const;
 
+		/// <summary>
+		/// Gives read acces to the mesh's normal buffer
+		/// </summary>
+		/// <returns></returns>
+		std::vector<LibMath::Vector3> getNormals() const;
+
 		/**
-		* \brief Calculates the normal of each Vertex
+		* \brief Calculates the normal of each Vertex based on triangle normals
 		*/
-		void CalculateNormals();
+		void calculateVertexNormals();
+
+		/**
+		* \brief Calculates the normal of each Triangle
+		*/
+		void calculateTriangleNormals();
 
 		/**
 		 * \brief Creates a cube of side 1
@@ -107,22 +122,23 @@ namespace My
 		static Mesh* createSphere(uint32_t p_latitudeCount, uint32_t p_longitudeCount,
 			const Color& p_color = Color::white);
 
-		/*
-		* *\brief We use it to give a texture to our Mesh
-		 * \param textture is the name of the texture we want to give him
-		 * */
+		/**
+		 * \brief Gives read access to the mesh's texture
+		 * \return The mesh's texture
+		 */
 		const Texture* getTexture() const;
 
 		/*
-		* *\brief We use it to give a texture to our Mesh
-		 * \param textture is the name of the texture we want to give him
-		 * */
-		void setTexture(My::Texture* texture);
+		 * \brief Sets the mesh's texture
+		 * \param p_texture the new mesh's texture
+		 */
+		void setTexture(const Texture* p_texture);
 
 	private:
-		std::vector<Vertex> m_vertices;
-		std::vector<size_t> m_indices;
-		const My::Texture* m_texture;
+		std::vector<Vertex>	m_vertices;
+		std::vector<size_t>	m_indices;
+		std::vector<Vec3>	m_normals;
+		const Texture*		m_texture;
 	};
 
 }
