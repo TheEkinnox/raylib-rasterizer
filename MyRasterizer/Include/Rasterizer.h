@@ -154,20 +154,19 @@ namespace My
 		/// </summary>
 		/// <param name="p_trianglePos">: triangle's position</param>
 		/// <param name="p_triangleNormal">: direction that the triangle is facing</param>
-		/// <param name="p_observerPos">: observer's position</param>
-		/// <param name="p_observerDir">: direction that the observer is loocking at</param>
+		/// <param name="p_viewPos">: observer's position</param>
 		/// <returns></returns>
-		bool checkBackFaceCulling(	const Vec3& p_trianglePos, const Vec3& p_triangleNormal, 
-									const Vec3& p_observerPos)const;
+		static bool shouldDrawFace(	const Vec3& p_trianglePos, const Vec3& p_triangleNormal,
+			const Vec3& p_viewPos);
 
 		/// <summary>
 		/// Checks if triangle should be rendered based on the observer's view direction
 		/// </summary>
 		/// <param name="p_trianglePos">: triangle's position</param>
 		/// <param name="p_observerPos">: observer's position</param>
-		/// <param name="p_observerDir">: direction that the observer is loocking at</param>
+		/// <param name="p_observerDir">: direction towards which the observer looks</param>
 		/// <returns></returns>
-		bool checkFacingDirection(	const Vec3& p_trianglePos, const Vec3& p_observerPos,
-									const Vec3& p_observerDir)const;
+		static bool checkFacingDirection(const Vec3& p_trianglePos, const Vec3& p_observerPos,
+			const Vec3& p_observerDir);
 	};
 }

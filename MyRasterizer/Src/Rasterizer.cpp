@@ -51,8 +51,9 @@ namespace My
 		if (p_entity.getMesh() != nullptr)
 		{
 			auto vertices = p_entity.getMesh()->getVertices();
+			auto normals = p_entity.getMesh()->getNormals();
 			const auto indices = p_entity.getMesh()->getIndices();
-			const Mat4 mvpMatrix = p_projectionMatrix * p_entity.getTransform();
+			const Mat4& mvpMatrix = p_projectionMatrix;
 
 			for (auto& v : vertices)
 			{
@@ -64,7 +65,7 @@ namespace My
 
 				// Update vertex normals
 				auto& nor = v.m_normal;
-				vec4 = LibMath::Vector4{ nor.m_x, nor.m_y, nor.m_z, 1.f };
+				vec4 = LibMath::Vector4{ nor.m_x, nor.m_y, nor.m_z, 0.f };
 				vec4 = p_entity.getRotation() * vec4;
 				nor = { vec4.m_x, vec4.m_y, vec4.m_z };
 
@@ -75,6 +76,11 @@ namespace My
 
 			for (size_t i = 0; i + 2 < indices.size(); i += 3)
 			{
+				auto& normal = normals[i / 3];
+				LibMath::Vector4 normal4 = LibMath::Vector4(normal.m_x, normal.m_y, normal.m_z, 0.f);
+				normal4 = p_entity.getRotation() * normal4;
+				normal = { normal4.m_x, normal4.m_y, normal4.m_z };
+
 				const Vertex triangle[3]
 				{
 					vertices[indices[i]],
@@ -82,8 +88,12 @@ namespace My
 					vertices[indices[i + 2]]
 				};
 
-				m_drawTriangle(triangle, p_target, p_lights, p_viewPos, mvpMatrix,
-					p_entity.getMesh()->getTexture(), m_zBuffer);
+				Vec3 centerPt = (triangle[0].m_position + triangle[1].m_position + triangle[2].m_position) / 3;
+
+				if (shouldDrawFace(centerPt, normal, p_viewPos)
+					&& checkFacingDirection(centerPt, p_viewPos, Vec3::front()))
+					m_drawTriangle(triangle, p_target, p_lights, p_viewPos, mvpMatrix,
+						p_entity.getMesh()->getTexture(), m_zBuffer);
 			}
 		}
 	}
@@ -441,5 +451,24 @@ namespace My
 				inBounds(p_pixelPos - 1, p_pixelPos + 1) ||
 				pointOnTriangleEdge(p_pixelPos, p_trianglePoints[2], p_trianglePoints[0]).
 				inBounds(p_pixelPos - 1, p_pixelPos + 1));
+	}
+
+	bool Rasterizer::shouldDrawFace(const Vec3& p_trianglePos, const Vec3& p_triangleNormal,
+		const Vec3& p_viewPos)
+	{
+		/*
+		* https://en.wikipedia.org/wiki/Back-face_culling
+		*/
+		const Vec3 deltaPos = p_trianglePos - p_viewPos; //bcs constant
+
+		return deltaPos.dot(p_triangleNormal) < 0;
+	}
+
+	bool Rasterizer::checkFacingDirection(const Vec3& p_trianglePos, const Vec3& p_observerPos,
+		const Vec3& p_observerDir)
+	{
+		const Vec3 deltaPos = p_trianglePos - p_observerPos; //bcs constant
+
+		return	deltaPos.dot(p_observerDir) <= 0;
 	}
 }

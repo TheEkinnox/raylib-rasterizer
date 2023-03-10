@@ -1,16 +1,15 @@
-#include "Trigonometry.h"
 #include "Mesh.h"
-#include "Texture.h"
-#include "Vector/Vector3.h"
-#include "Arithmetic.h"
-#include <map>
-#include <set>
-#include <numeric>
 
-using Vec3 = LibMath::Vector3;
+#include <numeric>
+#include <set>
+#include <map>
+
+#include "Texture.h"
+#include "Trigonometry.h"
+#include "Vector/Vector3.h"
 
 My::Mesh::Mesh(const std::vector<Vertex>& p_vertices,
-	const std::vector<size_t>& p_indices, const Texture* p_texture)
+               const std::vector<size_t>& p_indices, const Texture* p_texture)
 {
 	// Make sure the index buffer is a set of triangles
 	if (p_indices.size() % 3 != 0)
@@ -49,14 +48,14 @@ My::Mesh* My::Mesh::createCube(const Color& p_color)
 	float nLen = 0.57735027f;	// 1 = sqrt(3 * x2) => sqrt(1/3) = x => 0.57735027f = x
 	const std::vector<Vertex> vertices
 	{
-		{ { -.5f, .5f, .5f }, { -nLen, nLen, nLen }, p_color, 0, 0 },		// Front-top-left
-		{ { .5f, .5f, .5f }, { nLen, nLen, nLen }, p_color, 1, 0 },		// Front-top-right
-		{ { -.5f, -.5f, .5f }, { -nLen, -nLen, nLen }, p_color, 0, 1 },	// Front-bottom-left
-		{ { .5f, -.5f, .5f }, { nLen, -nLen, nLen }, p_color, 1, 1 },		// Front-bottom-right
-		{ { -.5f, .5f, -.5f }, { -nLen, nLen, -nLen }, p_color, 1, 0 },	// Back-top-left
-		{ { .5f, .5f, -.5f }, { nLen, nLen, -nLen }, p_color, 0, 0 },		// Back-top-right
-		{ { -.5f, -.5f, -.5f }, { -nLen, -nLen, -nLen }, p_color, 1, 1 },	// Back-bottom-left
-		{ { .5f, -.5f, -.5f }, { nLen, -nLen, -nLen }, p_color, 0, 1 }	// Back-bottom-right
+		{ { -.5f, .5f, .5f }, { -nLen, nLen, nLen }, p_color, 0, 0 },		// (0) Front-top-left
+		{ { .5f, .5f, .5f }, { nLen, nLen, nLen }, p_color, 1, 0 },			// (1) Front-top-right
+		{ { -.5f, -.5f, .5f }, { -nLen, -nLen, nLen }, p_color, 0, 1 },		// (2) Front-bottom-left
+		{ { .5f, -.5f, .5f }, { nLen, -nLen, nLen }, p_color, 1, 1 },		// (3) Front-bottom-right
+		{ { -.5f, .5f, -.5f }, { -nLen, nLen, -nLen }, p_color, 1, 0 },		// (4) Back-top-left
+		{ { .5f, .5f, -.5f }, { nLen, nLen, -nLen }, p_color, 0, 0 },		// (5) Back-top-right
+		{ { -.5f, -.5f, -.5f }, { -nLen, -nLen, -nLen }, p_color, 1, 1 },	// (6) Back-bottom-left
+		{ { .5f, -.5f, -.5f }, { nLen, -nLen, -nLen }, p_color, 0, 1 }		// (7) Back-bottom-right
 	};
 
 	const std::vector<size_t> indices
@@ -177,48 +176,35 @@ My::Mesh* My::Mesh::createSphere(const uint32_t p_latitudeCount, const uint32_t 
 
 void My::Mesh::calculateVertexNormals()
 {
-	Vec3* A, * B, * C;
-	Vec3 BC, BA, normal;
-
 	struct Compare
 	{
 		bool operator()(const Vec3& lhs, const Vec3& rhs) const noexcept
 		{
-			if (LibMath::floatGreaterThan(lhs.m_x, rhs.m_x)) //if x is bigger
-				return true;
-
-			if (LibMath::floatGreaterThan(lhs.m_y, rhs.m_y) &&
-				LibMath::floatEquals(lhs.m_x, rhs.m_x)) //if y bigger and x ==
-				return true;
-
-			if (LibMath::floatGreaterThan(lhs.m_z, rhs.m_z) &&
-				LibMath::floatEquals(lhs.m_x, rhs.m_x) &&
-				LibMath::floatEquals(lhs.m_y, rhs.m_y)) //if z bigger and x and y ==
-				return true;
-
-			return false; //if x y z is smaler
+			return lhs.isShorterThan(rhs);
 		}
 	};
+
 	std::set<Vec3, Compare> uniqueNormals;
-	std::map<Vertex*, std::set<const Vec3*>> vertexUniqueNormals; //each Vertex has a its set of unique normals ptrs
+
+	//each Vertex has it's own set of unique normals pointers
+	std::map<Vertex*, std::set<const Vec3*>> vertexUniqueNormals;
 
 	for (size_t i = 0; i < this->m_indices.size(); i += 3)
 	{
 		//triangle ABC
-		A = &this->m_vertices[m_indices[i]].m_position;
-		B = &this->m_vertices[m_indices[i + 1]].m_position;
-		C = &this->m_vertices[m_indices[i + 2]].m_position;
+		const Vec3& a = this->m_vertices[m_indices[i]].m_position;
+		const Vec3& b = this->m_vertices[m_indices[i + 1]].m_position;
+		const Vec3& c = this->m_vertices[m_indices[i + 2]].m_position;
 
 		//create plane
-		BC = *C - *B;
-		BA = *A - *B;
+		Vec3 bc = c - b;
+		Vec3 ba = a - b;
 
 		//get normal
-		normal = BC.cross(BA);
-		normal.normalize();
+		const Vec3 normal = bc.cross(ba).normalized();
 
 		//insert in uniqueNormals, returns pair<it,bool> (bool isNewInsert is ignored)
-		//it is ptr to either new normal or existant normal (no duplicates) 
+		//it is ptr to either new normal or existent normal (no duplicates)
 		const Vec3* normalPtr = &(*uniqueNormals.insert(normal).first);
 
 		vertexUniqueNormals[&m_vertices[m_indices[i]]].insert(normalPtr);
@@ -226,7 +212,7 @@ void My::Mesh::calculateVertexNormals()
 		vertexUniqueNormals[&m_vertices[m_indices[i + 2]]].insert(normalPtr);
 	}
 
-	//accumulate operator : add all the Vec3 ptr's values;
+	//accumulate operator : add all the Vec3 pointers' values;
 	auto op = [](const Vec3& v1, const Vec3* v2) { return v1 + *v2; };
 
 	for (auto& pair : vertexUniqueNormals)
@@ -234,6 +220,25 @@ void My::Mesh::calculateVertexNormals()
 		pair.first->m_normal = std::accumulate(pair.second.begin(), pair.second.end(),
 			Vec3::zero(), op);
 		pair.first->m_normal.normalize();
+	}
+}
+
+void My::Mesh::calculateTriangleNormals()
+{
+	this->m_normals.reserve(this->m_indices.size() / 3);
+
+	for (size_t i = 0; i + 2 < this->m_indices.size(); i += 3)
+	{
+		//ABC triangle
+		const Vec3& a = this->m_vertices[m_indices[i]].m_position;
+		const Vec3& b = this->m_vertices[m_indices[i + 1]].m_position;
+		const Vec3& c = this->m_vertices[m_indices[i + 2]].m_position;
+
+		//create plane
+		Vec3 ab = b - a;
+		Vec3 ac = c - a;
+
+		m_normals.push_back(ab.cross(ac).normalized());
 	}
 }
 
@@ -245,30 +250,4 @@ const My::Texture* My::Mesh::getTexture() const
 void My::Mesh::setTexture(const Texture* p_texture)
 {
 	m_texture = p_texture;
-}
-
-void My::Mesh::calculateTriangleNormals()
-{
-	Vec3* A, * B, * C;
-	Vec3 BC, BA, normal;
-
-	this->m_normals.reserve(this->m_indices.size() / 3); //3 indices = 1 trangle
-
-	for (size_t i = 0; i < this->m_indices.size(); i += 3)
-	{
-		//triangle ABC
-		A = &this->m_vertices[m_indices[i]].m_position;
-		B = &this->m_vertices[m_indices[i + 1]].m_position;
-		C = &this->m_vertices[m_indices[i + 2]].m_position;
-
-		//create plane
-		BC = *C - *B;
-		BA = *A - *B;
-
-		//get normal
-		normal = BC.cross(BA);
-		normal.normalize();
-
-		m_normals.push_back(normal);
-	}
 }

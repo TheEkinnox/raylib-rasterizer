@@ -32,20 +32,20 @@ int main()
 	scene.addMesh("cube", *cube);
 
 	scene.addMesh("sphereW", *My::Mesh::createSphere(8, 8, My::Color::white));
-	scene.addMesh("sphereR", *My::Mesh::createSphere(24, 24, My::Color::red));
-	scene.addMesh("sphereG", *My::Mesh::createSphere(24, 24, My::Color::green));
-	scene.addMesh("sphereB", *My::Mesh::createSphere(24, 24, My::Color::blue));
+	scene.addMesh("sphereR", *My::Mesh::createSphere(16, 16, My::Color::red));
+	scene.addMesh("sphereG", *My::Mesh::createSphere(16, 16, My::Color::green));
+	scene.addMesh("sphereB", *My::Mesh::createSphere(16, 16, My::Color::blue));
 
-	LibMath::Matrix4 transform = LibMath::Matrix4::translation(0, 0, -2) * LibMath::Matrix4::scaling(1.5f, 1.5f, 1.5f);
+	LibMath::Matrix4 transform = LibMath::Matrix4::translation(0, 0, -2) * LibMath::Matrix4::scaling(1.25f, 1.25f, 1.25f);
 	scene.addEntity(My::Entity(*scene.getMesh("cube"), 0.25f, transform));
 
-	transform = LibMath::Matrix4::translation(0, .75f, -3);
+	transform = LibMath::Matrix4::translation(0, 1.f, -3);
 	scene.addEntity(My::Entity(*scene.getMesh("sphereR"), transform));
 
-	transform = LibMath::Matrix4::translation(-.75f, -.75f, -3);
+	transform = LibMath::Matrix4::translation(-1.f, -1.f, -3);
 	scene.addEntity(My::Entity(*scene.getMesh("sphereG"), transform));
 
-	transform = LibMath::Matrix4::translation(.75f, -.75f, -3);
+	transform = LibMath::Matrix4::translation(1.f, -1.f, -3);
 	scene.addEntity(My::Entity(*scene.getMesh("sphereB"), transform));
 
 	//light
@@ -84,6 +84,14 @@ int main()
 		if (IsKeyPressed(KEY_F1))
 		{
 			rasterizer.toggleWireFrameMode();
+			rasterizer.renderScene(scene, texture, projMat);
+		}
+
+		if (IsKeyDown(KEY_R))
+		{
+			for (auto& entity : scene.getEntities())
+				entity.rotateEulerAngles(1_deg, 1_deg, 0_rad);
+
 			rasterizer.renderScene(scene, texture, projMat);
 		}
 
