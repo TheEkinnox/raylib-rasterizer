@@ -1,6 +1,7 @@
 #pragma once
 #include <vector>
 #include "Vertex.h"
+#include "Texture.h"
 #include "Vector/Vector3.h"
 
 namespace My
@@ -34,13 +35,17 @@ namespace My
 
 	class Mesh
 	{
+		using Vec3 = LibMath::Vector3;
+
 	public:
 		/**
 		 * \brief Creates a mesh with the given set of vertices and indices
+		 * \brief Vertex color converted to opaque Color if transparent
 		 * \param p_vertices The vertex buffer of the mesh
 		 * \param p_indices The index buffer of the mesh
+		 * \param p_texture The texture of the mesh (nullptr by default)
 		 */
-		Mesh(const std::vector<Vertex>& p_vertices, const std::vector<size_t>& p_indices);
+		Mesh(const std::vector<Vertex>& p_vertices, const std::vector<size_t>& p_indices, const Texture* p_texture = nullptr);
 
 		/**
 		 * \brief Creates a copy of the given mesh
@@ -74,13 +79,13 @@ namespace My
 
 		/**
 		 * \brief Gives read access to the vertex buffer of the mesh
-		 * \return The vertex buffer of the mesh
+		 * \return The mesh's vertex buffer
 		 */
 		std::vector<Vertex>	getVertices() const;
 
-		/**ss
+		/**
 		 * \brief Gives read access to the index buffer of the mesh
-		 * \return The index buffer of the mesh
+		 * \return The mesh's index buffer
 		 */
 		std::vector<size_t>	getIndices() const;
 
@@ -117,10 +122,23 @@ namespace My
 		static Mesh* createSphere(uint32_t p_latitudeCount, uint32_t p_longitudeCount,
 			const Color& p_color = Color::white);
 
+		/**
+		 * \brief Gives read access to the mesh's texture
+		 * \return The mesh's texture
+		 */
+		const Texture* getTexture() const;
+
+		/*
+		 * \brief Sets the mesh's texture
+		 * \param p_texture the new mesh's texture
+		 */
+		void setTexture(const Texture* p_texture);
+
 	private:
-		std::vector<Vertex> m_vertices;
-		std::vector<size_t> m_indices;
-		std::vector<LibMath::Vector3> m_normals;
+		std::vector<Vertex>	m_vertices;
+		std::vector<size_t>	m_indices;
+		std::vector<Vec3>	m_normals;
+		const Texture*		m_texture;
 	};
 
 }

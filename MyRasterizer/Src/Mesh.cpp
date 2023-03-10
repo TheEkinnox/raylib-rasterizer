@@ -1,5 +1,6 @@
 #include "Trigonometry.h"
 #include "Mesh.h"
+#include "Texture.h"
 #include "Vector/Vector3.h"
 #include "Arithmetic.h"
 #include <map>
@@ -8,7 +9,8 @@
 
 using Vec3 = LibMath::Vector3;
 
-My::Mesh::Mesh(const std::vector<Vertex>& p_vertices, const std::vector<size_t>& p_indices)
+My::Mesh::Mesh(const std::vector<Vertex>& p_vertices,
+	const std::vector<size_t>& p_indices, const Texture* p_texture)
 {
 	// Make sure the index buffer is a set of triangles
 	if (p_indices.size() % 3 != 0)
@@ -22,8 +24,9 @@ My::Mesh::Mesh(const std::vector<Vertex>& p_vertices, const std::vector<size_t>&
 
 	this->m_vertices = p_vertices;
 	this->m_indices = p_indices;
+	this->m_texture = p_texture;
 
-	//this->calculateVertexNormals();
+	this->calculateTriangleNormals();
 }
 
 std::vector<My::Vertex> My::Mesh::getVertices() const
@@ -46,14 +49,14 @@ My::Mesh* My::Mesh::createCube(const Color& p_color)
 	float nLen = 0.57735027f;	// 1 = sqrt(3 * x2) => sqrt(1/3) = x => 0.57735027f = x
 	const std::vector<Vertex> vertices
 	{
-		{ { -.5f, .5f, .5f }, { -nLen, nLen, nLen }, p_color  },		// Front-top-left
-		{ { .5f, .5f, .5f }, { nLen, nLen, nLen }, p_color  },		// Front-top-right
-		{ { -.5f, -.5f, .5f }, { -nLen, -nLen, nLen }, p_color  },	// Front-bottom-left
-		{ { .5f, -.5f, .5f }, { nLen, -nLen, nLen }, p_color  },		// Front-bottom-right
-		{ { -.5f, .5f, -.5f }, { -nLen, nLen, -nLen }, p_color  },	// Back-top-left
-		{ { .5f, .5f, -.5f }, { nLen, nLen, -nLen }, p_color  },		// Back-top-right
-		{ { -.5f, -.5f, -.5f }, { -nLen, -nLen, -nLen }, p_color  },	// Back-bottom-left
-		{ { .5f, -.5f, -.5f }, { nLen, -nLen, -nLen }, p_color  }	// Back-bottom-right
+		{ { -.5f, .5f, .5f }, { -nLen, nLen, nLen }, p_color, 0, 0 },		// Front-top-left
+		{ { .5f, .5f, .5f }, { nLen, nLen, nLen }, p_color, 1, 0 },		// Front-top-right
+		{ { -.5f, -.5f, .5f }, { -nLen, -nLen, nLen }, p_color, 0, 1 },	// Front-bottom-left
+		{ { .5f, -.5f, .5f }, { nLen, -nLen, nLen }, p_color, 1, 1 },		// Front-bottom-right
+		{ { -.5f, .5f, -.5f }, { -nLen, nLen, -nLen }, p_color, 1, 0 },	// Back-top-left
+		{ { .5f, .5f, -.5f }, { nLen, nLen, -nLen }, p_color, 0, 0 },		// Back-top-right
+		{ { -.5f, -.5f, -.5f }, { -nLen, -nLen, -nLen }, p_color, 1, 1 },	// Back-bottom-left
+		{ { .5f, -.5f, -.5f }, { nLen, -nLen, -nLen }, p_color, 0, 1 }	// Back-bottom-right
 	};
 
 	const std::vector<size_t> indices
@@ -82,17 +85,6 @@ My::Mesh* My::Mesh::createCube(const Color& p_color)
 		1, 5, 4,
 		4, 0, 1
 	};
-	//normal test
-	// auto m1 = new Mesh(vertices, indices);
-	// auto m2 = new Mesh(*m1);
-
-	// m2->calculateVertexNormals();
-
-	// for (auto& v : m1->m_vertices)
-	// 	std::cout << v.m_normal << std::endl;
-	// std::cout << "my normals" << std::endl;
-	// for (auto& v : m2->m_vertices)
-	// 	std::cout << v.m_normal << std::endl;
 
 	return new Mesh(vertices, indices);
 }
@@ -106,14 +98,14 @@ My::Mesh* My::Mesh::createSphere(const uint32_t p_latitudeCount, const uint32_t 
 	std::vector<Vertex> vertices;
 	std::vector<size_t> indices;
 
-	vertices.push_back({ Vec3::up(), Vec3::up(), p_color }); //top vertex
+	vertices.push_back({ Vec3::up(), Vec3::up(), p_color, 0, 0 }); //top vertex
 	for (uint32_t i = 1; i < p_latitudeCount; i++) // [1, count) bcs need only 1 vertex at top and bot
 	{
 		const float phi = static_cast<float>(i) * deltaPhi;
 		const float cosPhi = cosf(phi);
 		const float sinPhi = sinf(phi);
 
-		for (uint32_t j = 0; j < p_longitudeCount; j++) //dont nee <= bcs using vertex 
+		for (uint32_t j = 0; j < p_longitudeCount; j++) //don't need <= bcs using vertex 
 		{
 			constexpr float radius = 1.f;
 			const float theta = static_cast<float>(j) * deltaTheta;
@@ -127,13 +119,10 @@ My::Mesh* My::Mesh::createSphere(const uint32_t p_latitudeCount, const uint32_t 
 				sinPhi * cosTheta
 			};
 
-			bool test = normal.isUnitVector();
-			float mag = normal.magnitudeSquared();
-				
-			vertices.push_back({ normal * radius, normal, p_color});
+			vertices.push_back({ normal * radius, normal, p_color });
 		}
 	}
-	vertices.push_back({ Vec3::down(), Vec3::down(), p_color }); //bot vertex
+	vertices.push_back({ Vec3::down(), Vec3::down(), p_color, 0, 1 }); //bot vertex
 
 	for (uint32_t i = 0; i < p_longitudeCount; ++i)
 	{
@@ -183,46 +172,19 @@ My::Mesh* My::Mesh::createSphere(const uint32_t p_latitudeCount, const uint32_t 
 		indices.push_back(j0 + p_longitudeCount - 1);
 	}
 
-	//test normals
-	/*auto m1 = new Mesh(vertices, indices);
-	auto m2 = new Mesh(*m1);
-
-	m2->calculateVertexNormals();
-
-	for (auto& v : m1->m_vertices)
-		std::cout << v.m_normal << std::endl;
-	std::cout << "my normals" << std::endl;
-	for (auto& v : m2->m_vertices)
-		std::cout << v.m_normal << std::endl;
-
-	for (size_t i = 0; i < m1->m_vertices.size(); i++)
-	{
-		if (!LibMath::floatEquals(	m1->m_vertices[i].m_normal.m_x,
-									m2->m_vertices[i].m_normal.m_x))
-		{
-			float dif = LibMath::abs(m2->m_vertices[i].m_normal.m_x - m1->m_vertices[i].m_normal.m_x);
-			int l = 0;
-		}
-		
-	}*/
-
-
-	auto m = new Mesh(vertices, indices);
-	m->calculateTriangleNormals(); //calculate triangle normals based on triangles
-
-	return m;
+	return new Mesh(vertices, indices);
 }
 
 void My::Mesh::calculateVertexNormals()
 {
-	Vec3* A, *B, *C;
+	Vec3* A, * B, * C;
 	Vec3 BC, BA, normal;
 
 	struct Compare
 	{
 		bool operator()(const Vec3& lhs, const Vec3& rhs) const noexcept
 		{
-			if (LibMath::floatGreaterThan(lhs.m_x,rhs.m_x)) //if x is bigger
+			if (LibMath::floatGreaterThan(lhs.m_x, rhs.m_x)) //if x is bigger
 				return true;
 
 			if (LibMath::floatGreaterThan(lhs.m_y, rhs.m_y) &&
@@ -230,7 +192,7 @@ void My::Mesh::calculateVertexNormals()
 				return true;
 
 			if (LibMath::floatGreaterThan(lhs.m_z, rhs.m_z) &&
-				LibMath::floatEquals(lhs.m_x, rhs.m_x) && 
+				LibMath::floatEquals(lhs.m_x, rhs.m_x) &&
 				LibMath::floatEquals(lhs.m_y, rhs.m_y)) //if z bigger and x and y ==
 				return true;
 
@@ -249,7 +211,7 @@ void My::Mesh::calculateVertexNormals()
 
 		//create plane
 		BC = *C - *B;
-		BA = *A - *B;	
+		BA = *A - *B;
 
 		//get normal
 		normal = BC.cross(BA);
@@ -265,14 +227,24 @@ void My::Mesh::calculateVertexNormals()
 	}
 
 	//accumulate operator : add all the Vec3 ptr's values;
-	auto op = [](const Vec3& v1, const Vec3* v2) { return v1 + *v2; }; 
+	auto op = [](const Vec3& v1, const Vec3* v2) { return v1 + *v2; };
 
 	for (auto& pair : vertexUniqueNormals)
 	{
-		pair.first->m_normal = std::accumulate(	pair.second.begin(), pair.second.end(), 
-												Vec3::zero(), op);
+		pair.first->m_normal = std::accumulate(pair.second.begin(), pair.second.end(),
+			Vec3::zero(), op);
 		pair.first->m_normal.normalize();
 	}
+}
+
+const My::Texture* My::Mesh::getTexture() const
+{
+	return m_texture;
+}
+
+void My::Mesh::setTexture(const Texture* p_texture)
+{
+	m_texture = p_texture;
 }
 
 void My::Mesh::calculateTriangleNormals()

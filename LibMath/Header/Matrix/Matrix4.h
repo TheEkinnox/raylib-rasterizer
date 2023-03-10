@@ -43,10 +43,10 @@ namespace LibMath
 		static Matrix4x4	translation(float x, float y, float z);
 		static Matrix4x4	scaling(float x, float y, float z);
 		static Matrix4x4	rotation(const Radian& angle, const Vector3& axis);
-		static Matrix4x4	rotationEuler(const Radian& xAngle, const Radian& yAngle, const Radian& zAngle);
-
-	private:
 		static Matrix4x4	rotation(const Radian& yaw, const Radian& pitch, const Radian& roll);
+		static Matrix4x4	rotationEuler(const Radian& xAngle, const Radian& yAngle, const Radian& zAngle);
+		static Matrix4x4	orthographicProjection(float left, float right, float bottom, float top, float near, float far);
+		static Matrix4x4	perspectiveProjection(const Radian& fovY, float aspect, float near, float far);
 	};
 
 	typedef Matrix4x4 Matrix4;
