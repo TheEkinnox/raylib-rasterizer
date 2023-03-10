@@ -9,15 +9,15 @@ namespace My
 	class Texture
 	{
 	public:
-		Texture() = delete;
-		Texture(uint32_t p_width, uint32_t p_height);
-		Texture(const Texture&) = default;
-		Texture(Texture&&) = default;
-		Texture(const char* p_imagePath);
-		~Texture() = default;
+					Texture() = delete;
+					Texture(uint32_t p_width, uint32_t p_height);
+					Texture(const Texture& p_other);
+					Texture(Texture&& p_other) noexcept;
+		explicit	Texture(const char* p_imagePath);
+					~Texture();
 
-		Texture&	operator=(const Texture&) = default;
-		Texture&	operator=(Texture&&) = default;
+		Texture&	operator=(const Texture&);
+		Texture&	operator=(Texture&&) noexcept;
 
 		uint32_t	getWidth() const;
 		uint32_t	getHeight() const;

@@ -10,6 +10,34 @@
 
 namespace My
 {
+	namespace Exceptions
+	{
+		class InvalidDrawMode : public std::exception
+		{
+		public:
+			/**
+			 * \brief Creates an invalid draw mode exception with a default message
+			 */
+			InvalidDrawMode() :
+				std::exception("Divide By Zero") {}
+
+			/**
+			 * \brief Creates an invalid draw mode exception with a given message
+			 * \param message The message of the exception
+			 */
+			InvalidDrawMode(char const* message) :
+				std::exception(message) {}
+
+			/**
+			 * \brief Creates an invalid draw mode exception with a given message
+			 * \param message The message of the exception
+			 */
+			InvalidDrawMode(const std::string& message) :
+				std::exception(message.c_str()) {}
+		};
+	}
+
+	class Camera;
 	struct Vertex;
 	class Texture;
 	class Scene;
@@ -17,20 +45,22 @@ namespace My
 
 	class Rasterizer
 	{
+		enum class EDrawMode
+		{
+			E_FILL,
+			E_WIRE_FRAME
+		};
+
 		using Vec3 = LibMath::Vector3;
 		using Vec4 = LibMath::Vector4;
 		using Mat4 = LibMath::Matrix4;
-
-		// TODO: Replace p_viewPos and p_mvpMatrix with camera
-		typedef std::function<void(const Vertex p_vertices[3], Texture& p_target,
-			const std::vector<Light>& p_lights, const LibMath::Vector3& p_viewPos,
-			const Mat4& p_mvpMatrix, const Texture* p_texture,
-			std::vector<float>& p_zBuffer)> DrawFunc;
+		
+		typedef std::function<void(const Vertex p_vertices[3], const Texture* p_texture,
+			Rasterizer& self)> DrawFunc;
 
 	public:
 
-		Rasterizer() : Rasterizer(1)
-		{}
+		Rasterizer() = default;
 
 		explicit Rasterizer(uint8_t p_sampleCount);
 
@@ -63,78 +93,53 @@ namespace My
 		 * \brief Draws the scene in 3D on the target texture
 		 * \param p_scene The scene to render
 		 * \param p_target The texture on which the scene should be rendered
-		 * \param p_projectionMatrix The matrix to use to project points
+		 * \param p_camera The matrix to use to project points
 		 * from world space to clip space
 		 */
-		void renderScene(const Scene& p_scene, Texture& p_target,
-			const Mat4& p_projectionMatrix);
-
-		/**
-		 * \brief Draws the received entity on the target texture
-		 * \param p_entity The entity to draw
-		 * \param p_target The texture on which the entity should be drawn
-		 * \param p_projectionMatrix The matrix to use to project points
-		 * from world space to clip space
-		 * \param p_lights The lights to apply to the entity
-		 * \param p_viewPos The position from which the entity is seen
-		 */
-		void drawEntity(const Entity& p_entity, Texture& p_target,
-			const Mat4& p_projectionMatrix, const std::vector<Light>& p_lights,
-			const LibMath::Vector3& p_viewPos);
-
-		/**
-		 * \brief Draws the entity's normals on the target texture
-		 * \param p_entity The entity to draw
-		 * \param p_target The texture on which the entity should be drawn
-		 * \param p_viewPos The position from which the entity is seen
-		 */
-		void drawNormals(const Entity& p_entity, Texture& p_target,
-			const LibMath::Vector3& p_viewPos);
-
-		/**
-		 * \brief Draws the received triangle on the target texture
-		 * \param p_vertices The triangle to draw
-		 * \param p_target The texture on which the triangle should be drawn
-		 * \param p_lights The light used to shade the triangle
-		 * \param p_viewPos The position from which the triangle is seen
-		 * \param p_mvpMatrix The model view projection matrix used to convert the point
-		 * from world space to clip space
-		 * \param p_texture The texture of the triangle
-		 * \param p_zBuffer A reference to the rasterizer's zBuffer
-		 */
-		 // TODO: Replace p_viewPos and p_mvpMatrix with camera
-		static void drawTriangleFill(const Vertex p_vertices[3], Texture& p_target,
-			const std::vector<Light>& p_lights, const LibMath::Vector3& p_viewPos,
-			const Mat4& p_mvpMatrix, const Texture* p_texture,
-			std::vector<float>& p_zBuffer);
-
-		/**
-		 * \brief Draws the received triangle's edges on the target texture
-		 * \param p_vertices The triangle to draw
-		 * \param p_target The texture on which the triangle should be drawn
-		 * \param p_zBuffer A reference to the rasterizer's zBuffer
-		 */
-		static void drawTriangleWireFrame(const Vertex p_vertices[3], Texture& p_target,
-			const std::vector<Light>& p_lights, const LibMath::Vector3& p_viewPos,
-			const Mat4& p_mvpMatrix, const Texture* p_texture,
-			std::vector<float>& p_zBuffer);
+		void renderScene(const Scene& p_scene, const Camera& p_camera,
+			Texture& p_target);
 
 		void toggleWireFrameMode();
 
 
 	private:
-		std::vector<float>	m_zBuffer;
-		uint8_t				m_sampleCount;
-		Texture*			m_target;
+		std::vector<float>			m_zBuffer;
+		const std::vector<Light>*	m_lights = nullptr;
+		const Camera*				m_camera = nullptr;
+		Texture*					m_target = nullptr;
+		uint8_t						m_sampleCount = 1;
+		EDrawMode					m_drawMode = EDrawMode::E_FILL;
+		DrawFunc					m_drawTriangle = &Rasterizer::drawTriangleFill;
 
-		enum class e_drawMode
-		{
-			E_FILL,
-			E_WIRE_FRAME
-		};
+		/**
+		 * \brief Draws the received entity on the target texture
+		 * \param p_entity The entity to draw
+		 */
+		void drawEntity(const Entity& p_entity);
 
-		e_drawMode m_drawMode = e_drawMode::E_FILL;
-		DrawFunc m_drawTriangle = &Rasterizer::drawTriangleFill;
+		/**
+		 * \brief Draws the entity's normals on the target texture
+		 * \param p_entity The entity to draw
+		 */
+		void drawNormals(const Entity& p_entity);
+
+		/**
+		 * \brief Draws the received triangle on the target texture
+		 * \param p_vertices The triangle to draw
+		 * \param p_texture The triangle's source texture
+		 * \param p_self A reference to the rasterizer calling this function
+		 */
+		static void drawTriangleFill(const Vertex p_vertices[3], const Texture* p_texture,
+			Rasterizer& p_self);
+
+		/**
+		 * \brief Draws the received triangle's edges on the target texture
+		 * \param p_vertices The triangle to draw
+		 * \param p_texture The triangle's source texture
+		 * \param p_self A reference to the rasterizer calling this function
+		 */
+		static void drawTriangleWireFrame(const Vertex p_vertices[3], const Texture* p_texture,
+			Rasterizer& p_self);
 
 		/**
 		 * \brief Converts the given world point to pixel coordinates

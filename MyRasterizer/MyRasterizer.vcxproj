@@ -19,16 +19,19 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Include\Camera.h" />
     <ClInclude Include="Include\Color.h" />
     <ClInclude Include="Include\Entity.h" />
     <ClInclude Include="Include\Rasterizer.h" />
     <ClInclude Include="Include\Scene.h" />
     <ClInclude Include="Include\Mesh.h" />
+    <ClInclude Include="Include\ITransformable.h" />
     <ClInclude Include="Include\Vertex.h" />
     <ClInclude Include="Include\Texture.h" />
     <ClInclude Include="Include\Light.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Src\Camera.cpp" />
     <ClCompile Include="Src\Light.cpp" />
     <ClCompile Include="Src\Color.cpp" />
     <ClCompile Include="Src\Mesh.cpp" />
@@ -37,6 +40,7 @@
     <ClCompile Include="Src\Rasterizer.cpp" />
     <ClCompile Include="Src\Scene.cpp" />
     <ClCompile Include="Src\Texture.cpp" />
+    <ClCompile Include="Src\ITransformable.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\LibMath\LibMath.vcxproj">

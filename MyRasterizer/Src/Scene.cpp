@@ -11,12 +11,24 @@ My::Scene::~Scene()
 		delete pair.second;
 }
 
+My::Scene& My::Scene::operator=(Scene&& p_other) noexcept
+{
+	if (&p_other == this)
+		return *this;
+
+	m_entities = std::move(p_other.m_entities);
+	m_lights = std::move(p_other.m_lights);
+	m_meshes = std::move(p_other.m_meshes);
+
+	return *this;
+}
+
 const My::Mesh* My::Scene::addMesh(const std::string& p_name, Mesh& p_mesh)
 {
 	if (m_meshes.find(p_name) != m_meshes.end())
-		new (m_meshes[p_name]) Mesh(p_mesh);
-	else
-		m_meshes[p_name] = &p_mesh;
+		delete m_meshes[p_name];
+
+	m_meshes[p_name] = &p_mesh;
 
 	return m_meshes[p_name];
 }

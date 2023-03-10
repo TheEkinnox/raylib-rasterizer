@@ -35,7 +35,7 @@ namespace My
 		~Scene();
 
 		Scene&				operator=(const Scene& p_other) = default;
-		Scene&				operator=(Scene&& p_other) = default;
+		Scene&				operator=(Scene&& p_other) noexcept;
 
 		const Mesh*			addMesh(const std::string& p_name, Mesh& p_mesh);
 		const Mesh*			getMesh(const std::string& p_name);
