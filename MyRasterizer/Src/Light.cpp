@@ -40,7 +40,7 @@ My::Color My::Light::calculateLightingPhong(const Vertex& p_vertex, const Vec3& 
 	const Vec3 is = Color::white.rgb() * LibMath::pow(nDotH, static_cast<int>(p_shininess)) * m_specularComponent;
 
 	return Color(	ia + (id + is) * lightAngle * m_intensity,
-					255);
+					p_vertex.m_color.m_a);
 }
 
 My::Color My::Light::calculateLightingBlinnPhong(const Vec3& p_position,

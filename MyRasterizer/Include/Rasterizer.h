@@ -1,5 +1,6 @@
 #pragma once
 #include <vector>
+#include <functional>
 
 #include "Entity.h"
 #include "Light.h"
@@ -18,6 +19,12 @@ namespace My
 		using Vec3 = LibMath::Vector3;
 		using Vec4 = LibMath::Vector4;
 		using Mat4 = LibMath::Matrix4;
+
+		// TODO: Replace p_viewPos and p_mvpMatrix with camera
+		typedef std::function<void(const Vertex p_vertices[3], Texture& p_target,
+			const std::vector<Light>& p_lights, const LibMath::Vector3& p_viewPos,
+			const Mat4& p_mvpMatrix, const Texture* p_texture,
+			std::vector<float>& p_zBuffer)> DrawFunc;
 
 	public:
 		Rasterizer() = default;
@@ -88,11 +95,39 @@ namespace My
 		 * \param p_mvpMatrix The model view projection matrix used to convert the point
 		 * from world space to clip space
 		 * \param p_texture The texture of the triangle
+		 * \param p_zBuffer A reference to the rasterizer's zBuffer
 		 */
-		// TODO: Remove p_mvpMatrix and p_viewPos when camera is implemented
-		void drawTriangle(const Vertex p_vertices[3], Texture& p_target,
+		 // TODO: Replace p_viewPos and p_mvpMatrix with camera
+		static void drawTriangleFill(const Vertex p_vertices[3], Texture& p_target,
 			const std::vector<Light>& p_lights, const LibMath::Vector3& p_viewPos,
-			const Mat4& p_mvpMatrix, const Texture* p_texture);
+			const Mat4& p_mvpMatrix, const Texture* p_texture,
+			std::vector<float>& p_zBuffer);
+
+		/**
+		 * \brief Draws the received triangle's edges on the target texture
+		 * \param p_vertices The triangle to draw
+		 * \param p_target The texture on which the triangle should be drawn
+		 * \param p_zBuffer A reference to the rasterizer's zBuffer
+		 */
+		static void drawTriangleWireFrame(const Vertex p_vertices[3], Texture& p_target,
+			const std::vector<Light>& p_lights, const LibMath::Vector3& p_viewPos,
+			const Mat4& p_mvpMatrix, const Texture* p_texture,
+			std::vector<float>& p_zBuffer);
+
+		void toggleWireFrameMode();
+
+
+	private:
+		std::vector<float> m_zBuffer;
+
+		enum class e_drawMode
+		{
+			E_FILL,
+			E_WIRE_FRAME
+		};
+
+		e_drawMode m_drawMode = e_drawMode::E_FILL;
+		DrawFunc m_drawTriangle = &Rasterizer::drawTriangleFill;
 
 		/**
 		 * \brief Converts the given world point to pixel coordinates
@@ -105,7 +140,12 @@ namespace My
 		static Vec3 worldToPixel(const Vec3& p_pos, const Texture& p_target,
 			const Mat4& p_mvpMatrix);
 
-	private:
-		std::vector<float>	m_zBuffer;
+		static LibMath::Vector2 pointOnTriangleEdge(LibMath::Vector2 p_point, const LibMath::Vector2& p_triangleP1,
+			const LibMath::Vector2& p_triangleP2);
+
+		static bool fillCanDrawPixel(const LibMath::Vector3&);
+
+		static bool wireFrameCanDrawPixel(	const LibMath::Vector2& p_pixelPos, const LibMath::Vector2 p_trianglePoints[3],
+											const LibMath::Vector3& p_stw);
 	};
 }
