@@ -41,7 +41,6 @@ namespace My
 	struct Vertex;
 	class Texture;
 	class Scene;
-	class Vector3;
 
 	class Rasterizer
 	{
@@ -55,7 +54,7 @@ namespace My
 		using Vec4 = LibMath::Vector4;
 		using Mat4 = LibMath::Matrix4;
 		
-		typedef std::function<void(const Vertex p_vertices[3], const Texture* p_texture,
+		typedef std::function<void(const Vertex p_vertices[3], const Vec3 p_pixelTriangle[3], const Texture* p_texture,
 			Rasterizer& self)> DrawFunc;
 
 	public:
@@ -126,19 +125,21 @@ namespace My
 		/**
 		 * \brief Draws the received triangle on the target texture
 		 * \param p_vertices The triangle to draw
+		 * \param p_pixelTriangle The triangle's vertices' pixel coordinates
 		 * \param p_texture The triangle's source texture
 		 * \param p_self A reference to the rasterizer calling this function
 		 */
-		static void drawTriangleFill(const Vertex p_vertices[3], const Texture* p_texture,
+		static void drawTriangleFill(const Vertex p_vertices[3], const Vec3 p_pixelTriangle[3], const Texture* p_texture,
 			Rasterizer& p_self);
 
 		/**
 		 * \brief Draws the received triangle's edges on the target texture
 		 * \param p_vertices The triangle to draw
+		 * \param p_pixelTriangle The triangle's vertices' pixel coordinates
 		 * \param p_texture The triangle's source texture
 		 * \param p_self A reference to the rasterizer calling this function
 		 */
-		static void drawTriangleWireFrame(const Vertex p_vertices[3], const Texture* p_texture,
+		static void drawTriangleWireFrame(const Vertex p_vertices[3], const Vec3 p_pixelTriangle[3], const Texture* p_texture,
 			Rasterizer& p_self);
 
 		/**
