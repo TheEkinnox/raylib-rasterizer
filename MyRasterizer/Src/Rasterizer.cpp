@@ -109,6 +109,9 @@ namespace My
 		auto normals = p_entity.getMesh()->getNormals();
 		const auto indices = p_entity.getMesh()->getIndices();
 
+		std::vector<Vec3> pixelPoints;
+		pixelPoints.reserve(vertices.size());
+
 		// Model matrix not required since it's directly applied to vertices
 		const Mat4 mvpMatrix = m_camera->getProjectionMatrix()
 			* m_camera->getViewMatrix();
@@ -118,14 +121,16 @@ namespace My
 		for (auto& v : vertices)
 		{
 			// Update vertex positions
-			const Vec3 pos = v.m_position;
+			Vec3& pos = v.m_position;
 			Vec4 vec4 = { pos.m_x, pos.m_y, pos.m_z, 1.f };
 			vec4 = p_entity.getTransform() * vec4;
-			v.m_position = { vec4.m_x, vec4.m_y, vec4.m_z };
+			pos = { vec4.m_x, vec4.m_y, vec4.m_z };
+
+			pixelPoints.push_back(worldToPixel(pos, *m_target, mvpMatrix));
 
 			// Update vertex normals
 			auto& nor = v.m_normal;
-			vec4 = LibMath::Vector4{ nor.m_x, nor.m_y, nor.m_z, 0.f };
+			vec4 = { nor.m_x, nor.m_y, nor.m_z, 0.f };
 			vec4 = p_entity.getRotation() * vec4;
 			nor = { vec4.m_x, vec4.m_y, vec4.m_z };
 
@@ -148,11 +153,18 @@ namespace My
 				vertices[indices[i + 2]]
 			};
 
+			const Vec3 pixelTriangle[3]
+			{
+				pixelPoints[indices[i]],
+				pixelPoints[indices[i + 1]],
+				pixelPoints[indices[i + 2]]
+			};
+
 			Vec3 centerPt = (triangle[0].m_position + triangle[1].m_position + triangle[2].m_position) / 3;
 
 			if (shouldDrawFace(centerPt, normal, viewPos)
 				&& checkFacingDirection(centerPt, viewPos, m_camera->getForward()))
-				m_drawTriangle(triangle, p_entity.getMesh()->getTexture(), *this);
+				m_drawTriangle(triangle, pixelTriangle, p_entity.getMesh()->getTexture(), *this);
 		}
 	}
 
@@ -193,7 +205,14 @@ namespace My
 				Vertex{v.m_position,LibMath::Vector3::zero(), color, 0, 0 }
 			};
 
-			drawTriangleFill(triangle1, nullptr, *this);
+			const Vec3 pixelTriangle1[3]
+			{
+				worldToPixel(triangle1[0].m_position, *m_target, mvpMatrix),
+				worldToPixel(triangle1[1].m_position, *m_target, mvpMatrix),
+				worldToPixel(triangle1[2].m_position, *m_target, mvpMatrix)
+			};
+
+			drawTriangleFill(triangle1, pixelTriangle1, nullptr, *this);
 
 			const Vertex triangle2[3]
 			{
@@ -202,64 +221,52 @@ namespace My
 				Vertex{v.m_position + v.m_normal + LibMath::Vector3(0.02f),LibMath::Vector3::zero(), color, 0, 0 }
 			};
 
-			drawTriangleFill(triangle2, nullptr, *this);
+			const Vec3 pixelTriangle2[3]
+			{
+				worldToPixel(triangle2[0].m_position, *m_target, mvpMatrix),
+				worldToPixel(triangle2[1].m_position, *m_target, mvpMatrix),
+				worldToPixel(triangle2[2].m_position, *m_target, mvpMatrix)
+			};
+
+			drawTriangleFill(triangle2, pixelTriangle2, nullptr, *this);
 		}
 	}
 
-	void Rasterizer::drawTriangleFill(const Vertex p_vertices[3], const Texture* p_texture,
+	void Rasterizer::drawTriangleFill(const Vertex p_vertices[3], const Vec3 p_pixelTriangle[3], const Texture* p_texture,
 		Rasterizer& p_self)
 	{
 		if (p_self.m_camera == nullptr || p_self.m_target == nullptr)
 			return;
 
-		// Create an array of vector4 for the positions
-		Vec3 points[3]
-		{
-			{ p_vertices[0].m_position.m_x, p_vertices[0].m_position.m_y, p_vertices[0].m_position.m_z },
-			{ p_vertices[1].m_position.m_x, p_vertices[1].m_position.m_y, p_vertices[1].m_position.m_z },
-			{ p_vertices[2].m_position.m_x, p_vertices[2].m_position.m_y, p_vertices[2].m_position.m_z }
-		};
-
-		// Model matrix not required since it's already applied to vertices
-		const Mat4 viewProjMat = p_self.m_camera->getProjectionMatrix()
-			* p_self.m_camera->getViewMatrix();
-
-		for (auto& point : points)
-		{
-			// Convert vertex coordinates from world to screen
-			// THIS MUST BE DONE AFTER LIGHTING - LIGHTS USE WORLD POSITIONS
-			point = worldToPixel(point, *p_self.m_target, viewProjMat);
-		}
-
 		const float floatWidth = static_cast<float>(p_self.m_target->getWidth());
 		const float floatHeight = static_cast<float>(p_self.m_target->getHeight());
 
 		// Get the bounding box of the triangle
-		const int minX = static_cast<int>(LibMath::max(0.f, LibMath::min(points[0].m_x,
-			LibMath::min(points[1].m_x, points[2].m_x))));
+		const int minX = static_cast<int>(LibMath::max(0.f, LibMath::min(p_pixelTriangle[0].m_x,
+			LibMath::min(p_pixelTriangle[1].m_x, p_pixelTriangle[2].m_x))));
 
-		const int minY = static_cast<int>(LibMath::max(0.f, LibMath::min(points[0].m_y,
-			LibMath::min(points[1].m_y, points[2].m_y))));
+		const int minY = static_cast<int>(LibMath::max(0.f, LibMath::min(p_pixelTriangle[0].m_y,
+			LibMath::min(p_pixelTriangle[1].m_y, p_pixelTriangle[2].m_y))));
 
-		const int maxX = static_cast<int>(LibMath::min(floatWidth - 1, LibMath::max(points[0].m_x,
-			LibMath::max(points[1].m_x, points[2].m_x))));
+		const int maxX = static_cast<int>(LibMath::min(floatWidth - 1, LibMath::max(p_pixelTriangle[0].m_x,
+			LibMath::max(p_pixelTriangle[1].m_x, p_pixelTriangle[2].m_x))));
 
-		const int maxY = static_cast<int>(LibMath::min(floatHeight - 1, LibMath::max(points[0].m_y,
-			LibMath::max(points[1].m_y, points[2].m_y))));
+		const int maxY = static_cast<int>(LibMath::min(floatHeight - 1, LibMath::max(p_pixelTriangle[0].m_y,
+			LibMath::max(p_pixelTriangle[1].m_y, p_pixelTriangle[2].m_y))));
 
 		// Spanning vectors of edge (v1,v2) and (v1,v3)
-		const LibMath::Vector2 vs1(points[1].m_x - points[0].m_x,
-			points[1].m_y - points[0].m_y);
+		const LibMath::Vector2 vs1(p_pixelTriangle[1].m_x - p_pixelTriangle[0].m_x,
+			p_pixelTriangle[1].m_y - p_pixelTriangle[0].m_y);
 
-		const LibMath::Vector2 vs2(points[2].m_x - points[0].m_x,
-			points[2].m_y - points[0].m_y);
+		const LibMath::Vector2 vs2(p_pixelTriangle[2].m_x - p_pixelTriangle[0].m_x,
+			p_pixelTriangle[2].m_y - p_pixelTriangle[0].m_y);
 
 		for (int x = minX; x <= maxX; x++)
 		{
 			for (int y = minY; y <= maxY; y++)
 			{
-				LibMath::Vector2 q(static_cast<float>(x) - points[0].m_x,
-					static_cast<float>(y) - points[0].m_y);
+				LibMath::Vector2 q(static_cast<float>(x) - p_pixelTriangle[0].m_x,
+					static_cast<float>(y) - p_pixelTriangle[0].m_y);
 
 				const float t = q.cross(vs2) / vs1.cross(vs2);
 				const float w = vs1.cross(q) / vs1.cross(vs2);
@@ -270,9 +277,9 @@ namespace My
 
 				const size_t bufferIndex = static_cast<size_t>(y) * p_self.m_target->getWidth() + x;
 
-				const float pixelZ = points[0].m_z * s
-					+ points[1].m_z * t
-					+ points[2].m_z * w;
+				const float pixelZ = p_pixelTriangle[0].m_z * s
+					+ p_pixelTriangle[1].m_z * t
+					+ p_pixelTriangle[2].m_z * w;
 
 				if (LibMath::abs(pixelZ) > 1 || pixelZ >= p_self.m_zBuffer[bufferIndex])
 					continue;
@@ -329,52 +336,34 @@ namespace My
 		}
 	}
 
-	void Rasterizer::drawTriangleWireFrame(const Vertex p_vertices[3], const Texture* p_texture,
+	void Rasterizer::drawTriangleWireFrame(const Vertex p_vertices[3], const Vec3 p_pixelTriangle[3], const Texture* p_texture,
 		Rasterizer& p_self)
 	{
 		if (p_self.m_camera == nullptr || p_self.m_target == nullptr)
 			return;
 
-		// Create an array of vector4 for the positions
-		Vec3 points[3]
-		{
-			{ p_vertices[0].m_position.m_x, p_vertices[0].m_position.m_y, p_vertices[0].m_position.m_z },
-			{ p_vertices[1].m_position.m_x, p_vertices[1].m_position.m_y, p_vertices[1].m_position.m_z },
-			{ p_vertices[2].m_position.m_x, p_vertices[2].m_position.m_y, p_vertices[2].m_position.m_z }
-		};
-
-		const Mat4 viewProjMat = p_self.m_camera->getProjectionMatrix()
-			* p_self.m_camera->getViewMatrix();
-
-		for (auto& point : points)
-		{
-			// Convert vertex coordinates from world to screen
-			// THIS MUST BE DONE AFTER LIGHTING - LIGHTS USE WORLD POSITIONS
-			point = worldToPixel(point, *p_self.m_target, viewProjMat);
-		}
-
 		const float floatWidth = static_cast<float>(p_self.m_target->getWidth());
 		const float floatHeight = static_cast<float>(p_self.m_target->getHeight());
 
 		// Get the bounding box of the triangle
-		const int minX = static_cast<int>(LibMath::max(0.f, LibMath::min(points[0].m_x,
-			LibMath::min(points[1].m_x, points[2].m_x))));
+		const int minX = static_cast<int>(LibMath::max(0.f, LibMath::min(p_pixelTriangle[0].m_x,
+			LibMath::min(p_pixelTriangle[1].m_x, p_pixelTriangle[2].m_x))));
 
-		const int minY = static_cast<int>(LibMath::max(0.f, LibMath::min(points[0].m_y,
-			LibMath::min(points[1].m_y, points[2].m_y))));
+		const int minY = static_cast<int>(LibMath::max(0.f, LibMath::min(p_pixelTriangle[0].m_y,
+			LibMath::min(p_pixelTriangle[1].m_y, p_pixelTriangle[2].m_y))));
 
-		const int maxX = static_cast<int>(LibMath::min(floatWidth - 1, LibMath::max(points[0].m_x,
-			LibMath::max(points[1].m_x, points[2].m_x))));
+		const int maxX = static_cast<int>(LibMath::min(floatWidth - 1, LibMath::max(p_pixelTriangle[0].m_x,
+			LibMath::max(p_pixelTriangle[1].m_x, p_pixelTriangle[2].m_x))));
 
-		const int maxY = static_cast<int>(LibMath::min(floatHeight - 1, LibMath::max(points[0].m_y,
-			LibMath::max(points[1].m_y, points[2].m_y))));
+		const int maxY = static_cast<int>(LibMath::min(floatHeight - 1, LibMath::max(p_pixelTriangle[0].m_y,
+			LibMath::max(p_pixelTriangle[1].m_y, p_pixelTriangle[2].m_y))));
 
 		// Spanning vectors of edge (v1,v2) and (v1,v3)
-		const LibMath::Vector2 vs1(points[1].m_x - points[0].m_x,
-			points[1].m_y - points[0].m_y);
+		const LibMath::Vector2 vs1(p_pixelTriangle[1].m_x - p_pixelTriangle[0].m_x,
+			p_pixelTriangle[1].m_y - p_pixelTriangle[0].m_y);
 
-		const LibMath::Vector2 vs2(points[2].m_x - points[0].m_x,
-			points[2].m_y - points[0].m_y);
+		const LibMath::Vector2 vs2(p_pixelTriangle[2].m_x - p_pixelTriangle[0].m_x,
+			p_pixelTriangle[2].m_y - p_pixelTriangle[0].m_y);
 
 		// Delta Triangle size * delta UV's
 		const float deltaU =	LibMath::max(LibMath::max(p_vertices[0].m_u, p_vertices[1].m_u), p_vertices[2].m_u) -
@@ -389,22 +378,22 @@ namespace My
 		{
 			for (int y = minY; y <= maxY; y++)
 			{
-				LibMath::Vector2 q(static_cast<float>(x) - points[0].m_x,
-					static_cast<float>(y) - points[0].m_y);
+				LibMath::Vector2 q(static_cast<float>(x) - p_pixelTriangle[0].m_x,
+					static_cast<float>(y) - p_pixelTriangle[0].m_y);
 
 				const float t = q.cross(vs2) / vs1.cross(vs2);
 				const float w = vs1.cross(q) / vs1.cross(vs2);
 				const float s = 1 - t - w;
 
-				const LibMath::Vector3 pos = points[0] * s
-					+ points[1] * t
-					+ points[2] * w;
+				const LibMath::Vector3 pos = p_pixelTriangle[0] * s
+					+ p_pixelTriangle[1] * t
+					+ p_pixelTriangle[2] * w;
 
 				const LibMath::Vector2 pixelPoints[3]
 				{
-					{ points[0].m_x, points[0].m_y },
-					{ points[1].m_x, points[1].m_y },
-					{ points[2].m_x, points[2].m_y }
+					{ p_pixelTriangle[0].m_x, p_pixelTriangle[0].m_y },
+					{ p_pixelTriangle[1].m_x, p_pixelTriangle[1].m_y },
+					{ p_pixelTriangle[2].m_x, p_pixelTriangle[2].m_y }
 				};
 
 				if (!wireFrameCanDrawPixel({ pos.m_x, pos.m_y }, pixelPoints, LibMath::Vector3(s, t, w)))

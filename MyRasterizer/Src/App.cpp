@@ -20,8 +20,6 @@ namespace My
 
 		m_camera = Camera(Mat4::scaling(1.f, 1.f, -1.f) * Mat4::translation(0, 0, -2),
 			Mat4::perspectiveProjection(90_deg, aspect, 0.1f, 8.f));
-
-		createScene();
 	}
 
 	App::~App()
@@ -31,6 +29,8 @@ namespace My
 
 	void App::run()
 	{
+		createScene();
+
 		// Render the scene a first time (after that, only rendered when it changes)
 		m_rasterizer.renderScene(m_scene, m_camera, m_renderTexture);
 
