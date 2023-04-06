@@ -12,13 +12,13 @@
 
 namespace My
 {
-	Rasterizer::Rasterizer(const uint8_t p_sampleCount)
-		: m_sampleCount(p_sampleCount)
+	Rasterizer::Rasterizer(const float p_sampleRatio)
+		: m_sampleCount(p_sampleRatio)
 	{
-		if (p_sampleCount == 0)
+		if (p_sampleRatio == 0)
 			throw std::invalid_argument(
 				"Sample count must be greater than or equal to 1. Received: "
-				+ std::to_string(p_sampleCount));
+				+ std::to_string(p_sampleRatio));
 	}
 
 	void Rasterizer::renderScene(const Scene& p_scene, const Camera& p_camera,
@@ -28,8 +28,8 @@ namespace My
 
 		if (!LibMath::floatEquals(m_sampleCount, 1.f))
 		{
-			const uint32_t msaaWidth = (p_target.getWidth() + 1) * m_sampleCount;
-			const uint32_t msaaHeight = (p_target.getHeight() + 1) * m_sampleCount;
+			const uint32_t msaaWidth = (uint32_t)((float)p_target.getWidth() * m_sampleCount);
+			const uint32_t msaaHeight = (uint32_t)((float)p_target.getHeight() * m_sampleCount);
 
 			target = Texture(msaaWidth, msaaHeight);
 		}

@@ -61,7 +61,7 @@ namespace My
 
 		Rasterizer() = default;
 
-		explicit Rasterizer(uint8_t p_sampleCount);
+		explicit Rasterizer(float p_sampleRatio);
 
 		/**
 		 * \brief Creates a move copy of the given rasterizer
@@ -106,7 +106,7 @@ namespace My
 		const std::vector<Light>*	m_lights = nullptr;
 		const Camera*				m_camera = nullptr;
 		Texture*					m_target = nullptr;
-		uint8_t						m_sampleCount = 1;
+		float						p_sampleRatio = 1;
 		EDrawMode					m_drawMode = EDrawMode::E_FILL;
 		DrawFunc					m_drawTriangle = &Rasterizer::drawTriangleFill;
 
